@@ -3,7 +3,8 @@ import Spotify from 'spotify-web-api-js';
 import Util from './util';
 import './App.css';
 
-// Set up Spotify
+// Set up Spotify. This must execute immediately incase a redirect is necessary. There is maybe a
+// better practice for where this function should be called.
 const spotify = new Spotify();
 Util.setupSpotify(spotify);
 
