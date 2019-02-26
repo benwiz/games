@@ -14,3 +14,5 @@ A controller to run a power hour using Spotify.
 - Spotify login
 - Pause spotify / game
 - Start spotify / game correctly
+- Display timer, song title, and artist
+- Play a sound when song switches
