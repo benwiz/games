@@ -57,15 +57,15 @@ class Timer extends React.Component {
 class TrackInformation extends React.Component {
   render() {
     return (
-      <div>
+      <div className="track-information">
         <img
           src={this.props.albumImage}
           alt={this.props.albumName}
           width="175"
           height="175"
         />
-        <p>{this.props.songName}</p>
-        <p>{this.props.artists}</p>
+        <p className="song-name">{this.props.songName}</p>
+        <p className="artists">{this.props.artists}</p>
       </div>
     );
   }
@@ -151,7 +151,10 @@ class App extends React.Component {
     }
     const albumImage =
       result.item.album.images[result.item.album.images.length - 2].url;
-    const albumName = result.item.album.name;
+    let albumName = '';
+    if (result && result.item && result.item.album && result.item.album.name) {
+      albumName = result.item.album.name;
+    }
     this.setState({ gameIsPaused, songName, artists, albumImage, albumName });
   }
 

@@ -23,3 +23,17 @@ span {
 .restart-button {
   font-size: 12px;
 }
+
+.track-information {
+  margin-top: 50px;
+}
+
+.song-name {
+  text-align: center;
+  font-weight: bolder;
+  font-size: large;
+}
+
+.artists {
+  text-align: center;
+}
