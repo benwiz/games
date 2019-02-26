@@ -11,6 +11,6 @@ A controller to run a power hour using Spotify.
 
 ## To Do
 
-- "Start" button component
 - Spotify login
-- Component speaks with Spotify
+- Pause spotify / game
+- Start spotify / game correctly
