@@ -80,11 +80,17 @@ class App extends React.Component {
   tick() {
     let seconds = this.state.seconds + 1;
     let minutes = this.state.minutes;
-    if (seconds >= 60) {
+    const secondsInOneMinute = 60;
+    if (seconds >= secondsInOneMinute) {
       seconds = 0;
       minutes += 1;
     }
     this.setState({ seconds, minutes });
+
+    // Skip to next track if seconds is 0, do not await
+    if (seconds === 0) {
+      spotify.skipToNext();
+    }
   }
 
   async startButtonClickHandler() {
