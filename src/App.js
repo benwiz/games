@@ -121,6 +121,9 @@ class App extends React.Component {
 
     // Keep an eye on available devices
     setInterval(() => this.getDevices(), 5000);
+
+    // Keep an eye on current track and play status
+    setInterval(() => this.getCurrentTrack(), 1000);
   }
 
   async getDevices() {
@@ -168,11 +171,6 @@ class App extends React.Component {
   }
 
   tick() {
-    // Always keep an eye on Spotify's play status so that even if the user pauses Spotify using
-    // another device, the game will automatically be paused. If the person presses play on the
-    // other device, the game will be resumed. Also, we get current track info at the same time.
-    this.getCurrentTrack();
-
     // If the game is not active, exit the function
     if (this.state.gameIsPaused) {
       return;
