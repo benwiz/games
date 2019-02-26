@@ -24,7 +24,7 @@ const setupSpotify = spotify => {
     const scopes = encodeURIComponent(
       'user-read-playback-state user-modify-playback-state'
     );
-    const redirect_uri = window.location.origin;
+    const redirect_uri = window.location.href;
     const url = `https://accounts.spotify.com/authorize?response_type=token&client_id=${client_id}&scope=${scopes}&redirect_uri=${redirect_uri}`;
     window.location = url;
   }
