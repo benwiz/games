@@ -6,12 +6,26 @@ A controller to run a power hour using Spotify.
 
 All my functions ended up in in my top level component (App), why can they not live in the component they actually work with and pass the data upward to App to update the state?
 
-## Version 1 Plan
+## Getting set up
 
-### How to use
+Install everything
 
-1. Start music on Spotify like normal (possibly within desired playlist)
-2. Click the "start" button. Songs will begin changing every 60 seconds.
+```sh
+npm install
+```
+
+Run local server
+
+```sh
+npm start
+```
+
+Deploy
+
+```sh
+npm run deploy
+```
+
 
 ## To Do
 
