@@ -211,14 +211,14 @@ class App extends React.Component {
           gameIsPaused={this.state.gameIsPaused}
         />
         <Timer minutes={this.state.minutes} seconds={this.state.seconds} />
-        <RestartButton
-          onClick={this.restartButtonClickHandler}
-          gameHasStarted={this.state.gameHasStarted}
-        />
         <TrackInformation
           songName={this.state.songName}
           artists={this.state.artists}
           albumImage={this.state.albumImage}
+        />
+        <RestartButton
+          onClick={this.restartButtonClickHandler}
+          gameHasStarted={this.state.gameHasStarted}
         />
       </div>
     );
