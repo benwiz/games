@@ -15,12 +15,13 @@ All my functions ended up in in my top level component (App), why can they not l
 
 ## To Do
 
-- Restart button
 - Display track information
   - Song name
   - Artist name
   - Album name
   - Album art
+- Sort out an elegant way to deal with the fact that the Spotify access token expires at exactly 1 hour (meaning, likely before the game ends)
+  - Could be something like automatically getting a new access token shortly before it expires and storing the state of the game in the cookie, potentially no one would even notice
 - Make everything pretty
 
 - Play a sound when song switches
@@ -28,11 +29,9 @@ All my functions ended up in in my top level component (App), why can they not l
   - Maybe something related to how many ounces of beer
     - Possibly simulate a liquid that's slowly going down
 
-- Sort out an elegant way to deal with the fact that the Spotify access token expires at exactly 1 hour (meaning, likely before the game ends)
-  - Could be something like automatically getting a new access token shortly before it expires and storing the state of the game in the cookie, potentially no one would even notice
-
 - Later
   - Declare game over
   - Config game length
   - Config song length
   - Show how many beers are needed for configs
+  - Better restart button operations

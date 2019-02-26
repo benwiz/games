@@ -98,7 +98,6 @@ class App extends React.Component {
 
   async componentDidMount() {
     // Load data from Spotify
-    // TODO: Need to handle empty devices list (and maybe missing device from current playback)
     const [{ devices }, { device }] = await Promise.all([
       spotify.getMyDevices(),
       spotify.getMyCurrentPlaybackState(),
