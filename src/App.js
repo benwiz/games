@@ -33,7 +33,11 @@ class DeviceSelect extends React.Component {
 
 class StartButton extends React.Component {
   render() {
-    const text = this.props.gameIsActive ? 'Pause' : 'Play';
+    const text = this.props.gameHasStarted
+      ? this.props.gameIsPaused
+        ? 'Play'
+        : 'Pause'
+      : 'Play';
     return <button onClick={this.props.onClick}>{text}</button>;
   }
 }
@@ -61,7 +65,7 @@ class App extends React.Component {
       targetMinutes: 60,
       minutes: 0,
       seconds: 0,
-      gameIsPaused: false,
+      gameIsPaused: true,
       gameHasStarted: false,
     };
 
@@ -87,11 +91,6 @@ class App extends React.Component {
   }
 
   tick() {
-    // Do not tick is the game never started
-    if (this.state.gameHasStarted === false) {
-      return;
-    }
-
     // Always keep an eye on Spotify's play status so that even if the user pauses Spotify using
     // another device, the game will automatically be paused. If the person presses play on the
     // other device, the game will be resumed.
@@ -119,14 +118,20 @@ class App extends React.Component {
   }
 
   async startButtonClickHandler() {
+    // If the game has not yet started, start the game
+    if (!this.state.gameHasStarted) {
+      this.setState({ gameHasStarted: true });
+      setInterval(() => this.tick(), 1000);
+    }
+
     if (this.state.gameIsPaused) {
       // Pause Spotify using the selected device
       await spotify.play({ device_id: this.state.currentDeviceID });
-      this.setState({ gameIsPaused: false }); // Not strictly necessary but saves one roundtrip
+      // this.setState({ gameIsPaused: false }); // Not strictly necessary but saves one roundtrip
     } else {
       // Play Spotify using the selected device
       await spotify.pause();
-      this.setState({ gameIsPaused: true }); // Not strictly necessary but saves one roundtrip
+      // this.setState({ gameIsPaused: true }); // Not strictly necessary but saves one roundtrip
     }
   }
 
@@ -138,9 +143,6 @@ class App extends React.Component {
   }
 
   render() {
-    // Start the game ticker
-    setInterval(() => this.tick(), 1000);
-
     return (
       <div className="App">
         <DeviceSelect
@@ -150,7 +152,8 @@ class App extends React.Component {
         />
         <StartButton
           onClick={this.startButtonClickHandler}
-          gameIsActive={this.state.gameIsActive}
+          gameHasStarted={this.state.gameHasStarted}
+          gameIsPaused={this.state.gameIsPaused}
         />
         <Timer minutes={this.state.minutes} seconds={this.state.seconds} />
       </div>
