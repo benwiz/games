@@ -33,12 +33,16 @@ class App extends React.Component {
   constructor(props) {
     super(props);
 
+    // Get devices from spotify
     const devices = ['phone', 'computer'];
+
+    // Set initial state
     this.state = {
       devices,
       device: devices[0],
     };
 
+    // Bind class functions
     this.deviceSelectChangeHandler = this.deviceSelectChangeHandler.bind(this);
   }
 
