@@ -19,6 +19,12 @@ All my functions ended up in in my top level component (App), why can they not l
 - Pause spotify / game
 - Restart spotify / game
 - Display track information
+  - Song name
+  - Artist name
+  - Album name
+  - Album art
 
-- Come up with a clever p5.js animation for the background
 - Play a sound when song switches
+- Come up with a clever p5.js animation for the background
+  - Maybe something related to how many ounces of beer
+    - Possibly simulate a liquid that's slowly going down
