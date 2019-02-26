@@ -9,7 +9,7 @@ const setupSpotify = spotify => {
     const querystring = window.location.hash.slice(1);
     const query = QueryString.parse(querystring);
     if (query.access_token) {
-      cookies.set('spotify-access-token', query.access_token);
+      cookies.set('spotify-access-token', query.access_token, { maxAge: 3599 });
       // Final redirect to remove the hash, not really necessary, but url looks nicer
       window.location = window.location.href.split('#')[0];
     }
