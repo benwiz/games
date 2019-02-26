@@ -8,9 +8,12 @@ import './App.css';
 const spotify = new Spotify();
 Util.setupSpotify(spotify);
 
+const Timer = props => <span>{props.value}</span>;
+
 class DeviceSelect extends React.Component {
   createOptions() {
     const options = [];
+    console.log(this);
     for (const device of this.props.devices) {
       const option = (
         <option key={device.id} value={device.id}>
@@ -31,7 +34,18 @@ class DeviceSelect extends React.Component {
   }
 }
 
-const StartButton = props => <button onClick={props.onClick}>Start</button>;
+class StartButton extends React.Component {
+  async startButtonClickHandler() {
+    // Play Spotify using the selected device
+    await spotify.play({ device_id: this.props.currentDeviceID });
+  }
+
+  render() {
+    return (
+      <button onClick={() => this.startButtonClickHandler()}>Start</button>
+    );
+  }
+}
 
 class App extends React.Component {
   constructor(props) {
@@ -45,7 +59,7 @@ class App extends React.Component {
 
     // Bind class functions
     this.deviceSelectChangeHandler = this.deviceSelectChangeHandler.bind(this);
-    this.startButtonClickHandler = this.startButtonClickHandler.bind(this);
+    // this.startButtonClickHandler = this.startButtonClickHandler.bind(this);
   }
 
   async componentDidMount() {
@@ -65,11 +79,6 @@ class App extends React.Component {
     await spotify.transferMyPlayback([event.target.value]);
   }
 
-  async startButtonClickHandler() {
-    // Play Spotify using the selected device
-    await spotify.play({ device_id: this.state.currentDeviceID });
-  }
-
   render() {
     return (
       <div className="App">
@@ -78,7 +87,7 @@ class App extends React.Component {
           onChange={this.deviceSelectChangeHandler}
           devices={this.state.devices}
         />
-        <StartButton onClick={this.startButtonClickHandler} />
+        <StartButton currentDeviceID={this.state.currentDeviceID} />
       </div>
     );
   }
