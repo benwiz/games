@@ -10,9 +10,11 @@ body,
   display: flex;
   align-items: center;
   justify-content: center;
+  flex-direction: column;
   height: 100%;
 }
 
 button {
   font-size: 36px;
+  margin-top: 50px;
 }
