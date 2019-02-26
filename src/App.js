@@ -46,9 +46,9 @@ class App extends React.Component {
     this.setState({ device: event.target.value });
   }
 
-  // startButtonClickHandler() {
-  //   console.log('startButtonClickHandler()');
-  // }
+  startButtonClickHandler() {
+    console.log('startButtonClickHandler()');
+  }
 
   render() {
     return (
@@ -58,7 +58,7 @@ class App extends React.Component {
           onChange={this.deviceSelectChangeHandler}
           devices={this.state.devices}
         />
-        {/* <StartButton onClick={this.startButtonClickHandler} /> */}
+        <StartButton onClick={this.startButtonClickHandler} />
       </div>
     );
   }
