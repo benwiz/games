@@ -35,7 +35,7 @@ class StartButton extends React.Component {
   render() {
     const text = this.props.gameHasStarted
       ? this.props.gameIsPaused
-        ? 'Play'
+        ? 'Resume'
         : 'Pause'
       : 'Play';
     return <button onClick={this.props.onClick}>{text}</button>;
@@ -139,7 +139,14 @@ class App extends React.Component {
 
   async getCurrentTrack() {
     const result = await spotify.getMyCurrentPlayingTrack();
-    const gameIsPaused = !result.is_playing;
+
+    // Only update gameIsPaused if the game is started
+    let gameIsPaused = this.state.gameIsPaused;
+    if (this.state.gameHasStarted) {
+      gameIsPaused = !result.is_playing;
+    }
+
+    // Always update track info
     const songName = result.item.name;
     let artists = '';
     for (let i = 0; i < result.item.artists.length; i++) {
@@ -155,6 +162,8 @@ class App extends React.Component {
     if (result && result.item && result.item.album && result.item.album.name) {
       albumName = result.item.album.name;
     }
+
+    // Update the state
     this.setState({ gameIsPaused, songName, artists, albumImage, albumName });
   }
 
