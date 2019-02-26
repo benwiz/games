@@ -56,8 +56,16 @@ class Timer extends React.Component {
 
 class RestartButton extends React.Component {
   render() {
+    const styles = {
+      visibility: this.props.gameHasStarted ? 'visible' : 'hidden',
+    };
+
     return (
-      <button className="restart-button" onClick={this.props.onClick}>
+      <button
+        style={styles}
+        className="restart-button"
+        onClick={this.props.onClick}
+      >
         Restart
       </button>
     );
@@ -179,7 +187,10 @@ class App extends React.Component {
           gameIsPaused={this.state.gameIsPaused}
         />
         <Timer minutes={this.state.minutes} seconds={this.state.seconds} />
-        <RestartButton onClick={() => this.restartButtonClickHandler()} />
+        <RestartButton
+          onClick={this.restartButtonClickHandler}
+          gameHasStarted={this.state.gameHasStarted}
+        />
       </div>
     );
   }
