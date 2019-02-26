@@ -33,15 +33,15 @@ class DeviceSelect extends React.Component {
 
 class StartButton extends React.Component {
   render() {
-    return <button onClick={this.onClick}>Start</button>;
+    return <button onClick={this.props.onClick}>Start</button>;
   }
 }
 
-class Timer extends React.Component {
-  render() {
-    return <span>{this.props.value}</span>;
-  }
-}
+// class Timer extends React.Component {
+//   render() {
+//     return <span>{this.props.value}</span>;
+//   }
+// }
 
 class App extends React.Component {
   constructor(props) {
@@ -71,9 +71,23 @@ class App extends React.Component {
     this.setState({ devices, currentDeviceID: device.id });
   }
 
+  tick() {
+    let seconds = this.state.seconds + 1;
+    let minutes = this.state.minutes;
+    if (seconds >= 60) {
+      seconds = 0;
+      minutes += 1;
+    }
+    this.setState({ seconds, minutes });
+
+    console.log(`${this.state.minutes}:${this.state.seconds}`);
+  }
+
   async startButtonClickHandler() {
     // Play Spotify using the selected device
     await spotify.play({ device_id: this.state.currentDeviceID });
+    // Start the timer
+    setInterval(() => this.tick(), 1000);
   }
 
   async deviceSelectChangeHandler(event) {
@@ -83,8 +97,6 @@ class App extends React.Component {
     await spotify.transferMyPlayback([event.target.value]);
   }
 
-  tick() {}
-
   render() {
     return (
       <div className="App">
@@ -93,7 +105,7 @@ class App extends React.Component {
           onChange={this.deviceSelectChangeHandler}
           devices={this.state.devices}
         />
-        <StartButton currentDeviceID={this.startButtonClickHandler} />
+        <StartButton onClick={this.startButtonClickHandler} />
       </div>
     );
   }

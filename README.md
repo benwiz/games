@@ -2,6 +2,10 @@
 
 A controller to run a power hour using Spotify.
 
+## Thoughts about React
+
+All my functions ended up in in my top level component (App), why can they not live in the component they actually work with and pass the data upward to App to update the state?
+
 ## Version 1 Plan
 
 ### How to use
