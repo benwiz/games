@@ -54,6 +54,18 @@ class Timer extends React.Component {
   }
 }
 
+class TrackInformation extends React.Component {
+  render() {
+    return (
+      <div>
+        <p>{this.props.albumImage}</p>
+        <p>{this.props.songName}</p>
+        <p>{this.props.artists}</p>
+      </div>
+    );
+  }
+}
+
 class RestartButton extends React.Component {
   render() {
     const styles = {
@@ -93,6 +105,9 @@ class App extends React.Component {
       gameIsPaused: true,
       gameHasStarted: false,
       tickIntervalID: null,
+      songName: null,
+      artists: null,
+      albumImage: null,
     };
   }
 
@@ -105,10 +120,20 @@ class App extends React.Component {
     this.setState({ devices, currentDeviceID: device.id });
   }
 
-  async getCurrentPlaybackState() {
-    const playbackState = await spotify.getMyCurrentPlaybackState();
-    const gameIsPaused = !playbackState.is_playing;
-    this.setState({ gameIsPaused });
+  async getCurrentTrack() {
+    const result = await spotify.getMyCurrentPlayingTrack();
+    const gameIsPaused = !result.is_playing;
+    const songName = result.item.name;
+    let artists = '';
+    for (let i = 0; i < result.item.artists.length; i++) {
+      const artist = result.item.artists[i];
+      artists += artist.name;
+      if (i < result.item.artists.length - 1) {
+        artists += ', ';
+      }
+    }
+    const albumImage = result.item.album.images[0].url;
+    this.setState({ gameIsPaused, songName, artists, albumImage });
   }
 
   async deviceSelectChangeHandler(event) {
@@ -137,8 +162,8 @@ class App extends React.Component {
   tick() {
     // Always keep an eye on Spotify's play status so that even if the user pauses Spotify using
     // another device, the game will automatically be paused. If the person presses play on the
-    // other device, the game will be resumed.
-    this.getCurrentPlaybackState();
+    // other device, the game will be resumed. Also, we get current track info at the same time.
+    this.getCurrentTrack();
 
     // If the game is not active, exit the function
     if (this.state.gameIsPaused) {
@@ -189,6 +214,11 @@ class App extends React.Component {
         <RestartButton
           onClick={this.restartButtonClickHandler}
           gameHasStarted={this.state.gameHasStarted}
+        />
+        <TrackInformation
+          songName={this.state.songName}
+          artists={this.state.artists}
+          albumImage={this.state.albumImage}
         />
       </div>
     );
