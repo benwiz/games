@@ -38,16 +38,19 @@ class App extends React.Component {
       devices,
       device: devices[0],
     };
+
+    this.deviceSelectChangeHandler = this.deviceSelectChangeHandler.bind(this);
   }
 
   deviceSelectChangeHandler(event) {
-    console.log('change event:', event.target.value);
+    // TODO: Look into why this function is being called twice
+    console.log(event.target.value);
     this.setState({ device: event.target.value });
   }
 
-  startButtonClickHandler() {
-    console.log('startButtonClickHandler()');
-  }
+  // startButtonClickHandler() {
+  //   console.log('startButtonClickHandler()');
+  // }
 
   render() {
     return (
@@ -57,7 +60,7 @@ class App extends React.Component {
           onChange={this.deviceSelectChangeHandler}
           devices={this.state.devices}
         />
-        <StartButton onClick={this.startButtonClickHandler} />
+        {/* <StartButton onClick={this.startButtonClickHandler} /> */}
       </div>
     );
   }
