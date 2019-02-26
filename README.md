@@ -15,12 +15,13 @@ All my functions ended up in in my top level component (App), why can they not l
 
 ## To Do
 
+- Restart button
 - Display track information
   - Song name
   - Artist name
   - Album name
   - Album art
-- Declare game over
+- Make everything pretty
 
 - Play a sound when song switches
 - Come up with a clever p5.js animation for the background
@@ -33,4 +34,5 @@ All my functions ended up in in my top level component (App), why can they not l
 - Later
   - Declare game over
   - Config game length
-  - Config song switch interval
+  - Config song length
+  - Show how many beers are needed for configs

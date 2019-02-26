@@ -54,23 +54,38 @@ class Timer extends React.Component {
   }
 }
 
+class RestartButton extends React.Component {
+  render() {
+    return (
+      <button className="restart-button" onClick={this.props.onClick}>
+        Restart
+      </button>
+    );
+  }
+}
+
 class App extends React.Component {
   constructor(props) {
     super(props);
 
     // Set initial state
-    this.state = {
+    this.state = this.getInitialState();
+
+    // Bind class functions
+    this.deviceSelectChangeHandler = this.deviceSelectChangeHandler.bind(this);
+    this.startButtonClickHandler = this.startButtonClickHandler.bind(this);
+  }
+
+  getInitialState() {
+    return {
       devices: [],
       currentDeviceID: '',
       minutes: 0,
       seconds: 0,
       gameIsPaused: true,
       gameHasStarted: false,
+      tickIntervalID: null,
     };
-
-    // Bind class functions
-    this.deviceSelectChangeHandler = this.deviceSelectChangeHandler.bind(this);
-    this.startButtonClickHandler = this.startButtonClickHandler.bind(this);
   }
 
   async componentDidMount() {
@@ -87,6 +102,29 @@ class App extends React.Component {
     const playbackState = await spotify.getMyCurrentPlaybackState();
     const gameIsPaused = !playbackState.is_playing;
     this.setState({ gameIsPaused });
+  }
+
+  async deviceSelectChangeHandler(event) {
+    // Update the state
+    this.setState({ currentDeviceID: event.target.value });
+    // Switch Spotify play to selected device
+    await spotify.transferMyPlayback([event.target.value]);
+  }
+
+  async startButtonClickHandler() {
+    // If the game has not yet started, start the game
+    if (!this.state.gameHasStarted) {
+      const intervalID = setInterval(() => this.tick(), 1000);
+      this.setState({ gameHasStarted: true, tickIntervalID: intervalID });
+    }
+
+    if (this.state.gameIsPaused) {
+      // Pause Spotify using the selected device
+      await spotify.play({ device_id: this.state.currentDeviceID });
+    } else {
+      // Play Spotify using the selected device
+      await spotify.pause();
+    }
   }
 
   tick() {
@@ -116,29 +154,17 @@ class App extends React.Component {
     }
   }
 
-  async startButtonClickHandler() {
-    // If the game has not yet started, start the game
-    if (!this.state.gameHasStarted) {
-      this.setState({ gameHasStarted: true });
-      setInterval(() => this.tick(), 1000);
-    }
+  restartButtonClickHandler() {
+    // // Stop tick interval
+    // clearInterval(this.state.tickIntervalID);
+    // // Reset state
+    // this.setState(this.getInitialState());
 
-    if (this.state.gameIsPaused) {
-      // Pause Spotify using the selected device
-      await spotify.play({ device_id: this.state.currentDeviceID });
-    } else {
-      // Play Spotify using the selected device
-      await spotify.pause();
-    }
+    // For now, just reload the page
+    window.location = window.location.href;
   }
 
-  async deviceSelectChangeHandler(event) {
-    // Update the state
-    this.setState({ currentDeviceID: event.target.value });
-    // Switch Spotify play to selected device
-    await spotify.transferMyPlayback([event.target.value]);
-  }
-
+  // TODO: Only show restart button if there is a tickIntervalID
   render() {
     return (
       <div className="App">
@@ -153,6 +179,7 @@ class App extends React.Component {
           gameIsPaused={this.state.gameIsPaused}
         />
         <Timer minutes={this.state.minutes} seconds={this.state.seconds} />
+        <RestartButton onClick={() => this.restartButtonClickHandler()} />
       </div>
     );
   }
