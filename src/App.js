@@ -45,6 +45,7 @@ class App extends React.Component {
 
     // Bind class functions
     this.deviceSelectChangeHandler = this.deviceSelectChangeHandler.bind(this);
+    this.startButtonClickHandler = this.startButtonClickHandler.bind(this);
   }
 
   async componentDidMount() {
@@ -57,8 +58,9 @@ class App extends React.Component {
     this.setState({ currentDeviceID: event.target.value });
   }
 
-  startButtonClickHandler() {
-    console.log('startButtonClickHandler()');
+  async startButtonClickHandler() {
+    // Play Spotify using the selected device
+    await spotify.play({ device_id: this.state.currentDeviceID });
   }
 
   render() {
