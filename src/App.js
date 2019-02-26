@@ -58,7 +58,12 @@ class TrackInformation extends React.Component {
   render() {
     return (
       <div>
-        <p>{this.props.albumImage}</p>
+        <img
+          src={this.props.albumImage}
+          alt={this.props.albumName}
+          width="175"
+          height="175"
+        />
         <p>{this.props.songName}</p>
         <p>{this.props.artists}</p>
       </div>
@@ -108,6 +113,7 @@ class App extends React.Component {
       songName: null,
       artists: null,
       albumImage: null,
+      albumName: null,
     };
   }
 
@@ -143,8 +149,10 @@ class App extends React.Component {
         artists += ', ';
       }
     }
-    const albumImage = result.item.album.images[0].url;
-    this.setState({ gameIsPaused, songName, artists, albumImage });
+    const albumImage =
+      result.item.album.images[result.item.album.images.length - 2].url;
+    const albumName = result.item.album.name;
+    this.setState({ gameIsPaused, songName, artists, albumImage, albumName });
   }
 
   async deviceSelectChangeHandler(event) {
@@ -220,6 +228,7 @@ class App extends React.Component {
           songName={this.state.songName}
           artists={this.state.artists}
           albumImage={this.state.albumImage}
+          albumName={this.state.albumName}
         />
         <RestartButton
           onClick={this.restartButtonClickHandler}
