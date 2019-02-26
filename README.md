@@ -15,7 +15,6 @@ All my functions ended up in in my top level component (App), why can they not l
 
 ## To Do
 
-- Skip song
 - Pause spotify / game
 - Restart spotify / game
 - Display track information
@@ -23,6 +22,7 @@ All my functions ended up in in my top level component (App), why can they not l
   - Artist name
   - Album name
   - Album art
+- Declare game over
 
 - Play a sound when song switches
 - Come up with a clever p5.js animation for the background

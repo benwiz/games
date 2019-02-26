@@ -60,6 +60,7 @@ class App extends React.Component {
       targetMinutes: 60,
       minutes: 0,
       seconds: 0,
+      gameIsActive: false,
     };
 
     // Bind class functions
@@ -77,7 +78,23 @@ class App extends React.Component {
     this.setState({ devices, currentDeviceID: device.id });
   }
 
+  async getCurrentPlaybackState() {
+    const playbackState = await spotify.getMyCurrentPlaybackState();
+    this.setState({ gameIsActive: playbackState.is_playing });
+  }
+
   tick() {
+    // Always keep an eye on Spotify's play status so that even if the user pauses Spotify using
+    // another device, the game will automatically be paused. If the person presses play on the
+    // other device, the game will be resumed.
+    this.getCurrentPlaybackState();
+
+    // If the game is not active, exit the function
+    if (this.state.gameIsActive === false) {
+      return;
+    }
+
+    // Update the counter
     let seconds = this.state.seconds + 1;
     let minutes = this.state.minutes;
     const secondsInOneMinute = 60;
@@ -96,6 +113,8 @@ class App extends React.Component {
   async startButtonClickHandler() {
     // Play Spotify using the selected device
     await spotify.play({ device_id: this.state.currentDeviceID });
+    // Set the game to be active
+    this.setState({ gameIsActive: true });
     // Start the timer
     setInterval(() => this.tick(), 1000);
   }
