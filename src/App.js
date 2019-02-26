@@ -50,8 +50,10 @@ class App extends React.Component {
 
   async componentDidMount() {
     // Load data from Spotify
-    const { devices } = await spotify.getMyDevices();
-    const { device } = await spotify.getMyCurrentPlaybackState(); // TODO: Don't have 2 awaits that should be concurrent
+    const [{ devices }, { device }] = await Promise.all([
+      spotify.getMyDevices(),
+      spotify.getMyCurrentPlaybackState(),
+    ]);
     this.setState({ devices, currentDeviceID: device.id });
   }
 
