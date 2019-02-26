@@ -123,7 +123,7 @@ class App extends React.Component {
     setInterval(() => this.getDevices(), 5000);
 
     // Keep an eye on current track and play status
-    setInterval(() => this.getCurrentTrack(), 1000);
+    setInterval(() => this.getCurrentTrack(), 900);
   }
 
   async getDevices() {
