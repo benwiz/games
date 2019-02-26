@@ -2,7 +2,7 @@ import React from 'react';
 import * as Spotify from 'spotify-web-api-js';
 import './App.css';
 
-// Set up Spotify (TODO: Put this in a proper place)
+// Set up Spotify (TODO: Put this in a proper place using web login)
 const spotify = new Spotify();
 spotify.setAccessToken(
   'BQCI2wZ-GE4k35VQY4wrqs-HVnm2n4eWI93WqayyMZgR_8BSOXeiJnI8XnvVdvTHgZRXWg5GAqoHTST1eTOlnhLm7lmTQRjD_zPYE-WMrR_UVrg98sJOBHID2jGvhver9KgF00V0k492S4eTdcc-kpcJxsriustJGltn3p_v8IZ_1j8HKCo6lZQqPjBmPoyIPzaSIwrlY48dS3JnS5gnuU71'
@@ -16,7 +16,7 @@ class DeviceSelect extends React.Component {
     for (const device of this.props.devices) {
       const option = (
         <option key={device.id} value={device.id}>
-          {device.id}
+          {device.name}
         </option>
       );
       options.push(option);
@@ -54,8 +54,7 @@ class App extends React.Component {
   }
 
   deviceSelectChangeHandler(event) {
-    console.log('change');
-    // this.setState({ device: event.target.value });
+    this.setState({ currentDeviceID: event.target.value });
   }
 
   startButtonClickHandler() {
