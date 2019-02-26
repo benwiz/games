@@ -95,11 +95,6 @@ class App extends React.Component {
 
     // Set initial state
     this.state = this.getInitialState();
-
-    // Bind class functions
-    this.deviceSelectChangeHandler = this.deviceSelectChangeHandler.bind(this);
-    this.startButtonClickHandler = this.startButtonClickHandler.bind(this);
-    this.restartButtonClickHandler = this.restartButtonClickHandler.bind(this);
   }
 
   getInitialState() {
@@ -168,14 +163,14 @@ class App extends React.Component {
     this.setState({ gameIsPaused, songName, artists, albumImage, albumName });
   }
 
-  async deviceSelectChangeHandler(event) {
+  deviceSelectChangeHandler = async event => {
     // Update the state
     this.setState({ currentDeviceID: event.target.value });
     // Switch Spotify play to selected device
     await spotify.transferMyPlayback([event.target.value]);
-  }
+  };
 
-  async startButtonClickHandler() {
+  startButtonClickHandler = async () => {
     // If the game has not yet started, start the game
     if (!this.state.gameHasStarted) {
       const intervalID = setInterval(() => this.tick(), 1000);
@@ -189,7 +184,7 @@ class App extends React.Component {
       // Play Spotify using the selected device
       await spotify.pause();
     }
-  }
+  };
 
   tick() {
     // If the game is not active, exit the function
@@ -213,12 +208,12 @@ class App extends React.Component {
     }
   }
 
-  restartButtonClickHandler() {
+  restartButtonClickHandler = () => {
     // Stop tick interval
     clearInterval(this.state.tickIntervalID);
     // Reset state
     this.setState(this.getInitialState());
-  }
+  };
 
   render() {
     return (
