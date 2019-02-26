@@ -12,6 +12,7 @@ A controller to run a power hour using Spotify.
 ## To Do
 
 - Spotify login
+- Countdown timer, skip song
 - Pause spotify / game
 - Start spotify / game correctly
 - Display timer, song title, and artist

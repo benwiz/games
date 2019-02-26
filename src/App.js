@@ -1,12 +1,31 @@
 import React from 'react';
+import Cookies from 'universal-cookie';
 import * as Spotify from 'spotify-web-api-js';
 import './App.css';
 
-// Set up Spotify (TODO: Put this in a proper place using web login)
+// Set up cookie manager (TODO: Put this block in a proper place)
+const cookies = new Cookies();
+
+// Set up Spotify (TODO: Put this block in a proper place)
 const spotify = new Spotify();
-spotify.setAccessToken(
-  'BQCI2wZ-GE4k35VQY4wrqs-HVnm2n4eWI93WqayyMZgR_8BSOXeiJnI8XnvVdvTHgZRXWg5GAqoHTST1eTOlnhLm7lmTQRjD_zPYE-WMrR_UVrg98sJOBHID2jGvhver9KgF00V0k492S4eTdcc-kpcJxsriustJGltn3p_v8IZ_1j8HKCo6lZQqPjBmPoyIPzaSIwrlY48dS3JnS5gnuU71'
-);
+
+// http://localhost:3000/?code=AQCxX3OSP8zojzDz0O3Gl4rdKGTS-icK3yF-EcBQNYKdRLlV12b8aeonTZo3CPpr6X2_dM8Hyp5x7C_cLus6WNFbVgyyNZ1PS7XB5IzZOIP9r4K_wxIb2nReuEgjqn7mFufJrVql9vNGmJcY1uRuf5_SM54RkP8tqETJ1DQ0Lp0kDaQmCYSD-7AtVp1-Xo7W1B8MEVoOOwJJNjnLc4SJXtvXpBPw6Af57--4NBw0z0PtoAL0xb3jlPIr9YGbgcjaSYRZ
+// TODO: If query param `code` exists, then use that as spotify access token (and save to cookie), else try cookie, else redirect
+
+let spotifyAccessToken = cookies.get('spotify-access-token');
+if (spotifyAccessToken) {
+  spotify.setAccessToken(spotifyAccessToken);
+} else {
+  console.log('redirect to get spotify access token');
+
+  const client_id = 'ff53948d58f1491baa6169d34bc4179a';
+  const scopes = encodeURIComponent(
+    'user-read-playback-state user-modify-playback-state'
+  );
+  const redirect_uri = window.location.origin;
+  const url = `https://accounts.spotify.com/authorize?response_type=code&client_id=${client_id}&scope=${scopes}&redirect_uri=${redirect_uri}`;
+  window.location = url;
+}
 
 const StartButton = props => <button onClick={props.onClick}>Start</button>;
 
@@ -50,6 +69,7 @@ class App extends React.Component {
 
   async componentDidMount() {
     // Load data from Spotify
+    // TODO: Need to handle empty devices list (and maybe missing device from current playback)
     const [{ devices }, { device }] = await Promise.all([
       spotify.getMyDevices(),
       spotify.getMyCurrentPlaybackState(),

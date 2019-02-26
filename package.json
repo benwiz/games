@@ -6,7 +6,8 @@
     "react": "^16.8.3",
     "react-dom": "^16.8.3",
     "react-scripts": "2.1.5",
-    "spotify-web-api-js": "^1.2.0"
+    "spotify-web-api-js": "^1.2.0",
+    "universal-cookie": "^3.0.7"
   },
   "scripts": {
     "start": "react-scripts start",
