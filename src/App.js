@@ -33,7 +33,8 @@ class DeviceSelect extends React.Component {
 
 class StartButton extends React.Component {
   render() {
-    return <button onClick={this.props.onClick}>Start</button>;
+    const text = this.props.gameIsActive ? 'Pause' : 'Play';
+    return <button onClick={this.props.onClick}>{text}</button>;
   }
 }
 
@@ -111,12 +112,15 @@ class App extends React.Component {
   }
 
   async startButtonClickHandler() {
-    // Play Spotify using the selected device
-    await spotify.play({ device_id: this.state.currentDeviceID });
-    // Set the game to be active
-    this.setState({ gameIsActive: true });
-    // Start the timer
-    setInterval(() => this.tick(), 1000);
+    if (this.state.gameIsActive) {
+      // Pause Spotify using the selected device
+      await spotify.play({ device_id: this.state.currentDeviceID });
+      this.setState({ gameIsActive: false }); // Not strictly necessary but saves one roundtrip
+    } else {
+      // Play Spotify using the selected device
+      await spotify.pause();
+      this.setState({ gameIsActive: true }); // Not strictly necessary but saves one roundtrip
+    }
   }
 
   async deviceSelectChangeHandler(event) {
@@ -127,6 +131,9 @@ class App extends React.Component {
   }
 
   render() {
+    // Start the game ticker
+    setInterval(() => this.tick(), 1000);
+
     return (
       <div className="App">
         <DeviceSelect
@@ -134,7 +141,10 @@ class App extends React.Component {
           onChange={this.deviceSelectChangeHandler}
           devices={this.state.devices}
         />
-        <StartButton onClick={this.startButtonClickHandler} />
+        <StartButton
+          onClick={this.startButtonClickHandler}
+          gameIsActive={this.state.gameIsActive}
+        />
         <Timer minutes={this.state.minutes} seconds={this.state.seconds} />
       </div>
     );

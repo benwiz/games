@@ -15,8 +15,8 @@ All my functions ended up in in my top level component (App), why can they not l
 
 ## To Do
 
-- Pause spotify / game
-- Restart spotify / game
+- Pause game: via UI and via Spotify
+- Test restarting game: via UI and via Spotify
 - Display track information
   - Song name
   - Artist name
