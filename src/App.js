@@ -6,12 +6,16 @@ const spotify = new Spotify();
 
 const StartButton = props => <button onClick={props.onClick}>Start</button>;
 
-const DeviceSelect = props => (
-  <select value={props.value} onChange={props.onChange}>
-    <option value="12sx">Phone</option>
-    <option value="8e56">Mac</option>
-  </select>
-);
+class DeviceSelect extends React.Component {
+  render() {
+    return (
+      <select value={this.props.value} onChange={this.props.onChange}>
+        <option value="phone">Phone</option>
+        <option value="mac">Mac</option>
+      </select>
+    );
+  }
+}
 
 class App extends React.Component {
   constructor(props) {
@@ -22,7 +26,7 @@ class App extends React.Component {
   }
 
   deviceSelectChangeHandler(event) {
-    console.log('change event:', event);
+    console.log('change event:', event.target.value);
   }
 
   startButtonClickHandler() {
