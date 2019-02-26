@@ -62,7 +62,6 @@ class App extends React.Component {
     this.state = {
       devices: [],
       currentDeviceID: '',
-      targetMinutes: 60,
       minutes: 0,
       seconds: 0,
       gameIsPaused: true,
@@ -127,11 +126,9 @@ class App extends React.Component {
     if (this.state.gameIsPaused) {
       // Pause Spotify using the selected device
       await spotify.play({ device_id: this.state.currentDeviceID });
-      // this.setState({ gameIsPaused: false }); // Not strictly necessary but saves one roundtrip
     } else {
       // Play Spotify using the selected device
       await spotify.pause();
-      // this.setState({ gameIsPaused: true }); // Not strictly necessary but saves one roundtrip
     }
   }
 
