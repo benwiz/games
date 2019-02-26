@@ -15,8 +15,10 @@ All my functions ended up in in my top level component (App), why can they not l
 
 ## To Do
 
-- Countdown timer, skip song
+- Skip song
 - Pause spotify / game
-- Start spotify / game correctly
-- Display timer, song title, and artist
+- Restart spotify / game
+- Display track information
+
+- Come up with a clever p5.js animation for the background
 - Play a sound when song switches

@@ -37,11 +37,17 @@ class StartButton extends React.Component {
   }
 }
 
-// class Timer extends React.Component {
-//   render() {
-//     return <span>{this.props.value}</span>;
-//   }
-// }
+class Timer extends React.Component {
+  render() {
+    const minutes = this.props.minutes.toString().padStart(2, '0');
+    const seconds = this.props.seconds.toString().padStart(2, '0');
+    return (
+      <span>
+        {minutes}:{seconds}
+      </span>
+    );
+  }
+}
 
 class App extends React.Component {
   constructor(props) {
@@ -79,8 +85,6 @@ class App extends React.Component {
       minutes += 1;
     }
     this.setState({ seconds, minutes });
-
-    console.log(`${this.state.minutes}:${this.state.seconds}`);
   }
 
   async startButtonClickHandler() {
@@ -106,6 +110,7 @@ class App extends React.Component {
           devices={this.state.devices}
         />
         <StartButton onClick={this.startButtonClickHandler} />
+        <Timer minutes={this.state.minutes} seconds={this.state.seconds} />
       </div>
     );
   }
