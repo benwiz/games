@@ -8,8 +8,6 @@ import './App.css';
 const spotify = new Spotify();
 Util.setupSpotify(spotify);
 
-const StartButton = props => <button onClick={props.onClick}>Start</button>;
-
 class DeviceSelect extends React.Component {
   createOptions() {
     const options = [];
@@ -32,6 +30,8 @@ class DeviceSelect extends React.Component {
     );
   }
 }
+
+const StartButton = props => <button onClick={props.onClick}>Start</button>;
 
 class App extends React.Component {
   constructor(props) {
