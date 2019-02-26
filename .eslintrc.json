@@ -6,8 +6,7 @@
   },
   "rules": {
     "quotes": ["error", "single"],
-    "comma-dangle": ["error", "always"],
+    "comma-dangle": ["error", "always-multiline"],
     "object-shorthand": ["error", "always"]
   }
 }
-
