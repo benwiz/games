@@ -54,8 +54,11 @@ class App extends React.Component {
     this.setState({ devices, device: devices[0].id });
   }
 
-  deviceSelectChangeHandler(event) {
+  async deviceSelectChangeHandler(event) {
+    // Update the state
     this.setState({ currentDeviceID: event.target.value });
+    // Switch Spotify play to selected device
+    await spotify.transferMyPlayback([event.target.value]);
   }
 
   async startButtonClickHandler() {
