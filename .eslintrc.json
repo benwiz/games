@@ -1,0 +1,13 @@
+{
+  "extends": "react-app",
+  "env": {
+    "browser": true,
+    "node": false
+  },
+  "rules": {
+    "quotes": ["error", "single"],
+    "comma-dangle": ["error", "always"],
+    "object-shorthand": ["error", "always"]
+  }
+}
+
