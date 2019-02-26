@@ -99,6 +99,7 @@ class App extends React.Component {
     // Bind class functions
     this.deviceSelectChangeHandler = this.deviceSelectChangeHandler.bind(this);
     this.startButtonClickHandler = this.startButtonClickHandler.bind(this);
+    this.restartButtonClickHandler = this.restartButtonClickHandler.bind(this);
   }
 
   getInitialState() {
@@ -213,13 +214,10 @@ class App extends React.Component {
   }
 
   restartButtonClickHandler() {
-    // // Stop tick interval
-    // clearInterval(this.state.tickIntervalID);
-    // // Reset state
-    // this.setState(this.getInitialState());
-
-    // For now, just reload the page
-    window.location = window.location.href;
+    // Stop tick interval
+    clearInterval(this.state.tickIntervalID);
+    // Reset state
+    this.setState(this.getInitialState());
   }
 
   render() {
