@@ -8,12 +8,9 @@ import './App.css';
 const spotify = new Spotify();
 Util.setupSpotify(spotify);
 
-const Timer = props => <span>{props.value}</span>;
-
 class DeviceSelect extends React.Component {
   createOptions() {
     const options = [];
-    console.log(this);
     for (const device of this.props.devices) {
       const option = (
         <option key={device.id} value={device.id}>
@@ -35,15 +32,14 @@ class DeviceSelect extends React.Component {
 }
 
 class StartButton extends React.Component {
-  async startButtonClickHandler() {
-    // Play Spotify using the selected device
-    await spotify.play({ device_id: this.props.currentDeviceID });
-  }
-
   render() {
-    return (
-      <button onClick={() => this.startButtonClickHandler()}>Start</button>
-    );
+    return <button onClick={this.onClick}>Start</button>;
+  }
+}
+
+class Timer extends React.Component {
+  render() {
+    return <span>{this.props.value}</span>;
   }
 }
 
@@ -55,11 +51,14 @@ class App extends React.Component {
     this.state = {
       devices: [],
       currentDeviceID: '',
+      targetMinutes: 60,
+      minutes: 0,
+      seconds: 0,
     };
 
     // Bind class functions
     this.deviceSelectChangeHandler = this.deviceSelectChangeHandler.bind(this);
-    // this.startButtonClickHandler = this.startButtonClickHandler.bind(this);
+    this.startButtonClickHandler = this.startButtonClickHandler.bind(this);
   }
 
   async componentDidMount() {
@@ -72,12 +71,19 @@ class App extends React.Component {
     this.setState({ devices, currentDeviceID: device.id });
   }
 
+  async startButtonClickHandler() {
+    // Play Spotify using the selected device
+    await spotify.play({ device_id: this.state.currentDeviceID });
+  }
+
   async deviceSelectChangeHandler(event) {
     // Update the state
     this.setState({ currentDeviceID: event.target.value });
     // Switch Spotify play to selected device
     await spotify.transferMyPlayback([event.target.value]);
   }
+
+  tick() {}
 
   render() {
     return (
@@ -87,7 +93,7 @@ class App extends React.Component {
           onChange={this.deviceSelectChangeHandler}
           devices={this.state.devices}
         />
-        <StartButton currentDeviceID={this.state.currentDeviceID} />
+        <StartButton currentDeviceID={this.startButtonClickHandler} />
       </div>
     );
   }
