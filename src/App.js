@@ -118,6 +118,14 @@ class App extends React.Component {
       spotify.getMyCurrentPlaybackState(),
     ]);
     this.setState({ devices, currentDeviceID: device.id });
+
+    // Keep an eye on available devices
+    setInterval(() => this.getDevices(), 5000);
+  }
+
+  async getDevices() {
+    const { devices } = await spotify.getMyDevices();
+    this.setState({ devices });
   }
 
   async getCurrentTrack() {
@@ -196,7 +204,6 @@ class App extends React.Component {
     window.location = window.location.href;
   }
 
-  // TODO: Only show restart button if there is a tickIntervalID
   render() {
     return (
       <div className="App">
