@@ -43,8 +43,6 @@ class App extends React.Component {
   }
 
   deviceSelectChangeHandler(event) {
-    // TODO: Look into why this function is being called twice
-    console.log(event.target.value);
     this.setState({ device: event.target.value });
   }
 
