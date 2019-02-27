@@ -113,7 +113,7 @@ class App extends React.Component {
     };
   }
 
-  async componentDidMount() {
+  componentDidMount = async () => {
     // Load data from Spotify
     const [{ devices }, { device }] = await Promise.all([
       spotify.getMyDevices(),
@@ -126,14 +126,14 @@ class App extends React.Component {
 
     // Keep an eye on current track and play status
     setInterval(() => this.getCurrentTrack(), 900);
-  }
+  };
 
-  async getDevices() {
+  getDevices = async () => {
     const { devices } = await spotify.getMyDevices();
     this.setState({ devices });
-  }
+  };
 
-  async getCurrentTrack() {
+  getCurrentTrack = async () => {
     const result = await spotify.getMyCurrentPlayingTrack();
 
     // Only update gameIsPaused if the game is started
@@ -152,8 +152,7 @@ class App extends React.Component {
         artists += ', ';
       }
     }
-    const albumImage =
-      result.item.album.images[result.item.album.images.length - 2].url;
+    const albumImage = result.item.album.images[0].url;
     let albumName = '';
     if (result && result.item && result.item.album && result.item.album.name) {
       albumName = result.item.album.name;
@@ -161,7 +160,7 @@ class App extends React.Component {
 
     // Update the state
     this.setState({ gameIsPaused, songName, artists, albumImage, albumName });
-  }
+  };
 
   deviceSelectChangeHandler = async event => {
     // Update the state
@@ -186,7 +185,7 @@ class App extends React.Component {
     }
   };
 
-  tick() {
+  tick = () => {
     // If the game is not active, exit the function
     if (this.state.gameIsPaused) {
       return;
@@ -206,7 +205,7 @@ class App extends React.Component {
     if (seconds === 0) {
       spotify.skipToNext();
     }
-  }
+  };
 
   restartButtonClickHandler = () => {
     // Stop tick interval
@@ -215,7 +214,7 @@ class App extends React.Component {
     this.setState(this.getInitialState());
   };
 
-  render() {
+  render = () => {
     return (
       <div className="App">
         <DeviceSelect
@@ -241,7 +240,7 @@ class App extends React.Component {
         />
       </div>
     );
-  }
+  };
 }
 
 export default App;
