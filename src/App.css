@@ -23,14 +23,16 @@ body,
   width: 400px;
   margin: 0 auto;
 
+  background-color: rgba(0, 0, 0, 0.6);
+  border: 2px solid white;
+  border-radius: 8px;
+}
+
+.game {
   display: flex;
   align-items: center;
   justify-content: center;
   flex-direction: column;
-
-  background-color: rgba(0, 0, 0, 0.6);
-  border: 2px solid white;
-  border-radius: 8px;
 }
 
 select {

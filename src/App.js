@@ -1,4 +1,6 @@
 import React from 'react';
+
+import { MuiThemeProvider, createMuiTheme } from '@material-ui/core/styles';
 import Button from '@material-ui/core/Button';
 import Fab from '@material-ui/core/Fab';
 import Icon from '@material-ui/core/Icon';
@@ -6,6 +8,21 @@ import Icon from '@material-ui/core/Icon';
 import Spotify from 'spotify-web-api-js';
 import Util from './util';
 import './App.css';
+
+// Set theme color
+const theme = createMuiTheme({
+  palette: {
+    primary: {
+      main: '#91ddfc',
+    },
+    secondary: {
+      main: '#fcaf91',
+    },
+  },
+  typography: {
+    useNextVariants: true,
+  },
+});
 
 // Set up Spotify. This must execute immediately incase a redirect is necessary. There is maybe a
 // better practice for where this function should be called.
@@ -101,6 +118,36 @@ class RestartButton extends React.Component {
   }
 }
 
+class Game extends React.Component {
+  render = () => {
+    return (
+      <div className="game">
+        <DeviceSelect
+          value={this.props.currentDeviceID}
+          onChange={this.props.deviceSelectChangeHandler}
+          devices={this.props.devices}
+        />
+        <StartButton
+          onClick={this.props.startButtonClickHandler}
+          gameHasStarted={this.props.gameHasStarted}
+          gameIsPaused={this.props.gameIsPaused}
+        />
+        <Timer minutes={this.props.minutes} seconds={this.props.seconds} />
+        <TrackInformation
+          songName={this.props.songName}
+          artists={this.props.artists}
+          albumImage={this.props.albumImage}
+          albumName={this.props.albumName}
+        />
+        <RestartButton
+          onClick={this.restartButtonClickHandler}
+          gameHasStarted={this.props.gameHasStarted}
+        />
+      </div>
+    );
+  };
+}
+
 class App extends React.Component {
   constructor(props) {
     super(props);
@@ -131,7 +178,7 @@ class App extends React.Component {
       spotify.getMyDevices(),
       spotify.getMyCurrentPlaybackState(),
     ]);
-    this.setState({ devices, currentDeviceID: device.id });
+    this.setState({ devices, currentDeviceID: device ? device.id : null });
 
     // Keep an eye on available devices
     setInterval(() => this.getDevices(), 5000);
@@ -228,34 +275,30 @@ class App extends React.Component {
 
   render = () => {
     const style = { backgroundImage: `url(${this.state.albumImage})` };
+
     return (
-      <div className="App" style={style}>
-        <div className="dimmer">
-          <div className="container">
-            <DeviceSelect
-              value={this.state.currentDeviceID}
-              onChange={this.deviceSelectChangeHandler}
-              devices={this.state.devices}
-            />
-            <StartButton
-              onClick={this.startButtonClickHandler}
-              gameHasStarted={this.state.gameHasStarted}
-              gameIsPaused={this.state.gameIsPaused}
-            />
-            <Timer minutes={this.state.minutes} seconds={this.state.seconds} />
-            <TrackInformation
-              songName={this.state.songName}
-              artists={this.state.artists}
-              albumImage={this.state.albumImage}
-              albumName={this.state.albumName}
-            />
-            <RestartButton
-              onClick={this.restartButtonClickHandler}
-              gameHasStarted={this.state.gameHasStarted}
-            />
+      <MuiThemeProvider theme={theme}>
+        <div className="App" style={style}>
+          <div className="dimmer">
+            <div className="container">
+              <Game
+                currentDeviceID={this.state.currentDeviceID}
+                deviceSelectChangeHandler={this.deviceSelectChangeHandler}
+                devices={this.state.devices}
+                startButtonClickHandler={this.props.startButtonClickHandler}
+                gameHasStarted={this.state.gameHasStarted}
+                gameIsPaused={this.state.gameIsPaused}
+                minutes={this.state.minutes}
+                seconds={this.state.seconds}
+                songName={this.state.songName}
+                artists={this.state.artists}
+                albumImage={this.state.albumImage}
+                albumName={this.state.albumName}
+              />
+            </div>
           </div>
         </div>
-      </div>
+      </MuiThemeProvider>
     );
   };
 }
