@@ -28,34 +28,40 @@ body,
   justify-content: center;
   flex-direction: column;
 
-  background-color: rgba(0, 0, 0, 0.97);
+  background-color: rgba(0, 0, 0, 0.6);
   border: 2px solid white;
+  border-radius: 8px;
 }
 
-select,
-button,
-span {
+select {
   margin-top: 24px;
   margin-bottom: 24px;
 }
 
-span,
-p {
-  color: white;
+button {
+  margin-top: 24px;
+  margin-bottom: 24px;
+  background-color: red;
 }
 
-.restart-button {
+.timer {
+  margin-top: 24px;
+  margin-bottom: 24px;
+
+  color: white;
+  font-size: xx-large;
 }
 
 .track-information {
   margin-top: 24px;
   margin-bottom: 24px;
   text-align: center;
+  color: white;
 }
 
 .song-name {
   font-weight: bolder;
-  font-size: large;
+  font-size: larger;
 }
 
 .artists {

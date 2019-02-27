@@ -1,4 +1,8 @@
 import React from 'react';
+import Button from '@material-ui/core/Button';
+import Fab from '@material-ui/core/Fab';
+import Icon from '@material-ui/core/Icon';
+
 import Spotify from 'spotify-web-api-js';
 import Util from './util';
 import './App.css';
@@ -35,10 +39,14 @@ class StartButton extends React.Component {
   render() {
     const text = this.props.gameHasStarted
       ? this.props.gameIsPaused
-        ? 'Resume'
-        : 'Pause'
-      : 'Play';
-    return <button onClick={this.props.onClick}>{text}</button>;
+        ? 'play_arrow'
+        : 'pause'
+      : 'play_arrow';
+    return (
+      <Fab variant="round" color="primary" onClick={this.props.onClick}>
+        <Icon>{text}</Icon>
+      </Fab>
+    );
   }
 }
 
@@ -47,7 +55,7 @@ class Timer extends React.Component {
     const minutes = this.props.minutes.toString().padStart(2, '0');
     const seconds = this.props.seconds.toString().padStart(2, '0');
     return (
-      <span>
+      <span className="timer">
         {minutes}:{seconds}
       </span>
     );
@@ -75,16 +83,20 @@ class RestartButton extends React.Component {
   render() {
     const styles = {
       visibility: this.props.gameHasStarted ? 'visible' : 'hidden',
+      marginTop: '24px',
+      marginBottom: '24px',
     };
 
     return (
-      <button
+      <Button
+        variant="outlined"
+        color="primary"
+        size="small"
         style={styles}
-        className="restart-button"
         onClick={this.props.onClick}
       >
         Restart
-      </button>
+      </Button>
     );
   }
 }
