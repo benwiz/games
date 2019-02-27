@@ -29,11 +29,11 @@ npm run deploy
 
 ## To Do
 
+- Total time slider (with 15m increments)
+- Time between shots slider
+
 - Change to countdown timer
-- Configs component
-  - Config game length
-  - Config song length
-  - Show how many beers are needed for configs (maybe also show beers consumed in Game)
+
 - Declare game over
 - Put configs and game into tabs
 
