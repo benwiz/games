@@ -4,7 +4,10 @@ import { MuiThemeProvider, createMuiTheme } from '@material-ui/core/styles';
 import Button from '@material-ui/core/Button';
 import Fab from '@material-ui/core/Fab';
 import Icon from '@material-ui/core/Icon';
-import Slider from '@material-ui/lab/Slider';
+import FormControl from '@material-ui/core/FormControl';
+import InputLabel from '@material-ui/core/InputLabel';
+import Select from '@material-ui/core/Select';
+import FormHelperText from '@material-ui/core/FormHelperText';
 
 import Spotify from 'spotify-web-api-js';
 import Util from './util';
@@ -53,9 +56,33 @@ class DeviceSelect extends React.Component {
   }
 }
 
-class TargetNumberOfMinutesSlider extends React.Component {
+class GameLengthSelect extends React.Component {
   render = () => {
-    return <Slider className="slider" value={60} min={5} max={90} />;
+    return (
+      <FormControl className="select-form-control">
+        <InputLabel htmlFor="game-length">Game Length</InputLabel>
+        <Select
+          native
+          value={this.props.value}
+          onChange={this.props.onChange}
+          inputProps={{
+            name: 'game-length',
+            id: 'game-length',
+          }}
+        >
+          <option value={10}>Ten</option>
+          <option value={20}>Twenty</option>
+          <option value={30}>Thirty</option>
+          <option value={40}>Forty</option>
+          <option value={50}>Fifty</option>
+          <option value={60}>Sixty</option>
+          <option value={70}>Seventy</option>
+          <option value={80}>Eighty</option>
+          <option value={90}>Ninety</option>
+        </Select>
+        <FormHelperText>Minutes</FormHelperText>
+      </FormControl>
+    );
   };
 }
 
@@ -75,7 +102,7 @@ class StartButton extends React.Component {
 }
 
 class Timer extends React.Component {
-  render() {
+  render = () => {
     const minutes = this.props.minutes.toString().padStart(2, '0');
     const seconds = this.props.seconds.toString().padStart(2, '0');
     return (
@@ -83,11 +110,11 @@ class Timer extends React.Component {
         {minutes}:{seconds}
       </span>
     );
-  }
+  };
 }
 
 class TrackInformation extends React.Component {
-  render() {
+  render = () => {
     return (
       <div className="track-information">
         <img
@@ -100,7 +127,7 @@ class TrackInformation extends React.Component {
         <p className="artists">{this.props.artists}</p>
       </div>
     );
-  }
+  };
 }
 
 class RestartButton extends React.Component {
@@ -129,7 +156,10 @@ class Config extends React.Component {
   render = () => {
     return (
       <div className="config">
-        <TargetNumberOfMinutesSlider />
+        <GameLengthSelect
+          value={this.props.gameLengthMinutes}
+          onChange={this.props.gameLengthSelectChangeHandler}
+        />
       </div>
     );
   };
@@ -176,10 +206,11 @@ class App extends React.Component {
   getInitialState = () => {
     return {
       // Configs
-      minutes: 60,
-      seconds: 0,
+      gameLengthMinutes: 50,
       shotFrequencyInSeconds: 60,
       // Other, unsorted stuff
+      minutes: 60,
+      seconds: 0,
       devices: [],
       currentDeviceID: '',
       gameIsPaused: true,
@@ -244,6 +275,12 @@ class App extends React.Component {
     this.setState({ gameIsPaused, songName, artists, albumImage, albumName });
   };
 
+  gameLengthSelectChangeHandler = event => {
+    const gameLengthMinutes = event.target.value;
+    const minutes = gameLengthMinutes;
+    this.setState({ gameLengthMinutes, minutes });
+  };
+
   deviceSelectChangeHandler = async event => {
     // Update the state
     this.setState({ currentDeviceID: event.target.value });
@@ -290,6 +327,7 @@ class App extends React.Component {
     // If game is over, update the state to say so
     if (minutes === 0 && seconds === 0) {
       this.setState({ gameHasEnded: true });
+      clearInterval(this.state.tickIntervalID);
     }
   };
 
@@ -298,7 +336,7 @@ class App extends React.Component {
     clearInterval(this.state.tickIntervalID);
     // Reset state
     const state = this.getInitialState();
-    // TODO: Overwrite state with configs from this.state.
+    // TODO: Overwrite state with configs from this.state so that the settings are not lost.
     this.setState(state);
   };
 
@@ -311,18 +349,10 @@ class App extends React.Component {
           <div className="dimmer">
             <div className="container">
               <Config
-                currentDeviceID={this.state.currentDeviceID}
-                deviceSelectChangeHandler={this.deviceSelectChangeHandler}
-                devices={this.state.devices}
-                startButtonClickHandler={this.props.startButtonClickHandler}
-                gameHasStarted={this.state.gameHasStarted}
-                gameIsPaused={this.state.gameIsPaused}
-                minutes={this.state.minutes}
-                seconds={this.state.seconds}
-                songName={this.state.songName}
-                artists={this.state.artists}
-                albumImage={this.state.albumImage}
-                albumName={this.state.albumName}
+                gameLengthMinutes={this.state.gameLengthMinutes}
+                gameLengthSelectChangeHandler={
+                  this.gameLengthSelectChangeHandler
+                }
               />
               <Game
                 currentDeviceID={this.state.currentDeviceID}
