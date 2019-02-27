@@ -31,6 +31,8 @@ npm run deploy
 
 - Shot interval select
 - Upgrade the device select
+- Ensure that the configs actually work
+
 - Make the selects look good, probably in one row, outlined
 - Hide configs if gameHasStarted==true
 
