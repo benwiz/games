@@ -33,7 +33,7 @@ npm run deploy
 - Declare game over
 
 - Total time slider (with 15m increments)
-- Time between shots slider
+- Time between shots slider (with 15s increments)
 - Hide configs after gameHasStarted 
 
 - Sort out an elegant way to deal with the fact that the Spotify access token expires at exactly 1 hour (meaning, likely before the game ends)
