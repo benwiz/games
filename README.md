@@ -4,7 +4,7 @@ A controller to run a power hour using Spotify.
 
 ## Thoughts about React
 
-All my functions ended up in in my top level component (App), why can they not live in the component they actually work with and pass the data upward to App to update the state?
+All my functions ended up in in my top level component (App), can/should I move them lower and try harder to pass only data? I feel like I should.
 
 ## Getting set up
 
@@ -29,7 +29,6 @@ npm run deploy
 
 ## To Do
 
-- Bubble down a lot of features from App to Game
 - Configs component (and bubble down features from App)
   - Config game length
   - Config song length

@@ -202,7 +202,7 @@ class App extends React.Component {
     }
 
     // Always update track info
-    const songName = result.item.name;
+    const songName = result.item ? result.item.name : '';
     let artists = '';
     for (let i = 0; i < result.item.artists.length; i++) {
       const artist = result.item.artists[i];
