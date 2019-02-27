@@ -130,11 +130,6 @@ class Config extends React.Component {
     return (
       <div className="config">
         <TargetNumberOfMinutesSlider />
-        <DeviceSelect
-          value={this.props.currentDeviceID}
-          onChange={this.props.deviceSelectChangeHandler}
-          devices={this.props.devices}
-        />
       </div>
     );
   };
@@ -144,6 +139,11 @@ class Game extends React.Component {
   render = () => {
     return (
       <div className="game">
+        <DeviceSelect
+          value={this.props.currentDeviceID}
+          onChange={this.props.deviceSelectChangeHandler}
+          devices={this.props.devices}
+        />
         <StartButton
           onClick={this.props.startButtonClickHandler}
           gameHasStarted={this.props.gameHasStarted}

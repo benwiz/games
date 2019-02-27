@@ -29,20 +29,17 @@ npm run deploy
 
 ## To Do
 
+- Change to countdown timer
+- Declare game over
+
 - Total time slider (with 15m increments)
 - Time between shots slider
-
-- Change to countdown timer
-
-- Declare game over
-- Put configs and game into tabs
+- Hide configs after gameHasStarted 
 
 - Sort out an elegant way to deal with the fact that the Spotify access token expires at exactly 1 hour (meaning, likely before the game ends)
   - Could be something like automatically getting a new access token shortly before it expires and storing the state of the game in the cookie, potentially no one would even notice
 
-- Make everything pretty
-  - This includes editing the index.html probably
-
+- Finalize making everything pretty
 - Play a sound when song switches
 - Come up with a clever p5.js animation for the background
   - Maybe something related to how many ounces of beer
