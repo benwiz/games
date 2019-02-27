@@ -29,9 +29,10 @@ npm run deploy
 
 ## To Do
 
-- Total time slider (with 15m increments)
-- Time between shots slider (with 15s increments)
-- Hide configs after gameHasStarted 
+- Shot interval select
+- Upgrade the device select
+- Make the selects look good, probably in one row, outlined
+- Hide configs if gameHasStarted==true
 
 - Sort out an elegant way to deal with the fact that the Spotify access token expires at exactly 1 hour (meaning, likely before the game ends)
   - Could be something like automatically getting a new access token shortly before it expires and storing the state of the game in the cookie, potentially no one would even notice
