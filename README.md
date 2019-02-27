@@ -47,3 +47,4 @@ npm run deploy
   - Maybe something related to how many ounces of beer
     - Possibly simulate a liquid that's slowly going down
 - Update the theme to be the avg color of the albumImage
+- Clean all data when consuming it, not when using it
