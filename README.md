@@ -29,12 +29,12 @@ npm run deploy
 
 ## To Do
 
-- Configs component (and bubble down features from App)
+- Configs component
   - Config game length
   - Config song length
   - Show how many beers are needed for configs (maybe also show beers consumed in Game)
-
 - Declare game over
+- Put configs and game into tabs
 
 - Sort out an elegant way to deal with the fact that the Spotify access token expires at exactly 1 hour (meaning, likely before the game ends)
   - Could be something like automatically getting a new access token shortly before it expires and storing the state of the game in the cookie, potentially no one would even notice

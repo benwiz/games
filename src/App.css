@@ -28,6 +28,7 @@ body,
   border-radius: 8px;
 }
 
+.config,
 .game {
   display: flex;
   align-items: center;

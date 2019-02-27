@@ -118,15 +118,24 @@ class RestartButton extends React.Component {
   }
 }
 
-class Game extends React.Component {
+class Config extends React.Component {
   render = () => {
     return (
-      <div className="game">
+      <div className="config">
         <DeviceSelect
           value={this.props.currentDeviceID}
           onChange={this.props.deviceSelectChangeHandler}
           devices={this.props.devices}
         />
+      </div>
+    );
+  };
+}
+
+class Game extends React.Component {
+  render = () => {
+    return (
+      <div className="game">
         <StartButton
           onClick={this.props.startButtonClickHandler}
           gameHasStarted={this.props.gameHasStarted}
@@ -178,7 +187,7 @@ class App extends React.Component {
       spotify.getMyDevices(),
       spotify.getMyCurrentPlaybackState(),
     ]);
-    this.setState({ devices, currentDeviceID: device ? device.id : null });
+    this.setState({ devices, currentDeviceID: device ? device.id : '' });
 
     // Keep an eye on available devices
     setInterval(() => this.getDevices(), 5000);
@@ -204,14 +213,16 @@ class App extends React.Component {
     // Always update track info
     const songName = result.item ? result.item.name : '';
     let artists = '';
-    for (let i = 0; i < result.item.artists.length; i++) {
-      const artist = result.item.artists[i];
-      artists += artist.name;
-      if (i < result.item.artists.length - 1) {
-        artists += ', ';
+    if (result.item && result.item.artists) {
+      for (let i = 0; i < result.item.artists.length; i++) {
+        const artist = result.item.artists[i];
+        artists += artist.name;
+        if (i < result.item.artists.length - 1) {
+          artists += ', ';
+        }
       }
     }
-    const albumImage = result.item.album.images[0].url; // TODO: Change to 1 for a smaller image
+    const albumImage = result.item ? result.item.album.images[0].url : ''; // TODO: Change to 1 for a smaller image
     let albumName = '';
     if (result && result.item && result.item.album && result.item.album.name) {
       albumName = result.item.album.name;
@@ -281,6 +292,20 @@ class App extends React.Component {
         <div className="App" style={style}>
           <div className="dimmer">
             <div className="container">
+              <Config
+                currentDeviceID={this.state.currentDeviceID}
+                deviceSelectChangeHandler={this.deviceSelectChangeHandler}
+                devices={this.state.devices}
+                startButtonClickHandler={this.props.startButtonClickHandler}
+                gameHasStarted={this.state.gameHasStarted}
+                gameIsPaused={this.state.gameIsPaused}
+                minutes={this.state.minutes}
+                seconds={this.state.seconds}
+                songName={this.state.songName}
+                artists={this.state.artists}
+                albumImage={this.state.albumImage}
+                albumName={this.state.albumName}
+              />
               <Game
                 currentDeviceID={this.state.currentDeviceID}
                 deviceSelectChangeHandler={this.deviceSelectChangeHandler}
