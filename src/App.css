@@ -45,16 +45,15 @@ p {
 }
 
 .restart-button {
-  font-size: 12px;
 }
 
 .track-information {
   margin-top: 24px;
   margin-bottom: 24px;
+  text-align: center;
 }
 
 .song-name {
-  text-align: center;
   font-weight: bolder;
   font-size: large;
 }
