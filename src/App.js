@@ -184,6 +184,7 @@ class App extends React.Component {
       currentDeviceID: '',
       gameIsPaused: true,
       gameHasStarted: false,
+      gameHasEnded: false,
       tickIntervalID: null,
       songName: null,
       artists: null,
@@ -284,6 +285,11 @@ class App extends React.Component {
     // Skip to next track if seconds is 0, do not await
     if (seconds === 0) {
       spotify.skipToNext();
+    }
+
+    // If game is over, update the state to say so
+    if (minutes === 0 && seconds === 0) {
+      this.setState({ gameHasEnded: true });
     }
   };
 
