@@ -4,6 +4,7 @@ import { MuiThemeProvider, createMuiTheme } from '@material-ui/core/styles';
 import Button from '@material-ui/core/Button';
 import Fab from '@material-ui/core/Fab';
 import Icon from '@material-ui/core/Icon';
+import Slider from '@material-ui/lab/Slider';
 
 import Spotify from 'spotify-web-api-js';
 import Util from './util';
@@ -52,8 +53,14 @@ class DeviceSelect extends React.Component {
   }
 }
 
+class TargetNumberOfMinutesSlider extends React.Component {
+  render = () => {
+    return <Slider className="slider" value={60} min={5} max={90} />;
+  };
+}
+
 class StartButton extends React.Component {
-  render() {
+  render = () => {
     const text = this.props.gameHasStarted
       ? this.props.gameIsPaused
         ? 'play_arrow'
@@ -64,7 +71,7 @@ class StartButton extends React.Component {
         <Icon>{text}</Icon>
       </Fab>
     );
-  }
+  };
 }
 
 class Timer extends React.Component {
@@ -122,6 +129,7 @@ class Config extends React.Component {
   render = () => {
     return (
       <div className="config">
+        <TargetNumberOfMinutesSlider />
         <DeviceSelect
           value={this.props.currentDeviceID}
           onChange={this.props.deviceSelectChangeHandler}
@@ -167,6 +175,10 @@ class App extends React.Component {
 
   getInitialState() {
     return {
+      // Configs
+      targetNumberOfMinutes: 60,
+      shotFrequencyInSeconds: 60,
+      // Other, unsorted stuff
       devices: [],
       currentDeviceID: '',
       minutes: 0,
@@ -281,7 +293,9 @@ class App extends React.Component {
     // Stop tick interval
     clearInterval(this.state.tickIntervalID);
     // Reset state
-    this.setState(this.getInitialState());
+    const state = this.getInitialState();
+    // TODO: Overwrite state with configs from this.state.
+    this.setState(state);
   };
 
   render = () => {

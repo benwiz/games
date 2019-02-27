@@ -29,6 +29,7 @@ npm run deploy
 
 ## To Do
 
+- Change to countdown timer
 - Configs component
   - Config game length
   - Config song length

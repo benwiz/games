@@ -30,6 +30,10 @@ body,
 
 .config,
 .game {
+  /* TODO: Sort out width */
+  margin-top: 24px;
+  margin-bottom: 24px;
+
   display: flex;
   align-items: center;
   justify-content: center;
