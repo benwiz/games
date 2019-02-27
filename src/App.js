@@ -152,7 +152,7 @@ class App extends React.Component {
         artists += ', ';
       }
     }
-    const albumImage = result.item.album.images[0].url;
+    const albumImage = result.item.album.images[0].url; // TODO: Change to 1 for a smaller image
     let albumName = '';
     if (result && result.item && result.item.album && result.item.album.name) {
       albumName = result.item.album.name;
@@ -215,29 +215,32 @@ class App extends React.Component {
   };
 
   render = () => {
+    const style = { backgroundImage: `url(${this.state.albumImage})` };
     return (
-      <div className="App">
-        <DeviceSelect
-          value={this.state.currentDeviceID}
-          onChange={this.deviceSelectChangeHandler}
-          devices={this.state.devices}
-        />
-        <StartButton
-          onClick={this.startButtonClickHandler}
-          gameHasStarted={this.state.gameHasStarted}
-          gameIsPaused={this.state.gameIsPaused}
-        />
-        <Timer minutes={this.state.minutes} seconds={this.state.seconds} />
-        <TrackInformation
-          songName={this.state.songName}
-          artists={this.state.artists}
-          albumImage={this.state.albumImage}
-          albumName={this.state.albumName}
-        />
-        <RestartButton
-          onClick={this.restartButtonClickHandler}
-          gameHasStarted={this.state.gameHasStarted}
-        />
+      <div className="App" style={style}>
+        <div className="dimmer">
+          <DeviceSelect
+            value={this.state.currentDeviceID}
+            onChange={this.deviceSelectChangeHandler}
+            devices={this.state.devices}
+          />
+          <StartButton
+            onClick={this.startButtonClickHandler}
+            gameHasStarted={this.state.gameHasStarted}
+            gameIsPaused={this.state.gameIsPaused}
+          />
+          <Timer minutes={this.state.minutes} seconds={this.state.seconds} />
+          <TrackInformation
+            songName={this.state.songName}
+            artists={this.state.artists}
+            albumImage={this.state.albumImage}
+            albumName={this.state.albumName}
+          />
+          <RestartButton
+            onClick={this.restartButtonClickHandler}
+            gameHasStarted={this.state.gameHasStarted}
+          />
+        </div>
       </div>
     );
   };
