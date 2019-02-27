@@ -173,16 +173,15 @@ class App extends React.Component {
     this.state = this.getInitialState();
   }
 
-  getInitialState() {
+  getInitialState = () => {
     return {
       // Configs
-      targetNumberOfMinutes: 60,
+      minutes: 60,
+      seconds: 0,
       shotFrequencyInSeconds: 60,
       // Other, unsorted stuff
       devices: [],
       currentDeviceID: '',
-      minutes: 0,
-      seconds: 0,
       gameIsPaused: true,
       gameHasStarted: false,
       tickIntervalID: null,
@@ -191,7 +190,7 @@ class App extends React.Component {
       albumImage: null,
       albumName: null,
     };
-  }
+  };
 
   componentDidMount = async () => {
     // Load data from Spotify
@@ -274,12 +273,11 @@ class App extends React.Component {
     }
 
     // Update the counter
-    let seconds = this.state.seconds + 1;
+    let seconds = this.state.seconds - 1;
     let minutes = this.state.minutes;
-    const secondsInOneMinute = 60;
-    if (seconds >= secondsInOneMinute) {
-      seconds = 0;
-      minutes += 1;
+    if (seconds < 0) {
+      seconds = 59;
+      minutes -= 1;
     }
     this.setState({ seconds, minutes });
 
@@ -324,7 +322,7 @@ class App extends React.Component {
                 currentDeviceID={this.state.currentDeviceID}
                 deviceSelectChangeHandler={this.deviceSelectChangeHandler}
                 devices={this.state.devices}
-                startButtonClickHandler={this.props.startButtonClickHandler}
+                startButtonClickHandler={this.startButtonClickHandler}
                 gameHasStarted={this.state.gameHasStarted}
                 gameIsPaused={this.state.gameIsPaused}
                 minutes={this.state.minutes}
