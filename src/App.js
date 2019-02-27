@@ -219,27 +219,29 @@ class App extends React.Component {
     return (
       <div className="App" style={style}>
         <div className="dimmer">
-          <DeviceSelect
-            value={this.state.currentDeviceID}
-            onChange={this.deviceSelectChangeHandler}
-            devices={this.state.devices}
-          />
-          <StartButton
-            onClick={this.startButtonClickHandler}
-            gameHasStarted={this.state.gameHasStarted}
-            gameIsPaused={this.state.gameIsPaused}
-          />
-          <Timer minutes={this.state.minutes} seconds={this.state.seconds} />
-          <TrackInformation
-            songName={this.state.songName}
-            artists={this.state.artists}
-            albumImage={this.state.albumImage}
-            albumName={this.state.albumName}
-          />
-          <RestartButton
-            onClick={this.restartButtonClickHandler}
-            gameHasStarted={this.state.gameHasStarted}
-          />
+          <div className="container">
+            <DeviceSelect
+              value={this.state.currentDeviceID}
+              onChange={this.deviceSelectChangeHandler}
+              devices={this.state.devices}
+            />
+            <StartButton
+              onClick={this.startButtonClickHandler}
+              gameHasStarted={this.state.gameHasStarted}
+              gameIsPaused={this.state.gameIsPaused}
+            />
+            <Timer minutes={this.state.minutes} seconds={this.state.seconds} />
+            <TrackInformation
+              songName={this.state.songName}
+              artists={this.state.artists}
+              albumImage={this.state.albumImage}
+              albumName={this.state.albumName}
+            />
+            <RestartButton
+              onClick={this.restartButtonClickHandler}
+              gameHasStarted={this.state.gameHasStarted}
+            />
+          </div>
         </div>
       </div>
     );
