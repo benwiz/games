@@ -45,7 +45,9 @@ class GameLengthSelect extends React.Component {
   }
 
   render = () => {
-    const style = { display: this.props.gameHasStarted ? 'none' : 'block' };
+    const style = {
+      display: this.props.gameHasStarted ? 'none' : 'default',
+    };
 
     return (
       <FormControl
@@ -83,7 +85,6 @@ class GameLengthSelect extends React.Component {
           <option value={80}>80 minutes</option>
           <option value={90}>90 minutes</option>
         </Select>
-        {/* <FormHelperText>Minutes</FormHelperText> */}
       </FormControl>
     );
   };
@@ -102,7 +103,7 @@ class ShotIntervalSelect extends React.Component {
 
   render = () => {
     return (
-      <FormControl className="select-form-control">
+      <FormControl className="select-form-control" variant="outlined">
         <InputLabel
           ref={ref => {
             this.InputLabelRef = ref;
@@ -130,7 +131,6 @@ class ShotIntervalSelect extends React.Component {
           <option value={150}>150 seconds</option>
           <option value={180}>180 seconds</option>
         </Select>
-        {/* <FormHelperText>Minutes</FormHelperText> */}
       </FormControl>
     );
   };
@@ -162,7 +162,7 @@ class DeviceSelect extends React.Component {
 
   render() {
     return (
-      <FormControl className="select-form-control">
+      <FormControl className="select-form-control" variant="outlined">
         <InputLabel
           ref={ref => {
             this.InputLabelRef = ref;
