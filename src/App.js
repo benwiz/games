@@ -265,7 +265,7 @@ class App extends React.Component {
         }
       }
     }
-    const albumImage = result.item ? result.item.album.images[0].url : ''; // TODO: Change to 1 for a smaller image
+    const albumImage = result.item ? result.item.album.images[0].url : ''; // TODO: Change index to 1 for a smaller image
     let albumName = '';
     if (result && result.item && result.item.album && result.item.album.name) {
       albumName = result.item.album.name;
