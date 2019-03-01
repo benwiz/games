@@ -39,6 +39,7 @@ body,
 }
 
 .select-form-control {
+  margin-top: 24px;
   width: 200px;
 }
 

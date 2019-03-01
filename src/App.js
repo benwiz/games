@@ -269,6 +269,11 @@ class Config extends React.Component {
           value={this.props.shotIntervalSeconds}
           onChange={this.props.shotIntervalSelectChangeHandler}
         />
+        <DeviceSelect
+          value={this.props.currentDeviceID}
+          onChange={this.props.deviceSelectChangeHandler}
+          devices={this.props.devices}
+        />
       </div>
     );
   };
@@ -278,11 +283,6 @@ class Game extends React.Component {
   render = () => {
     return (
       <div className="game">
-        <DeviceSelect
-          value={this.props.currentDeviceID}
-          onChange={this.props.deviceSelectChangeHandler}
-          devices={this.props.devices}
-        />
         <StartButton
           onClick={this.props.startButtonClickHandler}
           gameHasStarted={this.props.gameHasStarted}
@@ -477,11 +477,11 @@ class App extends React.Component {
                 shotIntervalSelectChangeHandler={
                   this.shotIntervalSelectChangeHandler
                 }
-              />
-              <Game
                 currentDeviceID={this.state.currentDeviceID}
                 deviceSelectChangeHandler={this.deviceSelectChangeHandler}
                 devices={this.state.devices}
+              />
+              <Game
                 startButtonClickHandler={this.startButtonClickHandler}
                 gameHasStarted={this.state.gameHasStarted}
                 gameIsPaused={this.state.gameIsPaused}
