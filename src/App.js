@@ -307,6 +307,21 @@ class Game extends React.Component {
   };
 }
 
+class Footer extends React.Component {
+  render = () => {
+    return (
+      <div>
+        <a href="/">
+          <img src="./home.svg" width="24" height="24" alt="Home" />
+        </a>
+        <a href="https://github.com/benwiz/power-hour">
+          <img src="./github.svg" width="24" height="24" alt="GitHub" />
+        </a>
+      </div>
+    );
+  };
+}
+
 class App extends React.Component {
   constructor(props) {
     super(props);
@@ -504,6 +519,7 @@ class App extends React.Component {
                 albumName={this.state.albumName}
                 restartButtonClickHandler={this.restartButtonClickHandler}
               />
+              <Footer />
             </div>
           </div>
         </div>
