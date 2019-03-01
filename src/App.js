@@ -299,7 +299,7 @@ class Game extends React.Component {
           albumName={this.props.albumName}
         />
         <RestartButton
-          onClick={this.restartButtonClickHandler}
+          onClick={this.props.restartButtonClickHandler}
           gameHasStarted={this.props.gameHasStarted}
         />
       </div>
@@ -455,13 +455,18 @@ class App extends React.Component {
   };
 
   restartButtonClickHandler = () => {
-    // Stop tick interval
-    clearInterval(this.state.tickIntervalID);
-    // Reset state
-    const state = this.getInitialState();
-    // TODO: Overwrite state with configs from this.state so that the settings
-    // are not lost.
-    this.setState(state);
+    // // Stop tick interval
+    // clearInterval(this.state.tickIntervalID);
+    // // Reset state
+    // const state = this.getInitialState();
+    // // TODO: Overwrite state with configs from this.state so that the settings
+    // // are not lost.
+    // this.setState(state);
+    // // Call component did mount again
+    // this.componentDidMount();
+
+    // For now, just reload the page
+    window.location = window.location.href;
   };
 
   render = () => {
@@ -496,6 +501,7 @@ class App extends React.Component {
                 artists={this.state.artists}
                 albumImage={this.state.albumImage}
                 albumName={this.state.albumName}
+                restartButtonClickHandler={this.restartButtonClickHandler}
               />
             </div>
           </div>
