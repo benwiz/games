@@ -477,6 +477,7 @@ class App extends React.Component {
         <div className="App" style={style}>
           <div className="dimmer">
             <div className="container">
+              <h2>Power Hour</h2>
               <Config
                 gameHasStarted={this.state.gameHasStarted}
                 gameLengthMinutes={this.state.gameLengthMinutes}
