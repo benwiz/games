@@ -33,29 +33,6 @@ const theme = createMuiTheme({
 const spotify = new Spotify();
 Util.setupSpotify(spotify);
 
-class DeviceSelect extends React.Component {
-  createOptions() {
-    const options = [];
-    for (const device of this.props.devices) {
-      const option = (
-        <option key={device.id} value={device.id}>
-          {device.name}
-        </option>
-      );
-      options.push(option);
-    }
-    return options;
-  }
-
-  render() {
-    return (
-      <select value={this.props.value} onChange={this.props.onChange}>
-        {this.createOptions()}
-      </select>
-    );
-  }
-}
-
 class GameLengthSelect extends React.Component {
   render = () => {
     return (
@@ -80,10 +57,44 @@ class GameLengthSelect extends React.Component {
           <option value={80}>Eighty</option>
           <option value={90}>Ninety</option>
         </Select>
-        <FormHelperText>Minutes</FormHelperText>
+        {/* <FormHelperText>Minutes</FormHelperText> */}
       </FormControl>
     );
   };
+}
+
+class DeviceSelect extends React.Component {
+  createOptions() {
+    const options = [];
+    for (const device of this.props.devices) {
+      const option = (
+        <option key={device.id} value={device.id}>
+          {device.name}
+        </option>
+      );
+      options.push(option);
+    }
+    return options;
+  }
+
+  render() {
+    return (
+      <FormControl className="select-form-control">
+        <InputLabel htmlFor="Device">Device</InputLabel>
+        <Select
+          native
+          value={this.props.value}
+          onChange={this.props.onChange}
+          inputProps={{
+            name: 'Device',
+            id: 'Device',
+          }}
+        >
+          {this.createOptions()}
+        </Select>
+      </FormControl>
+    );
+  }
 }
 
 class StartButton extends React.Component {
