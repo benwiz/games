@@ -38,10 +38,9 @@ npm run deploy
     - Load configs and other state variables from the cookie
     - Delete the cookie
 
-- Finalize making everything pretty (or just leave it as is cuz its pretty enough)
-- For final drink, play The Final Countdown
-
 - Later
+  - Most things can definitely be prettier
+  - For final drink, play The Final Countdown
   - Declare game over by showing a new "end of game" component
   - Play a sound when song switches
   - Come up with a clever p5.js animation for the background
@@ -49,4 +48,3 @@ npm run deploy
       - Possibly simulate a liquid that's slowly going down
   - Update the theme to be the avg color of the albumImage
   - Clean all data when consuming it, not when using it
-  - There is a minor bug with the device select dropdown after clicking the reset button
