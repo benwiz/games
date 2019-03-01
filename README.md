@@ -29,11 +29,10 @@ npm run deploy
 
 ## To Do
 
-- Shot interval select
-- Upgrade the device select
-- Ensure that the configs actually work
+- Game length select should not be visible if game is started
+- Reset button has broken
 
-- Make the selects look good, probably in one row, outlined
+- Make the selects look good, probably in one row, outlined, all the same width
 - Hide configs if gameHasStarted==true
 
 - Sort out an elegant way to deal with the fact that the Spotify access token expires at exactly 1 hour (meaning, likely before the game ends)

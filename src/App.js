@@ -34,11 +34,14 @@ Util.setupSpotify(spotify);
 
 class GameLengthSelect extends React.Component {
   render = () => {
+    const style = { display: this.props.gameHasStarted ? 'none' : 'block' };
+
     return (
-      <FormControl className="select-form-control">
+      <FormControl className="select-form-control" style={style}>
         <InputLabel htmlFor="game-length">Game Length</InputLabel>
         <Select
           native
+          variant="outlined"
           value={this.props.value}
           onChange={this.props.onChange}
           inputProps={{
@@ -80,8 +83,8 @@ class ShotIntervalSelect extends React.Component {
           <option value={60}>60 seconds</option>
           <option value={90}>90 seconds</option>
           <option value={120}>120 seconds</option>
+          <option value={150}>150 seconds</option>
           <option value={180}>180 seconds</option>
-          <option value={240}>240 seconds</option>
         </Select>
         {/* <FormHelperText>Minutes</FormHelperText> */}
       </FormControl>
@@ -196,6 +199,7 @@ class Config extends React.Component {
         <GameLengthSelect
           value={this.props.gameLengthMinutes}
           onChange={this.props.gameLengthSelectChangeHandler}
+          gameHasStarted={this.props.gameHasStarted}
         />
         <ShotIntervalSelect
           value={this.props.shotIntervalSeconds}
@@ -366,7 +370,9 @@ class App extends React.Component {
     this.setState({ seconds, minutes });
 
     // Skip to next track if shotIntervalSeconds has passed since the last shot
-    const timeForShot = false;
+    const ellapsedMinutes = this.state.gameLengthMinutes - this.state.minutes;
+    const ellapsedSeconds = 60 * ellapsedMinutes + (60 - this.state.seconds);
+    const timeForShot = ellapsedSeconds % this.state.shotIntervalSeconds === 0;
     if (timeForShot) {
       spotify.skipToNext();
       // TODO: Maybe play a sound
@@ -398,6 +404,7 @@ class App extends React.Component {
           <div className="dimmer">
             <div className="container">
               <Config
+                gameHasStarted={this.state.gameHasStarted}
                 gameLengthMinutes={this.state.gameLengthMinutes}
                 gameLengthSelectChangeHandler={
                   this.gameLengthSelectChangeHandler
