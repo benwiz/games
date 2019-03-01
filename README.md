@@ -29,7 +29,6 @@ npm run deploy
 
 ## To Do
 
-- Title
 - Links to website and github
 
 - Automatic spotify token refresh:
