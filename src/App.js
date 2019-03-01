@@ -310,11 +310,11 @@ class Game extends React.Component {
 class Footer extends React.Component {
   render = () => {
     return (
-      <div>
-        <a href="/">
+      <div className="footer">
+        <a className="footer-link" href="/">
           <img src="./home.svg" width="24" height="24" alt="Home" />
         </a>
-        <a href="https://github.com/benwiz/power-hour">
+        <a className="footer-link" href="https://github.com/benwiz/power-hour">
           <img src="./github.svg" width="24" height="24" alt="GitHub" />
         </a>
       </div>
