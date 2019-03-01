@@ -29,7 +29,8 @@ npm run deploy
 
 ## To Do
 
-- Links to website and github
+- Links to website and github 
+  - Need the function that does this... try to be clever and use one function... also the function probably can live within Footer not within Game or App
 
 - Automatic spotify token refresh:
   - If fewer than 5 minutes left on spotify-access-token cookie
