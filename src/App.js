@@ -67,6 +67,7 @@ class GameLengthSelect extends React.Component {
           native
           value={this.props.value}
           onChange={this.props.onChange}
+          className="config-select"
           input={
             <OutlinedInput
               labelWidth={this.state.labelWidth}
@@ -116,6 +117,7 @@ class ShotIntervalSelect extends React.Component {
           native
           value={this.props.value}
           onChange={this.props.onChange}
+          className="config-select"
           input={
             <OutlinedInput
               labelWidth={this.state.labelWidth}
@@ -175,6 +177,7 @@ class DeviceSelect extends React.Component {
           native
           value={this.props.value}
           onChange={this.props.onChange}
+          className="config-select"
           input={
             <OutlinedInput
               labelWidth={this.state.labelWidth}

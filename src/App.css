@@ -1,7 +1,6 @@
 html,
 body,
 #root {
-  height: 100%;
   width: 100%;
 }
 
@@ -39,8 +38,13 @@ body,
 }
 
 .select-form-control {
-  margin-top: 24px;
   width: 200px;
+}
+
+/* This is not a good way of adding margin but I could
+   not get it to work in .select-form-control */
+.config-select {
+  margin-bottom: 24px;
 }
 
 button {
