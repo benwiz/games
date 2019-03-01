@@ -38,12 +38,6 @@ body,
   flex-direction: column;
 }
 
-select {
-  margin-top: 12px;
-  margin-bottom: 12px;
-  background-color: red;
-}
-
 button {
   margin-top: 12px;
   margin-bottom: 12px;

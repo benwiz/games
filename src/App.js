@@ -1,5 +1,5 @@
 import React from 'react';
-
+import ReactDOM from 'react-dom';
 import { MuiThemeProvider, createMuiTheme } from '@material-ui/core/styles';
 import Button from '@material-ui/core/Button';
 import Fab from '@material-ui/core/Fab';
@@ -7,6 +7,7 @@ import Icon from '@material-ui/core/Icon';
 import FormControl from '@material-ui/core/FormControl';
 import InputLabel from '@material-ui/core/InputLabel';
 import Select from '@material-ui/core/Select';
+import OutlinedInput from '@material-ui/core/OutlinedInput';
 
 import Spotify from 'spotify-web-api-js';
 import Util from './util';
@@ -33,21 +34,44 @@ const spotify = new Spotify();
 Util.setupSpotify(spotify);
 
 class GameLengthSelect extends React.Component {
+  state = {
+    labelWidth: 0,
+  };
+
+  componentDidMount() {
+    this.setState({
+      labelWidth: ReactDOM.findDOMNode(this.InputLabelRef).offsetWidth,
+    });
+  }
+
   render = () => {
     const style = { display: this.props.gameHasStarted ? 'none' : 'block' };
 
     return (
-      <FormControl className="select-form-control" style={style}>
-        <InputLabel htmlFor="game-length">Game Length</InputLabel>
+      <FormControl
+        className="select-form-control"
+        variant="outlined"
+        style={style}
+      >
+        <InputLabel
+          ref={ref => {
+            this.InputLabelRef = ref;
+          }}
+          htmlFor="game-length"
+        >
+          Game Length
+        </InputLabel>
         <Select
           native
-          variant="outlined"
           value={this.props.value}
           onChange={this.props.onChange}
-          inputProps={{
-            name: 'game-length',
-            id: 'game-length',
-          }}
+          input={
+            <OutlinedInput
+              labelWidth={this.state.labelWidth}
+              name="game-length"
+              id="game-length"
+            />
+          }
         >
           <option value={10}>10 minutes</option>
           <option value={20}>20 minutes</option>
@@ -66,18 +90,38 @@ class GameLengthSelect extends React.Component {
 }
 
 class ShotIntervalSelect extends React.Component {
+  state = {
+    labelWidth: 0,
+  };
+
+  componentDidMount() {
+    this.setState({
+      labelWidth: ReactDOM.findDOMNode(this.InputLabelRef).offsetWidth,
+    });
+  }
+
   render = () => {
     return (
       <FormControl className="select-form-control">
-        <InputLabel htmlFor="shot-interval">Shot Interval</InputLabel>
+        <InputLabel
+          ref={ref => {
+            this.InputLabelRef = ref;
+          }}
+          htmlFor="shot-interval"
+        >
+          Shot Interval
+        </InputLabel>
         <Select
           native
           value={this.props.value}
           onChange={this.props.onChange}
-          inputProps={{
-            name: 'shot-interval',
-            id: 'shot-interval',
-          }}
+          input={
+            <OutlinedInput
+              labelWidth={this.state.labelWidth}
+              name="shot-interval"
+              id="shot-interval"
+            />
+          }
         >
           <option value={30}>30 seconds</option>
           <option value={60}>60 seconds</option>
@@ -93,6 +137,16 @@ class ShotIntervalSelect extends React.Component {
 }
 
 class DeviceSelect extends React.Component {
+  state = {
+    labelWidth: 0,
+  };
+
+  componentDidMount() {
+    this.setState({
+      labelWidth: ReactDOM.findDOMNode(this.InputLabelRef).offsetWidth,
+    });
+  }
+
   createOptions() {
     const options = [];
     for (const device of this.props.devices) {
@@ -109,15 +163,25 @@ class DeviceSelect extends React.Component {
   render() {
     return (
       <FormControl className="select-form-control">
-        <InputLabel htmlFor="Device">Device</InputLabel>
+        <InputLabel
+          ref={ref => {
+            this.InputLabelRef = ref;
+          }}
+          htmlFor="device"
+        >
+          Device
+        </InputLabel>
         <Select
           native
           value={this.props.value}
           onChange={this.props.onChange}
-          inputProps={{
-            name: 'Device',
-            id: 'Device',
-          }}
+          input={
+            <OutlinedInput
+              labelWidth={this.state.labelWidth}
+              name="device"
+              id="device"
+            />
+          }
         >
           {this.createOptions()}
         </Select>
