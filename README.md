@@ -29,6 +29,8 @@ npm run deploy
 
 ## To Do
 
+- Links to website and github
+
 - Automatic spotify token refresh:
   - If fewer than 5 minutes left on spotify-access-token cookie
     - Delete the cookie
