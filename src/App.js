@@ -241,14 +241,14 @@ class RestartButton extends React.Component {
   render() {
     const styles = {
       visibility: this.props.gameHasStarted ? 'visible' : 'hidden',
-      marginTop: '24px',
-      marginBottom: '24px',
+      marginTop: '12px',
+      marginBottom: '12px',
     };
 
     return (
       <Button
         variant="outlined"
-        color="primary"
+        color="secondary"
         size="small"
         style={styles}
         onClick={this.props.onClick}
