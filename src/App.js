@@ -28,8 +28,8 @@ const theme = createMuiTheme({
   },
 });
 
-// Set up Spotify. This must execute immediately incase a redirect is necessary. There is maybe a
-// better practice for where this function should be called.
+// Set up Spotify. This must execute immediately incase a redirect is necessary.
+// There is maybe a better practice for where this function should be called.
 const spotify = new Spotify();
 Util.setupSpotify(spotify);
 
@@ -206,10 +206,10 @@ class App extends React.Component {
   getInitialState = () => {
     return {
       // Configs
-      gameLengthMinutes: 50,
+      gameLengthMinutes: 60,
       shotFrequencyInSeconds: 60,
       // Other, unsorted stuff
-      minutes: 60,
+      minutes: 60, // NOTE: Must match gameLengthMinutes
       seconds: 0,
       devices: [],
       currentDeviceID: '',
