@@ -336,7 +336,8 @@ class App extends React.Component {
     clearInterval(this.state.tickIntervalID);
     // Reset state
     const state = this.getInitialState();
-    // TODO: Overwrite state with configs from this.state so that the settings are not lost.
+    // TODO: Overwrite state with configs from this.state so that the settings
+    // are not lost.
     this.setState(state);
   };
 
