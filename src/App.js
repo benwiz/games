@@ -7,7 +7,6 @@ import Icon from '@material-ui/core/Icon';
 import FormControl from '@material-ui/core/FormControl';
 import InputLabel from '@material-ui/core/InputLabel';
 import Select from '@material-ui/core/Select';
-import FormHelperText from '@material-ui/core/FormHelperText';
 
 import Spotify from 'spotify-web-api-js';
 import Util from './util';
@@ -47,15 +46,42 @@ class GameLengthSelect extends React.Component {
             id: 'game-length',
           }}
         >
-          <option value={10}>Ten</option>
-          <option value={20}>Twenty</option>
-          <option value={30}>Thirty</option>
-          <option value={40}>Forty</option>
-          <option value={50}>Fifty</option>
-          <option value={60}>Sixty</option>
-          <option value={70}>Seventy</option>
-          <option value={80}>Eighty</option>
-          <option value={90}>Ninety</option>
+          <option value={10}>10 minutes</option>
+          <option value={20}>20 minutes</option>
+          <option value={30}>30 minutes</option>
+          <option value={40}>40 minutes</option>
+          <option value={50}>50 minutes</option>
+          <option value={60}>60 minutes</option>
+          <option value={70}>70 minutes</option>
+          <option value={80}>80 minutes</option>
+          <option value={90}>90 minutes</option>
+        </Select>
+        {/* <FormHelperText>Minutes</FormHelperText> */}
+      </FormControl>
+    );
+  };
+}
+
+class ShotIntervalSelect extends React.Component {
+  render = () => {
+    return (
+      <FormControl className="select-form-control">
+        <InputLabel htmlFor="shot-interval">Shot Interval</InputLabel>
+        <Select
+          native
+          value={this.props.value}
+          onChange={this.props.onChange}
+          inputProps={{
+            name: 'shot-interval',
+            id: 'shot-interval',
+          }}
+        >
+          <option value={30}>30 seconds</option>
+          <option value={60}>60 seconds</option>
+          <option value={90}>90 seconds</option>
+          <option value={120}>120 seconds</option>
+          <option value={180}>180 seconds</option>
+          <option value={240}>240 seconds</option>
         </Select>
         {/* <FormHelperText>Minutes</FormHelperText> */}
       </FormControl>
@@ -171,6 +197,10 @@ class Config extends React.Component {
           value={this.props.gameLengthMinutes}
           onChange={this.props.gameLengthSelectChangeHandler}
         />
+        <ShotIntervalSelect
+          value={this.props.shotIntervalSeconds}
+          onChange={this.props.shotIntervalSelectChangeHandler}
+        />
       </div>
     );
   };
@@ -218,7 +248,7 @@ class App extends React.Component {
     return {
       // Configs
       gameLengthMinutes: 60,
-      shotFrequencyInSeconds: 60,
+      shotIntervalSeconds: 60,
       // Other, unsorted stuff
       minutes: 60, // NOTE: Must match gameLengthMinutes
       seconds: 0,
@@ -292,6 +322,11 @@ class App extends React.Component {
     this.setState({ gameLengthMinutes, minutes });
   };
 
+  shotIntervalSelectChangeHandler = event => {
+    const shotIntervalSeconds = event.target.value;
+    this.setState({ shotIntervalSeconds });
+  };
+
   deviceSelectChangeHandler = async event => {
     // Update the state
     this.setState({ currentDeviceID: event.target.value });
@@ -330,9 +365,11 @@ class App extends React.Component {
     }
     this.setState({ seconds, minutes });
 
-    // Skip to next track if seconds is 0, do not await
-    if (seconds === 0) {
+    // Skip to next track if shotIntervalSeconds has passed since the last shot
+    const timeForShot = false;
+    if (timeForShot) {
       spotify.skipToNext();
+      // TODO: Maybe play a sound
     }
 
     // If game is over, update the state to say so
@@ -364,6 +401,10 @@ class App extends React.Component {
                 gameLengthMinutes={this.state.gameLengthMinutes}
                 gameLengthSelectChangeHandler={
                   this.gameLengthSelectChangeHandler
+                }
+                shotIntervalSeconds={this.state.shotIntervalSeconds}
+                shotIntervalSelectChangeHandler={
+                  this.shotIntervalSelectChangeHandler
                 }
               />
               <Game
