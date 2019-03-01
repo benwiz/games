@@ -439,7 +439,9 @@ class App extends React.Component {
     // Skip to next track if shotIntervalSeconds has passed since the last shot
     const ellapsedMinutes = this.state.gameLengthMinutes - this.state.minutes;
     const ellapsedSeconds = 60 * ellapsedMinutes + (60 - this.state.seconds);
-    const timeForShot = ellapsedSeconds % this.state.shotIntervalSeconds === 0;
+    const timeForShot =
+      ellapsedSeconds % this.state.shotIntervalSeconds === 0 || // Interval
+      (minutes === 0 && seconds === 0); // End of game
     if (timeForShot) {
       spotify.skipToNext();
       // TODO: Maybe play a sound
