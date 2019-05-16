@@ -2,6 +2,10 @@
 
 A controller to run a power hour using Spotify.
 
+## Why
+
+A project to learn React. There is also no Spotify-based power hour app on the Apple app store so I'd like to port this to React Native.
+
 ## Thoughts about React
 
 All my functions ended up in in my top level component (App), can/should I move them lower and try harder to pass only data? I feel like I should.
