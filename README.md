@@ -4,7 +4,7 @@ A controller to run a power hour using Spotify.
 
 ## Why
 
-A project to learn React. There is also no Spotify-based power hour app on the Apple app store so I'd like to port this to React Native.
+A project to learn React. There is also no Spotify-based power hour app or service.
 
 ## Thoughts about React
 
@@ -33,7 +33,7 @@ npm run deploy
 
 ## To Do
 
-- Links to website and github 
+- Links to website and github
   - Need the function that does this... try to be clever and use one function... also the function probably can live within Footer not within Game or App
 - Throw an alert that Spotify must be open on at least one device if no devices found
 
@@ -51,7 +51,8 @@ npm run deploy
   - For final drink, play The Final Countdown
   - Declare game over by showing a new "end of game" component
   - Play a sound when song switches
-  - Come up with a clever p5.js animation for the background
+  - Background animation
+    - Use shaders visualizer
     - Maybe something related to how many ounces of beer
       - Possibly simulate a liquid that's slowly going down
   - Update the theme to be the avg color of the albumImage
