@@ -1,4 +1,4 @@
-# power-hour
+# powerhour
 
 A controller to run a power hour using Spotify.
 
