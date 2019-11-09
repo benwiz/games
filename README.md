@@ -33,9 +33,7 @@ npm run deploy
 
 ## To Do
 
-- Links to website and github
-  - Need the function that does this... try to be clever and use one function... also the function probably can live within Footer not within Game or App
-- Throw an alert that Spotify must be open on at least one device if no devices found
+- Probably rewrite this in ClojureScript
 
 - Automatic spotify token refresh:
   - If fewer than 5 minutes left on spotify-access-token cookie
