@@ -6,6 +6,8 @@ Play Spyfall with just your phone
 
 Taken from https://chezsoi.org/lucas/spyfall/?lang=en
 
+left off at Space Station
+
 Entertainment Venues
 - Beach
   - Beach Waitress
@@ -67,8 +69,22 @@ Stores & Services
   - Bellman
   - Customer
 - Restaurant
+  - Musician
+  - Bouncer
+  - Hostess
+  - Head Chef
+  - Food Critic
+  - Waiter
+  - Customer
 - Supermarket
 - Service Station
+  - Manager
+  - Tire Specialist
+  - Biker
+  - Car Owner
+  - Car Wash Operator
+  - Electrician
+  - Auto Mechanic
 
 Government buildings
 - Hospital
@@ -81,7 +97,21 @@ Government buildings
   - Patient
 - Embassy
 - Military Base
+  - Deserter
+  - Colonel
+  - Medic
+  - Sniper
+  - Officer
+  - Tank Engineer
+  - Soldier
 - Police Station
+  - Detective
+  - Lawyer
+  - Journalist
+  - Criminalist
+  - Archivist
+  - Criminal
+  - Patrol Officer
 - School
 - University
 
@@ -90,14 +120,28 @@ Vehicles and transportation
   - First Class Passenger
   - Air Marshal
   - Mechanic
-  - Flight Attendent
+  - Flight Attendant
   - Co-Pilot
   - Captain
   - Economy Class Passenger
 - Ocean Liner
 - Passenger Train
+  - Mechanic
+  - Border Patrol
+  - Train Attendant
+  - Restaurant Chef
+  - Train Driver
+  - Stoker
+  - Passenger
 - Submarine
 - Pirate Ship
+  - Cook
+  - Slave
+  - Cannoneer
+  - Tied Up Prisoner
+  - Cabin Boy
+  - Brave Captain
+  - Sailor
 
 Religion
 - Cathedral
@@ -130,6 +174,13 @@ Religion
 
 Research Stations
 - Polar Station
+  - Medic
+  - Expedition Leader
+  - Biologist
+  - Radioman
+  - Hydrologist
+  - Meteorologist
+  - Geologist
 - Space Station 
 
 Other
