@@ -1,4 +1,4 @@
-const board = [[1,   0,   0],
+const BOARD = [[1,   0,   0],
                [1,   0,   0],
                [1,  -1,   0],
                [1,   0,  -1],
@@ -32,26 +32,26 @@ const shuffle = (array, seed) => {
     seed = seed || 1;
 
     let random = function() {
-        var x = Math.sin(seed++) * 10000;
-        return x - Math.floor(x);
+      var x = Math.sin(seed++) * 10000;
+      return x - Math.floor(x);
     };
 
     // While there remain elements to shuffle
     while (0 !== currentIndex) {
-        // Pick a remaining element
-        randomIndex = Math.floor(random() * currentIndex);
+      // Pick a reboarding element
+      randomIndex = Math.floor(random() * currentIndex);
         currentIndex -= 1;
 
-        // Swap it with the current element.
-        temporaryValue = array[currentIndex];
-        array[currentIndex] = array[randomIndex];
-        array[randomIndex] = temporaryValue;
+      // Swap it with the current element.
+      temporaryValue = array[currentIndex];
+      array[currentIndex] = array[randomIndex];
+      array[randomIndex] = temporaryValue;
     }
     return array;
 };
 
-const main = (player, seed) => {
-    const shuffled = shuffle(board.slice(), seed);
+const board = (player, seed) => {
+    const shuffled = shuffle(BOARD.slice(), seed);
     const gridWrapper = document.querySelector('.wrapper');
     const cards = gridWrapper.querySelectorAll('.card');
     cards.forEach((card, i) => {
@@ -79,20 +79,20 @@ const main = (player, seed) => {
     });
 };
 
-main(-1, SEED);
+board(-1, SEED);
 
 document.querySelectorAll('input[name=player]').forEach((radio) => {
     radio.addEventListener('change', (e) => {
         const player = parseInt(e.target.value) - 1;
         PLAYER = player;
-        main(PLAYER, SEED);
+        board(PLAYER, SEED);
     });
 });
 
 const updateSeed = (e) => {
     const seed = e.target.value;
     SEED = parseInt(seed);
-    main(PLAYER, SEED);
+    board(PLAYER, SEED);
 };
 document.querySelector('#seed').addEventListener('keyup', updateSeed);
 document.querySelector('#seed').addEventListener('change', updateSeed);
