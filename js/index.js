@@ -28,24 +28,25 @@ let PLAYER = -1;
 let SEED = -1;
 
 const shuffle = (array, seed) => {
+    array = array.slice();
     let currentIndex = array.length, temporaryValue, randomIndex;
     seed = seed || 1;
 
-    let random = function() {
-      var x = Math.sin(seed++) * 10000;
-      return x - Math.floor(x);
+    let random = () => {
+        var x = Math.sin(seed++) * 10000;
+        return x - Math.floor(x);
     };
 
     // While there remain elements to shuffle
     while (0 !== currentIndex) {
-      // Pick a reboarding element
-      randomIndex = Math.floor(random() * currentIndex);
+        // Pick a reboarding element
+        randomIndex = Math.floor(random() * currentIndex);
         currentIndex -= 1;
 
-      // Swap it with the current element.
-      temporaryValue = array[currentIndex];
-      array[currentIndex] = array[randomIndex];
-      array[randomIndex] = temporaryValue;
+        // Swap it with the current element.
+        temporaryValue = array[currentIndex];
+        array[currentIndex] = array[randomIndex];
+        array[randomIndex] = temporaryValue;
     }
     return array;
 };
@@ -56,7 +57,6 @@ const board = (player, seed) => {
     const cards = gridWrapper.querySelectorAll('.card');
     cards.forEach((card, i) => {
         const cardType = shuffled[i][player];
-        console.log(cardType);
         let color;
         switch (cardType) {
         case -1:
@@ -76,21 +76,49 @@ const board = (player, seed) => {
     });
 };
 
+const showBoard = () => {
+    const board = document.querySelector('.wrapper');
+    if (PLAYER > -1 && SEED > -1) {
+        board.className = 'wrapper';
+    } else {
+        board.className = 'wrapper hidden';
+    }
+};
+
+
+// Input labels (TODO probably should be nested within a div with the actual content)
+const seedInputLabel = document.querySelector('#seed-input-label');
+const playerInputLabel = document.querySelector('#player-input-labe');
+const boardLabel = document.querySelector('#board-label');
+
+// Seed event handlers
+const updateSeed = (e) => {
+    const seed = e.target.value;
+    SEED = parseInt(seed);
+    board(PLAYER, SEED);
+    showBoard();
+    if (SEED > -1) {
+        boardLabel.className = '';
+    }
+};
+const seedInput = document.querySelector('#seed');
+seedInput.addEventListener('keyup', updateSeed);
+seedInput.addEventListener('change', updateSeed);
+
+// Player handlers
 document.querySelectorAll('input[name=player]').forEach((radio) => {
     radio.addEventListener('change', (e) => {
         const player = parseInt(e.target.value) - 1;
         PLAYER = player;
         board(PLAYER, SEED);
+        showBoard();
+        console.log(PLAYER);
+        if (PLAYER > -1) {
+            seedInput.className = '';
+            seedInputLabel.className = '';
+        }
     });
 });
-
-const updateSeed = (e) => {
-    const seed = e.target.value;
-    SEED = parseInt(seed);
-    board(PLAYER, SEED);
-};
-document.querySelector('#seed').addEventListener('keyup', updateSeed);
-document.querySelector('#seed').addEventListener('change', updateSeed);
 
 // Start the initial board
 board(PLAYER, SEED);

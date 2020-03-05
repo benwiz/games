@@ -1,5 +1,5 @@
 body {
-  /* margin: 40px; */
+    /* margin: 40px; */
 }
 
 .card {
@@ -25,11 +25,16 @@ body {
 
 .wrapper {
     margin: 0 auto;
-  width: 400px;
-  display: grid;
-  grid-column-gap: 10px;
-  grid-row-gap: 0px;
-  grid-template-columns: repeat(5, 100px);
-  grid-template-rows: repeat(5, 100px);
-  grid-auto-flow: row;
+    width: 400px;
+    display: grid;
+    grid-column-gap: 10px;
+    grid-row-gap: 0px;
+    grid-template-columns: repeat(5, 100px);
+    grid-template-rows: repeat(5, 100px);
+    grid-auto-flow: row;
+}
+
+/* This class must be after wrapper to override display.  */
+.hidden {
+    display: none;
 }
