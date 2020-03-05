@@ -24,26 +24,28 @@ const board = [[1,   0,   0],
                [0,   0,   0],
                [0,   0,   0]];
 
-// TODO long term dont use globals, just doing this for ease now
-let gPlayer = -1;
-let gSeed = -1;
+let PLAYER = -1;
+let SEED = -1;
 
 const shuffle = (array, seed) => {
     let currentIndex = array.length, temporaryValue, randomIndex;
     seed = seed || 1;
+
     let random = function() {
-      var x = Math.sin(seed++) * 10000;
-      return x - Math.floor(x);
+        var x = Math.sin(seed++) * 10000;
+        return x - Math.floor(x);
     };
-    // While there remain elements to shuffle...
+
+    // While there remain elements to shuffle
     while (0 !== currentIndex) {
-      // Pick a remaining element...
-      randomIndex = Math.floor(random() * currentIndex);
-      currentIndex -= 1;
-      // And swap it with the current element.
-      temporaryValue = array[currentIndex];
-      array[currentIndex] = array[randomIndex];
-      array[randomIndex] = temporaryValue;
+        // Pick a remaining element
+        randomIndex = Math.floor(random() * currentIndex);
+        currentIndex -= 1;
+
+        // Swap it with the current element.
+        temporaryValue = array[currentIndex];
+        array[currentIndex] = array[randomIndex];
+        array[randomIndex] = temporaryValue;
     }
     return array;
 };
@@ -77,20 +79,20 @@ const main = (player, seed) => {
     });
 };
 
-main(-1, gSeed);
+main(-1, SEED);
 
 document.querySelectorAll('input[name=player]').forEach((radio) => {
     radio.addEventListener('change', (e) => {
         const player = parseInt(e.target.value) - 1;
-        gPlayer = player;
-        main(gPlayer, gSeed);
+        PLAYER = player;
+        main(PLAYER, SEED);
     });
 });
 
 const updateSeed = (e) => {
     const seed = e.target.value;
-    gSeed = parseInt(seed);
-    main(gPlayer, gSeed);
+    SEED = parseInt(seed);
+    main(PLAYER, SEED);
 };
 document.querySelector('#seed').addEventListener('keyup', updateSeed);
 document.querySelector('#seed').addEventListener('change', updateSeed);
