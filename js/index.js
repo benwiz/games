@@ -29,7 +29,9 @@ let SEED = -1;
 
 const shuffle = (array, seed) => {
     array = array.slice();
-    let currentIndex = array.length, temporaryValue, randomIndex;
+    let currentIndex = array.length
+    let temporaryValue;
+    let randomIndex;
     seed = seed || 1;
 
     let random = () => {
