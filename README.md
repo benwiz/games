@@ -2,13 +2,10 @@
 
 Play Spyfall with just your phone
 
-## Locations (28 total) with Roles
+## Locations with Roles
 
 Taken from https://chezsoi.org/lucas/spyfall/?lang=en
 
-left off at Space Station
-
-Entertainment Venues
 - Beach
   - Beach Waitress
   - Kite Surfer
@@ -49,8 +46,53 @@ Entertainment Venues
   - Secretary
   - Delivery Boy
   - Accountant
-
-Stores & Services
+- Race Track
+  - Team Owner
+  - Driver
+  - Engineer
+  - Spectator
+  - Referee
+  - Mechanic
+  - Food Vendor
+  - Commentator
+  - Bookmaker
+- Art Museum
+  - Ticket Seller
+  - Student
+  - Visitor
+  - Teacher
+  - Security Guard
+  - Painter
+  - Art Collector
+  - Art Critic
+  - Photographer
+  - Tourist
+- Baseball Stadium
+  - Pitcher
+  - Catcher
+  - Commenter
+  - Spectator
+  - Security Guard
+  - Umpire
+  - Food Vendor
+  - Manager
+  - First Baseman
+  - Shortstop
+  - Outfielder
+  - Second Baseman
+  - Third Baseman
+  - Mascot
+  - Team Owner
+- Cat Show
+  - Judge
+  - Cat-Handler
+  - Veterinarian
+  - Security Guard
+  - Cat Trainer
+  - Crazy Cat Lady
+  - Animal Lover
+  - Cat Owner
+  - Cat
 - Bank
   - Armored Car Driver
   - Manager
@@ -59,7 +101,6 @@ Stores & Services
   - Security Guard
   - Teller
   - Customer
-- Day Spa
 - Hotel
   - Doorman
   - Security Guard
@@ -76,7 +117,6 @@ Stores & Services
   - Food Critic
   - Waiter
   - Customer
-- Supermarket
 - Service Station
   - Manager
   - Tire Specialist
@@ -85,8 +125,36 @@ Stores & Services
   - Car Wash Operator
   - Electrician
   - Auto Mechanic
-
-Government buildings
+- Vineyard
+  - Gardener
+  - Gourmet Guide
+  - Winemaker
+  - Exporter
+  - Butler
+  - Wine Taster
+  - Sommelier
+  - Owner
+  - Vineyard Manager
+- Construction Site
+  - Free-Roaming Toddler
+  - Contractor
+  - Crane Driver
+  - Trespasser
+  - Safety Officer
+  - Electrician
+  - Engineer
+  - Architect
+  - Construction Worker
+- Candy Factory
+  - Candy Maker
+  - Pastry Chef
+  - Visitor
+  - Taster
+  - Truffle Maker
+  - Supply Worker
+  - Packager
+  - Inspector
+  - Machine Operator
 - Hospital
   - Nurse
   - Doctor
@@ -95,7 +163,6 @@ Government buildings
   - Therapist
   - Surgeon
   - Patient
-- Embassy
 - Military Base
   - Deserter
   - Colonel
@@ -112,10 +179,39 @@ Government buildings
   - Archivist
   - Criminal
   - Patrol Officer
-- School
-- University
-
-Vehicles and transportation
+- Library
+  - Old Man
+  - Journalist
+  - Author
+  - Volunteer
+  - Know-It-All
+  - Student
+  - Librarian
+  - Loudmouth
+  - Book Fanatic
+  - Nerd
+- Jail
+  - Wrongly Accused Man
+  - CCTV Operator
+  - Guard
+  - Visitor
+  - Lawyer
+  - Janitor
+  - Jailkeeper
+  - Criminal
+  - Correction Officer
+  - Maniac
+- United Nations
+  - Diplomat
+  - Interpreter
+  - Blowhard
+  - Tourist
+  - Napping Delegate
+  - Journalist
+  - Secretary of State
+  - Speaker
+  - Secretary General
+  - Lobbyist
 - Airplane
   - First Class Passenger
   - Air Marshal
@@ -124,7 +220,6 @@ Vehicles and transportation
   - Co-Pilot
   - Captain
   - Economy Class Passenger
-- Ocean Liner
 - Passenger Train
   - Mechanic
   - Border Patrol
@@ -134,6 +229,13 @@ Vehicles and transportation
   - Stoker
   - Passenger
 - Submarine
+  - Cook
+  - Commander
+  - Sonar Technician
+  - Eloctronics Technician
+  - Radioman
+  - Navigator
+  - Sailor
 - Pirate Ship
   - Cook
   - Slave
@@ -142,8 +244,6 @@ Vehicles and transportation
   - Cabin Boy
   - Brave Captain
   - Sailor
-
-Religion
 - Cathedral
   - Priest
   - Beggar
@@ -171,8 +271,6 @@ Religion
   - Flower Seller
   - Grave Digger
   - Goth Girl/Boy
-
-Research Stations
 - Polar Station
   - Medic
   - Expedition Leader
@@ -181,7 +279,116 @@ Research Stations
   - Hydrologist
   - Meteorologist
   - Geologist
-- Space Station 
-
-Other
+- Space Station
+  - Engineer
+  - Alien
+  - Pilot
+  - Commander
+  - Scientist
+  - Doctor
+  - Space Tourist
 - Wolrd War II Squadron
+  - Resistance Fighter
+  - Radioman
+  - Scout
+  - Medic
+  - Cook
+  - Imprisoned Nazi
+    - Soldier
+- Retirement Home
+  - Relative
+  - Cribbage Player
+  - Old Person
+  - Nurse
+  - Janitor
+  - Cook
+  - Blind Soul
+  - Psychologist
+- Subway
+  - Tourist
+  - Subway Operator
+  - Ticket Inspector
+  - Pregnant Lady
+  - Pickpocket
+  - Cleaner
+  - Businessman
+  - Ticket Seller
+  - Old Lady
+  - Blind Man
+  - Performer
+- Coal Mine
+  - Safety Inspector
+  - Miner
+  - Overseet
+  - Dump Truck Operator
+  - Driller
+  - Coordinator
+  - Blasting Engineer
+  - Solid Waste Engineer
+  - Worker
+- Rock Concert
+  - Guitarist
+  - Drummer
+  - Roadie
+  - Stage Diver
+  - Security Guard
+  - Bassist
+  - Sound Technician
+- Jazz Club
+  - Bouncer
+  - Drummer
+  - Pianist
+  - Saxophonist
+  - Singer
+  - Jazz Fanatic
+  - Dancer
+  - Barman
+  - VIP
+  - Waiter
+- Wedding
+  - Ring Bearer
+  - Groom
+  - Bride
+  - Officiant
+  - Photographer
+  - Flower Girl
+  - Father of the Bride
+  - Wedding Crasher
+  - Best Man
+  - Maid of Honor
+  - Relative
+- Gas Station
+  - Car Enthusiast
+  - Service Attendant
+  - Shopkeeper
+  - Customer
+  - Car Washer
+  - Cashier
+  - Climate Change Activist
+  - Manager
+- Harbor Docks
+  - Loader
+  - Salty Old Pirate
+  - Captain
+  - Sailor
+  - Fisherman
+  - Exporter
+  - Cargo Overseer
+  - Cargo Inspector
+  - Smuggler
+  - Old Man
+- Sightseeing Bus
+  - Old Man
+  - Lone Tourist
+  - Driver
+  - Annoying Child
+  - Tourist
+  - Tour Guide
+  - Photographer
+  - Lost Person
+
+
+## To Do
+
+- Finish list
+  - There should be vaildation on the coded list, like at least 7 roles per location
