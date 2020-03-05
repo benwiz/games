@@ -56,12 +56,9 @@ const board = (player, seed) => {
     const cards = gridWrapper.querySelectorAll('.card');
     cards.forEach((card, i) => {
         const cardType = shuffled[i][player];
-        if (i == 0) { console.log(i, player, '->', cardType); };
+        console.log(cardType);
         let color;
         switch (cardType) {
-        case undefined:
-            color = 'lightblue';
-            break;
         case -1:
             color = 'black';
             break;
@@ -79,8 +76,6 @@ const board = (player, seed) => {
     });
 };
 
-board(-1, SEED);
-
 document.querySelectorAll('input[name=player]').forEach((radio) => {
     radio.addEventListener('change', (e) => {
         const player = parseInt(e.target.value) - 1;
@@ -96,3 +91,6 @@ const updateSeed = (e) => {
 };
 document.querySelector('#seed').addEventListener('keyup', updateSeed);
 document.querySelector('#seed').addEventListener('change', updateSeed);
+
+// Start the initial board
+board(PLAYER, SEED);
