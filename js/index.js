@@ -112,7 +112,6 @@ document.querySelectorAll('input[name=player]').forEach((radio) => {
         PLAYER = player;
         board(PLAYER, SEED);
         showBoard();
-        console.log(PLAYER);
         if (PLAYER > -1) {
             seedInput.className = '';
             seedInputLabel.className = '';
