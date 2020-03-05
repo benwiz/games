@@ -26,38 +26,44 @@
       <label for="3">Three</label>
     </div>
 
-    <h4 id="seed-input-label" class="hidden">2. Pick a game id (any number)<h4>
-        <input class="hidden" type="number" id="seed" name="seed" min="0" pattern="\d*" autocomplete="off"><br><br>
+    <h4 id="seed-input-label" class="hidden">2. Pick board size and a game id (any number)</h4>
+    <div id="board-size" class="toggle-buttons hidden">
+      <input type="radio" id="5x5" name="board-size" value="5x5" autocomplete="off" checked>
+      <label for="1">One</label>
+      <input type="radio" id="6x6" name="board-size" value="6x6" autocomplete="off">
+      <label for="2">Two</label>
+    </div>
+    <input class="hidden" type="number" id="seed" name="seed" min="0" pattern="\d*" autocomplete="off"><br><br>
 
-        <h4 id="board-label" class="hidden">3. Play the game<h4>
-            <div class="wrapper hidden">
-              <div class="card"></div>
-              <div class="card"></div>
-              <div class="card"></div>
-              <div class="card"></div>
-              <div class="card"></div>
-              <div class="card"></div>
-              <div class="card"></div>
-              <div class="card"></div>
-              <div class="card"></div>
-              <div class="card"></div>
-              <div class="card"></div>
-              <div class="card"></div>
-              <div class="card"></div>
-              <div class="card"></div>
-              <div class="card"></div>
-              <div class="card"></div>
-              <div class="card"></div>
-              <div class="card"></div>
-              <div class="card"></div>
-              <div class="card"></div>
-              <div class="card"></div>
-              <div class="card"></div>
-              <div class="card"></div>
-              <div class="card"></div>
-              <div class="card"></div>
-            </div>
+    <h4 id="board-label" class="hidden">3. Play the game</h4>
+    <div class="wrapper hidden">
+      <div class="card"></div>
+      <div class="card"></div>
+      <div class="card"></div>
+      <div class="card"></div>
+      <div class="card"></div>
+      <div class="card"></div>
+      <div class="card"></div>
+      <div class="card"></div>
+      <div class="card"></div>
+      <div class="card"></div>
+      <div class="card"></div>
+      <div class="card"></div>
+      <div class="card"></div>
+      <div class="card"></div>
+      <div class="card"></div>
+      <div class="card"></div>
+      <div class="card"></div>
+      <div class="card"></div>
+      <div class="card"></div>
+      <div class="card"></div>
+      <div class="card"></div>
+      <div class="card"></div>
+      <div class="card"></div>
+      <div class="card"></div>
+      <div class="card"></div>
+    </div>
 
-            <script src="js/index.js"></script>
+    <script src="js/index.js"></script>
   </body>
 </html>

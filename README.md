@@ -20,4 +20,3 @@ Push to master
 ## To Do
 
 - Add 6x6 option
-- Better font
