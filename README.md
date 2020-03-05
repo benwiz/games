@@ -19,4 +19,4 @@ Push to master
 
 ## To Do
 
-- Use radio toggle buttons like these https://codepen.io/JiveDig/pen/jbdJXR/
+- Add 6x6 option
