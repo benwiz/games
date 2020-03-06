@@ -400,5 +400,4 @@ Push to master
 
 ## To Do
 
-- code the list into javascript
-  - There should be vaildation on the coded list, like at least 7 roles per location
+- Hide/unhide secret info

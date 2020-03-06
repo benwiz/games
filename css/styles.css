@@ -3,7 +3,58 @@ body {
     /* max-width: 400px; */
 }
 
+.color-grid {
+    width: 100vw;
+    height: 80vh;
+    display: grid;
+    /* grid-column-gap: 10px; */
+    /* grid-row-gap: 10px; */
+    grid-auto-flow: row;
+    grid-template-columns: repeat(2, 1fr);
+    grid-template-rows: repeat(4, 1fr);
+}
 
+.a {
+    background-color: blue;
+}
+
+.b {
+    background-color: red;
+}
+
+.c {
+    background-color: green;
+}
+
+.d {
+    background-color: orange;
+}
+
+.e {
+    background-color: yellow;
+}
+
+.f {
+    background-color: cyan;
+}
+
+.g {
+    background-color: magenta;
+}
+
+.h {
+    background-color: blanchedalmond;
+}
+
+.color-item {
+    cursor: pointer;
+    margin: 1px;
+}
+
+.color-item-confirm {
+    width: 100vw;
+    height: 80vw;
+}
 
 .hidden {
     display: none;
