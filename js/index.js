@@ -39,3 +39,29 @@ const OPTIONS = [{location: "Beach", roles: ["Beach Waitress", "Kite Surfer", "L
                  {location: "Gas Station", roles: ["Car Enthusiast", "Service Attendant", "Shopkeeper", "Customer", "Car Washer", "Cashier", "Climate Change Activist", "Manager"]},
                  {location: "Harbor Docks", roles: ["Loader", "Salty Old Pirate", "Captain", "Sailor", "Fisherman", "Exporter", "Cargo Overseer", "Cargo Inspector", "Smuggler", "Old Man"]},
                  {location: "Sightseeing Bus", roles: ["Old Man", "Lone Tourist", "Driver", "Annoying Child", "Tourist", "Tour Guide", "Photographer", "Lost Person"]}]
+
+const shuffle = (array, seed) => {
+    array = array.slice();
+    let currentIndex = array.length
+    let temporaryValue;
+    let randomIndex;
+    seed = seed || 1;
+
+    let random = () => {
+        var x = Math.sin(seed++) * 10000;
+        return x - Math.floor(x);
+    };
+
+    // While there remain elements to shuffle
+    while (0 !== currentIndex) {
+        // Pick a reboarding element
+        randomIndex = Math.floor(random() * currentIndex);
+        currentIndex -= 1;
+
+        // Swap it with the current element.
+        temporaryValue = array[currentIndex];
+        array[currentIndex] = array[randomIndex];
+        array[randomIndex] = temporaryValue;
+    }
+    return array;
+};
