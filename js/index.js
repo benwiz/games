@@ -68,6 +68,7 @@ const shuffle = (array, seed) => {
 
 const board = (player, boardSize, seed) => {
     let newBoard;
+    console.log('bs:', boardSize);
     switch (boardSize) {
     case '6x6':
         newBoard = BOARD.slice().concat(BOARD_6x6_APPEND.slice());
@@ -78,25 +79,27 @@ const board = (player, boardSize, seed) => {
     }
     const shuffled = shuffle(newBoard, seed);
     const gridWrapper = document.querySelector('.wrapper');
-    const cards = gridWrapper.querySelectorAll('.card');
-    cards.forEach((card, i) => {
-        const cardType = shuffled[i][player];
-        let color;
+    gridWrapper.innerHTML = '';
+    shuffled.forEach((set) => {
+        const cardType = set[player];
+        let classes = 'card ';
         switch (cardType) {
         case -1:
-            color = 'black';
+            classes += 'black';
             break;
         case 0:
-            color = 'yellow';
+            classes += 'yellow';
             break;
         case 1:
-            color = 'green';
+            classes += 'green';
             break;
         default:
-            color = 'magenta';
+            classes += 'magenta';
             break;
         };
-        card.className = 'card ' + color;
+        const card = document.createElement('div');
+        card.className = classes;
+        gridWrapper.appendChild(card);
     });
 };
 
