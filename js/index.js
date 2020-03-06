@@ -40,6 +40,14 @@ const OPTIONS = [{location: "Beach", roles: ["Beach Waitress", "Kite Surfer", "L
                  {location: "Harbor Docks", roles: ["Loader", "Salty Old Pirate", "Captain", "Sailor", "Fisherman", "Exporter", "Cargo Overseer", "Cargo Inspector", "Smuggler", "Old Man"]},
                  {location: "Sightseeing Bus", roles: ["Old Man", "Lone Tourist", "Driver", "Annoying Child", "Tourist", "Tour Guide", "Photographer", "Lost Person"]}]
 
+const validation = (options) => {
+    options.forEach((option) => {
+        if (option.roles.length < 7) {
+            console.log(`WARNING: Location ${option.location} has only ${option.roles.length} roles.`);
+        }
+    });
+};
+
 const shuffle = (array, seed) => {
     array = array.slice();
     let currentIndex = array.length
@@ -65,3 +73,5 @@ const shuffle = (array, seed) => {
     }
     return array;
 };
+
+validation(OPTIONS);
