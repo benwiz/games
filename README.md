@@ -19,4 +19,4 @@ Push to master
 
 ## To Do
 
-- Add 6x6 option
+- Prevent non digits from being entered into the seed text field (very unimportant)
