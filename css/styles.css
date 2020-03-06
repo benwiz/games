@@ -1,5 +1,5 @@
 body {
-    font-family: 'Oxanium', sans-serif;
+    font-family: 'Oxanium', sans-serif; /* google suggested to use cursive which I don't get*/
     max-width: 400px;
 }
 
@@ -69,16 +69,25 @@ body {
 
 .wrapper {
     margin: 10px;
-    /* width: 100px; */
     display: grid;
     grid-column-gap: 10px;
     grid-row-gap: 10px;
-    grid-template-columns: repeat(5, 1fr);
-    grid-template-rows: repeat(5, 40px);
     grid-auto-flow: row;
 }
 
-/* This class must be after wrapper to override display.  */
+/* This class must be after wrapper for override. */
+.five-by-five {
+    grid-template-columns: repeat(5, 1fr);
+    grid-template-rows: repeat(5, 40px);
+}
+
+/* This class must be after wrapper for override. */
+.six-by-six {
+    grid-template-columns: repeat(6, 1fr);
+    grid-template-rows: repeat(6, 40px);
+}
+
+/* This class must be after wrapper for override. */
 .hidden {
     display: none;
 }

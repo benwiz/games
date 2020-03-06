@@ -24,8 +24,21 @@ const BOARD = [[1,   0,   0],
                [0,   0,   0],
                [0,   0,   0]];
 
+const BOARD_6x6_APPEND = [[1, 0, 0],
+                          [1, 0, 0],
+                          [0, 1, 0],
+                          [0, 1, 0],
+                          [0, 0, 1],
+                          [0, 0, 1],
+                          [-1,0, 0],
+                          [0,-1, 0],
+                          [0, 0,-1],
+                          [0, 0, 0],
+                          [0, 0, 0]];
+
 let PLAYER = -1;
 let SEED = -1;
+let BOARD_SIZE = '5x5';
 
 const shuffle = (array, seed) => {
     array = array.slice();
@@ -53,8 +66,17 @@ const shuffle = (array, seed) => {
     return array;
 };
 
-const board = (player, seed) => {
-    const shuffled = shuffle(BOARD.slice(), seed);
+const board = (player, boardSize, seed) => {
+    let newBoard;
+    switch (boardSize) {
+    case '6x6':
+        newBoard = BOARD.slice().concat(BOARD_6x6_APPEND.slice());
+        break;
+    default:
+        newBoard = BOARD.slice();
+        break;
+    }
+    const shuffled = shuffle(newBoard, seed);
     const gridWrapper = document.querySelector('.wrapper');
     const cards = gridWrapper.querySelectorAll('.card');
     cards.forEach((card, i) => {
@@ -80,24 +102,42 @@ const board = (player, seed) => {
 
 const showBoard = () => {
     const board = document.querySelector('.wrapper');
-    if (PLAYER > -1 && SEED > -1) {
-        board.className = 'wrapper';
-    } else {
-        board.className = 'wrapper hidden';
+    let classes = 'wrapper';
+    if (PLAYER == -1 || SEED == -1) {
+        classes += ' hidden';
     }
+    if (BOARD_SIZE == '6x6') {
+        classes += ' six-by-six';
+    } else {
+        classes += ' five-by-five';
+    }
+    board.className = classes;
 };
 
 
-// Input labels (TODO probably should be nested within a div with the actual content)
+// Input labels (TODO probably should be nested within a div with the actual content, would simplify things)
 const seedInputLabel = document.querySelector('#seed-input-label');
 const playerInputLabel = document.querySelector('#player-input-labe');
 const boardLabel = document.querySelector('#board-label');
+
+const boardWrapper = document.querySelector('.wrapper');
+
+// Board size event handlers
+const boardSizeRadioGroup = document.querySelector('#board-size');
+document.querySelectorAll('input[name=board-size]').forEach((radio) => {
+    radio.addEventListener('change', (e) => {
+        const boardSize = e.target.value;
+        BOARD_SIZE = boardSize;
+        board(PLAYER, BOARD_SIZE, SEED);
+        showBoard();
+    });
+});
 
 // Seed event handlers
 const updateSeed = (e) => {
     const seed = e.target.value;
     SEED = parseInt(seed);
-    board(PLAYER, SEED);
+    board(PLAYER, BOARD_SIZE, SEED);
     showBoard();
     if (SEED > -1) {
         boardLabel.className = '';
@@ -112,14 +152,15 @@ document.querySelectorAll('input[name=player]').forEach((radio) => {
     radio.addEventListener('change', (e) => {
         const player = parseInt(e.target.value) - 1;
         PLAYER = player;
-        board(PLAYER, SEED);
+        board(PLAYER, BOARD_SIZE, SEED);
         showBoard();
         if (PLAYER > -1) {
             seedInput.className = '';
             seedInputLabel.className = '';
+            boardSizeRadioGroup.className = 'toggle-buttons';
         }
     });
 });
 
 // Start the initial board
-board(PLAYER, SEED);
+board(PLAYER, BOARD_SIZE, SEED);
