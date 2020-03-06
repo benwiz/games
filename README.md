@@ -387,8 +387,18 @@ Taken from https://chezsoi.org/lucas/spyfall/?lang=en
   - Photographer
   - Lost Person
 
+# Run locally
+
+```sh
+npm install -g nodemon http-server
+nodemon -x http-server
+```
+
+## Deploy
+
+Push to master
 
 ## To Do
 
-- Finish list
+- code the list into javascript
   - There should be vaildation on the coded list, like at least 7 roles per location
