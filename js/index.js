@@ -44,6 +44,7 @@ const validation = (options) => {
     options.forEach((option) => {
         if (option.roles.length < 7) {
             console.log(`WARNING: Location ${option.location} has only ${option.roles.length} roles.`);
+            alert(`WARNING: Location ${option.location} has only ${option.roles.length} roles.`);
         }
     });
 };
