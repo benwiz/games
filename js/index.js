@@ -82,6 +82,7 @@ const populateLocationsList = (options) => {
     const locationsList = document.querySelector('#locations-list');
     options.map((option) => {
         const location = document.createElement('div');
+        location.classList.add('location-item');
         location.innerHTML = option.location;
         locationsList.appendChild(location);
     });
@@ -91,6 +92,7 @@ const colorPicker = document.querySelector('#color-picker');
 const confirmColors = document.querySelector('#confirm-colors');
 const confirmColorItem = confirmColors.querySelector('.color-item-confirm');
 const game = document.querySelector('#game');
+const playerColor = game.querySelector('#player-color');
 
 // Run a render cycle
 const render = () => {
@@ -103,10 +105,12 @@ const render = () => {
         confirmColors.classList.remove('hidden');
         confirmColorItem.classList.add(PLAYER);
         game.classList.add('hidden');
+        playerColor.classList.add(PLAYER);
     } else if (PLAYER && CONFIRMED_COLOR) {
         colorPicker.classList.add('hidden');
         confirmColors.classList.add('hidden');
         game.classList.remove('hidden');
+        playerColor.classList.add(PLAYER);
     } else {
         const s = `Unknown state: PLAYER: ${PLAYER}; CONFIRMED_COLOR: ${CONFIRMED_COLOR}`;
         console.log(s);
@@ -126,5 +130,18 @@ document.querySelectorAll('.color-item').forEach((elem) => {
         const player = e.target.className.split(' ')[1];
         PLAYER = player;
         render();
+    });
+});
+
+// Confirm button
+document.querySelector('#confirm-colors > h5').addEventListener('click', (_e) => {
+    CONFIRMED_COLOR = true;
+    render();
+});
+
+// Toggle location
+document.querySelectorAll('.location-item').forEach((elem) => {
+    elem.addEventListener('click', (e) => {
+        e.target.classList.toggle('gray');
     });
 });
