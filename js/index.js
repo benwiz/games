@@ -40,6 +40,8 @@ const OPTIONS = [{location: "Beach", roles: ["Beach Waitress", "Kite Surfer", "L
                  {location: "Harbor Docks", roles: ["Loader", "Salty Old Pirate", "Captain", "Sailor", "Fisherman", "Exporter", "Cargo Overseer", "Cargo Inspector", "Smuggler", "Old Man"]},
                  {location: "Sightseeing Bus", roles: ["Old Man", "Lone Tourist", "Driver", "Annoying Child", "Tourist", "Tour Guide", "Photographer", "Lost Person"]}]
 
+let PLAYER = null;
+
 const validation = (options) => {
     options.forEach((option) => {
         if (option.roles.length < 7) {
@@ -84,5 +86,27 @@ const populateLocationsList = (options) => {
     });
 };
 
+const colorPicker = document.querySelector('#color-picker');
+const confirmColors = document.querySelector('#confirm-colors');
+const game = document.querySelector('#game');
+
+// Run a render cycle
+const render = () => {
+    if (PLAYER !== null) {
+         // DONT do className thing, try to do classList.remove and .add
+    }
+};
+
+// Validate options
 validation(OPTIONS);
+
+// Populate locations list
 populateLocationsList(OPTIONS);
+
+// Color selector click handlers
+document.querySelectorAll('.color-item').forEach((elem) => {
+    elem.addEventListener('click', (e) => {
+        const player = e.target.className.split(' ')[1];
+        PLAYER = player;
+    });
+});
