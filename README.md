@@ -400,5 +400,4 @@ Push to master
 
 ## To Do
 
-- Hide/unhide button for secret info
--
+- Maybe categorize locations
