@@ -98,7 +98,11 @@ const selectLocationAndRole = () => {
     roles.push('Spy'); // append spy
     roles = shuffle(roles, SEED); // shuffle again to mix in spy
     const role = roles[index];
-    locationLabel.innerHTML = location;
+    if (role === 'Spy') {
+        locationLabel.innerHTML = '???';
+    } else {
+        locationLabel.innerHTML = location;
+    }
     roleLabel.innerHTML = role;
 };
 
