@@ -104,10 +104,11 @@ const selectLocationAndRole = () => {
 
 const populateLocationsList = (options) => {
     const locationsList = document.querySelector('#locations-list');
-    options.map((option) => {
+    const locations = options.map(option => option.location).sort();
+    locations.map((loc) => {
         const location = document.createElement('div');
         location.classList.add('location-item');
-        location.innerHTML = option.location;
+        location.innerHTML = loc;
         locationsList.appendChild(location);
     });
 };
