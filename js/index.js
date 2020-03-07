@@ -42,6 +42,15 @@ const OPTIONS = [{location: "Beach", roles: ["Beach Waitress", "Kite Surfer", "L
 
 let PLAYER = null;
 let CONFIRMED_COLOR = false;
+let SEED = -1;
+let PLAYER_ID_MAP = {"a": 1,
+                     "b": 2,
+                     "c": 3,
+                     "d": 4,
+                     "e": 5,
+                     "f": 6,
+                     "g": 7,
+                     "h": 8};
 
 const validation = (options) => {
     options.forEach((option) => {
@@ -78,6 +87,19 @@ const shuffle = (array, seed) => {
     return array;
 };
 
+const locationLabel = document.querySelector('#location-label');
+const roleLabel = document.querySelector('#role-label');
+console.log(locationLabel, roleLabel);
+
+const selectLocationAndRole = () => {
+    const pack = shuffle(OPTIONS.slice(), SEED)[0];
+    const location = pack.location;
+    const index = PLAYER_ID_MAP[PLAYER];
+    const role = shuffle(pack.roles, SEED)[index];
+    locationLabel.innerHTML = location;
+    roleLabel.innerHTML = role;
+};
+
 const populateLocationsList = (options) => {
     const locationsList = document.querySelector('#locations-list');
     options.map((option) => {
@@ -111,6 +133,7 @@ const render = () => {
         confirmColors.classList.add('hidden');
         game.classList.remove('hidden');
         playerColor.classList.add(PLAYER);
+        selectLocationAndRole();
     } else {
         const s = `Unknown state: PLAYER: ${PLAYER}; CONFIRMED_COLOR: ${CONFIRMED_COLOR}`;
         console.log(s);
