@@ -170,3 +170,14 @@ document.querySelectorAll('.location-item').forEach((elem) => {
         e.target.classList.toggle('gray');
     });
 });
+
+// Seed input
+// Seed event handlers
+const updateSeed = (e) => {
+    const seed = e.target.value;
+    SEED = parseInt(seed);
+    render();
+};
+const seedInput = document.querySelector('#seed');
+seedInput.addEventListener('keyup', updateSeed);
+seedInput.addEventListener('change', updateSeed);
