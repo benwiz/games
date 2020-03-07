@@ -75,4 +75,14 @@ const shuffle = (array, seed) => {
     return array;
 };
 
+const populateLocationsList = (options) => {
+    const locationsList = document.querySelector('#locations-list');
+    options.map((option) => {
+        const location = document.createElement('div');
+        location.innerHTML = option.location;
+        locationsList.appendChild(location);
+    });
+};
+
 validation(OPTIONS);
+populateLocationsList(OPTIONS);

@@ -46,6 +46,10 @@ body {
     background-color: blanchedalmond;
 }
 
+u {
+    cursor: pointer;
+}
+
 .color-item {
     cursor: pointer;
     margin: 1px;
