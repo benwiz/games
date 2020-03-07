@@ -193,7 +193,6 @@ const hideShowButton = document.querySelector('#hide-show-button');
 hideShowButton.addEventListener('click', (_e) => {
     if (hideShowButton.innerHTML === '(hide)') {
         locationAndRole.classList.add('invisible');
-        console.log('add invisible');
         hideShowButton.innerHTML = '(show)';
     } else {
         locationAndRole.classList.remove('invisible');
