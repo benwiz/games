@@ -146,10 +146,16 @@ const render = () => {
 // Validate options
 validation(OPTIONS);
 
-// Populate locations list
-populateLocationsList(OPTIONS);
+// Back button
+document.querySelector('#back-button').addEventListener('click', (e) => {
+    // purposely not modifying seed
+    PLAYER = null;
+    CONFIRMED_COLOR = false;
+    render();
+});
 
-// Color selector click handlers
+// Populate locations list
+populateLocationsList(OPTIONS);// Color selector click handlers
 document.querySelectorAll('.color-item').forEach((elem) => {
     elem.addEventListener('click', (e) => {
         const player = e.target.className.split(' ')[1];
@@ -171,7 +177,6 @@ document.querySelectorAll('.location-item').forEach((elem) => {
     });
 });
 
-// Seed input
 // Seed event handlers
 const updateSeed = (e) => {
     const seed = e.target.value;
