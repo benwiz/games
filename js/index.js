@@ -173,7 +173,7 @@ document.querySelector('#confirm-colors > h5').addEventListener('click', (_e) =>
 // Toggle location
 document.querySelectorAll('.location-item').forEach((elem) => {
     elem.addEventListener('click', (e) => {
-        e.target.classList.toggle('gray');
+        e.target.classList.toggle('scratch');
     });
 });
 

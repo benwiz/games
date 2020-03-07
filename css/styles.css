@@ -57,8 +57,9 @@ body {
     background-color: blanchedalmond;
 }
 
-.gray {
+.scratch {
     color: #BBB;
+    text-decoration: line-through;
 }
 
 u {
