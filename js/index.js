@@ -41,6 +41,7 @@ const OPTIONS = [{location: "Beach", roles: ["Beach Waitress", "Kite Surfer", "L
                  {location: "Sightseeing Bus", roles: ["Old Man", "Lone Tourist", "Driver", "Annoying Child", "Tourist", "Tour Guide", "Photographer", "Lost Person"]}]
 
 let PLAYER = null;
+let CONFIRMED_COLOR = false;
 
 const validation = (options) => {
     options.forEach((option) => {
@@ -88,12 +89,28 @@ const populateLocationsList = (options) => {
 
 const colorPicker = document.querySelector('#color-picker');
 const confirmColors = document.querySelector('#confirm-colors');
+const confirmColorItem = confirmColors.querySelector('.color-item-confirm');
 const game = document.querySelector('#game');
 
 // Run a render cycle
 const render = () => {
-    if (PLAYER !== null) {
-         // DONT do className thing, try to do classList.remove and .add
+    if (!PLAYER && !CONFIRMED_COLOR) {
+        colorPicker.classList.remove('hidden');
+        confirmColors.classList.add('hidden');
+        game.classList.add('hidden');
+    } else if (PLAYER && !CONFIRMED_COLOR) {
+        colorPicker.classList.add('hidden');
+        confirmColors.classList.remove('hidden');
+        confirmColorItem.classList.add(PLAYER);
+        game.classList.add('hidden');
+    } else if (PLAYER && CONFIRMED_COLOR) {
+        colorPicker.classList.add('hidden');
+        confirmColors.classList.add('hidden');
+        game.classList.remove('hidden');
+    } else {
+        const s = `Unknown state: PLAYER: ${PLAYER}; CONFIRMED_COLOR: ${CONFIRMED_COLOR}`;
+        console.log(s);
+        document.querySelector('#error').innerHTML = s;
     }
 };
 
@@ -108,5 +125,6 @@ document.querySelectorAll('.color-item').forEach((elem) => {
     elem.addEventListener('click', (e) => {
         const player = e.target.className.split(' ')[1];
         PLAYER = player;
+        render();
     });
 });
