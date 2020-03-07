@@ -3,11 +3,11 @@ body {
     /* max-width: 400px; */
 }
 
-#back-button {
+.button {
     color: gray;
 }
 
-#back-button:hover {
+.button:hover {
     text-decoration: underline;
     cursor: pointer;
 }
@@ -84,7 +84,7 @@ u {
 }
 
 #location-and-role {
-    margin: 20px 0px 20px 0px;
+    margin: 20px 0px 50px 0px;
 }
 
 .location-item {
@@ -98,4 +98,8 @@ u {
 
 .hidden {
     display: none;
+}
+
+.invisible {
+    visibility: hidden;
 }

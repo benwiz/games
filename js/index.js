@@ -186,3 +186,18 @@ const updateSeed = (e) => {
 const seedInput = document.querySelector('#seed');
 seedInput.addEventListener('keyup', updateSeed);
 seedInput.addEventListener('change', updateSeed);
+
+// Hide button
+const locationAndRole = game.querySelector('#location-and-role');
+const hideShowButton = document.querySelector('#hide-show-button');
+hideShowButton.addEventListener('click', (_e) => {
+    if (hideShowButton.innerHTML === '(hide)') {
+        locationAndRole.classList.add('invisible');
+        console.log('add invisible');
+        hideShowButton.innerHTML = '(show)';
+    } else {
+        locationAndRole.classList.remove('invisible');
+        console.log('remove invisible');
+        hideShowButton.innerHTML = '(hide)';
+    }
+});
