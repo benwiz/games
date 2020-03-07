@@ -43,14 +43,14 @@ const OPTIONS = [{location: "Beach", roles: ["Beach Waitress", "Kite Surfer", "L
 let PLAYER = null;
 let CONFIRMED_COLOR = false;
 let SEED = -1;
-let PLAYER_ID_MAP = {"a": 1,
-                     "b": 2,
-                     "c": 3,
-                     "d": 4,
-                     "e": 5,
-                     "f": 6,
-                     "g": 7,
-                     "h": 8};
+let PLAYER_ID_MAP = {"a": 0,
+                     "b": 1,
+                     "c": 2,
+                     "d": 3,
+                     "e": 4,
+                     "f": 5,
+                     "g": 6,
+                     "h": 7};
 
 const validation = (options) => {
     options.forEach((option) => {
@@ -89,13 +89,15 @@ const shuffle = (array, seed) => {
 
 const locationLabel = document.querySelector('#location-label');
 const roleLabel = document.querySelector('#role-label');
-console.log(locationLabel, roleLabel);
 
 const selectLocationAndRole = () => {
     const pack = shuffle(OPTIONS.slice(), SEED)[0];
     const location = pack.location;
     const index = PLAYER_ID_MAP[PLAYER];
-    const role = shuffle(pack.roles, SEED)[index];
+    let roles = shuffle(pack.roles.slice(), SEED).slice(0, 7); // randomly keep 7 of the roles
+    roles.push('Spy'); // append spy
+    roles = shuffle(roles, SEED); // shuffle again to mix in spy
+    const role = roles[index];
     locationLabel.innerHTML = location;
     roleLabel.innerHTML = role;
 };
