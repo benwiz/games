@@ -6,11 +6,11 @@ extern crate ws;
 // A WebSocket handler that routes connections to different boxed handlers by resource
 struct Router {
     sender: ws::Sender,
-    inner: Box<ws::Handler>,
+    inner: Box<dyn ws::Handler>,
 }
 
 impl ws::Handler for Router {
-    fn on_request(&mut self, req: &ws::Request) -> ws::Result<(ws::Response)> {
+    fn on_request(&mut self, req: &ws::Request) -> ws::Result<ws::Response> {
         // Clone the sender so that we can move it into the child handler
         let out = self.sender.clone();
         println!("o: {}", req.resource());
@@ -80,7 +80,7 @@ impl ws::Handler for Router {
 struct NotFound;
 
 impl ws::Handler for NotFound {
-    fn on_request(&mut self, req: &ws::Request) -> ws::Result<(ws::Response)> {
+    fn on_request(&mut self, req: &ws::Request) -> ws::Result<ws::Response> {
         // This handler responds to all requests with a 404
         let mut res = ws::Response::from_request(req)?;
         res.set_status(404);
