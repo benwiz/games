@@ -18,7 +18,7 @@ impl ws::Handler for Router {
         match req.resource() {
             "/echo" => self.inner = Box::new(Echo { ws: out }),
 
-            // Route to a data handler
+            // Data handler (this will be useful for getting up to date list of users and games)
             "/data/one" => {
                 self.inner = Box::new(Data {
                     ws: out,
@@ -26,19 +26,11 @@ impl ws::Handler for Router {
                 })
             }
 
-            // Route to another data handler
-            "/data/two" => {
-                self.inner = Box::new(Data {
-                    ws: out,
-                    data: vec!["いち", "二", "さん", "四", "ご"],
-                })
-            }
-
-            // Use a closure as the child handler
+             // Use a closure as the child handler and auto close
             "/closure" => {
                 self.inner = Box::new(move |msg: ws::Message| {
                     println!("Got a message on a closure handler: {}", msg);
-                    out.close_with_reason(ws::CloseCode::Error, "Not Implemented.")
+                    out.send("I'll process some data and respond: hello!")
                 })
             }
 
