@@ -3,6 +3,8 @@ extern crate env_logger;
 /// to an infinitely extensible number of handlers
 extern crate ws;
 
+// TODO need to figure out how to have different connections for each client
+
 // A WebSocket handler that routes connections to different boxed handlers by resource
 struct Router {
     sender: ws::Sender,
@@ -119,7 +121,7 @@ fn main() {
     env_logger::init();
 
     // Listen on an address and call the closure for each connection
-    if let Err(error) = ws::listen("127.0.0.1:3012", |out| {
+    if let Err(error) = ws::listen("0.0.0.0:3012", |out| {
         // Use our router as the handler to route the new connection
         Router {
             sender: out,
