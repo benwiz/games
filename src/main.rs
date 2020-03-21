@@ -43,11 +43,11 @@ impl ws::Handler for Router {
         }
 
         // TODO need to figure out how to get route and msg inside the thread
-        let req_clone = req.clone();
+        // let req_clone = req.clone();
         let out_clone = self.sender.clone();
         thread::spawn(move || {
             sleep(Duration::from_millis(2000));
-            println!("hi {}", req_clone.resource());
+            // println!("hi {}", req_clone.resource());
             out_clone.send("Hi, this is a push message at a later time.")
         });
 
