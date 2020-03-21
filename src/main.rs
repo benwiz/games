@@ -3,6 +3,10 @@ extern crate env_logger;
 /// to an infinitely extensible number of handlers
 extern crate ws;
 
+use std::thread;
+use std::thread::sleep;
+use std::time::Duration;
+
 // A WebSocket handler that routes connections to different boxed handlers by resource
 struct Router {
     sender: ws::Sender,
@@ -13,7 +17,7 @@ impl ws::Handler for Router {
     fn on_request(&mut self, req: &ws::Request) -> ws::Result<ws::Response> {
         // Clone the sender so that we can move it into the child handler
         let out = self.sender.clone();
-        println!("o: {}", req.resource());
+        println!("route: {}", req.resource());
 
         match req.resource() {
             "/echo" => self.inner = Box::new(Echo { ws: out }),
@@ -26,7 +30,7 @@ impl ws::Handler for Router {
                 })
             }
 
-             // Use a closure as the child handler and auto close
+            // Use a closure as the child handler and auto close
             "/closure" => {
                 self.inner = Box::new(move |msg: ws::Message| {
                     println!("Got a message on a closure handler: {}", msg);
@@ -37,6 +41,15 @@ impl ws::Handler for Router {
             // Use the default child handler, NotFound
             _ => (),
         }
+
+        // TODO need to figure out how to get route and msg inside the thread
+        let req_clone = req.clone();
+        let out_clone = self.sender.clone();
+        thread::spawn(move || {
+            sleep(Duration::from_millis(2000));
+            println!("hi {}", req_clone.resource());
+            out_clone.send("Hi, this is a push message at a later time.")
+        });
 
         // Delegate to the child handler
         self.inner.on_request(req)
