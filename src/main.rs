@@ -3,8 +3,6 @@ extern crate env_logger;
 /// to an infinitely extensible number of handlers
 extern crate ws;
 
-// TODO need to figure out how to have different connections for each client
-
 // A WebSocket handler that routes connections to different boxed handlers by resource
 struct Router {
     sender: ws::Sender,
