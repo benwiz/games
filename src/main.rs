@@ -9,6 +9,7 @@ use std::str;
 use std::thread;
 use serde::{Deserialize, Serialize};
 // use serde_json::Result;
+use sled::{Config, Event};
 
 /*
 
@@ -17,9 +18,10 @@ Some notes about the general architecture:
 - Each connection is for a single route
 - Each (routed) connection spawns a thread that listens for changes to the datastore and pushes updates to the client.\
 
+- Currently I'm sending the entire users list each time there is an update. Instead, I should send the whole list
+  when the connection is created then send just the updates later.
+
  */
-
-
 
 #[derive(Serialize, Deserialize)]
 struct User {
@@ -59,9 +61,26 @@ impl ws::Handler for Router {
             "/echo" => self.inner = Box::new(Echo { ws: out }),
 
             "/users" => {
+                let db_clone = db.clone();
                 let out_clone = out.clone();
                 thread::spawn(move || {
-                    // out_clone.send("Hi, this is a push message from the /users endpoint.")
+                    let mut events = db_clone.watch_prefix("user/");
+                    // TODO optimization: send all users on connection (like I'm doing here), then send updates here.
+
+                    for event in events {
+                        out_clone.send("Users was updated");
+
+                        // match event {
+                        //     Event::Insert(k, v) => {
+                        //         let key = &str::from_utf8(&k).unwrap();
+                        //         let user: User = serde_json::from_slice(&v).unwrap();
+                        //         println!("insert event: {:?} {:?}", key, user.name);
+                        //     },
+                        //     Event::Remove(k) => {
+                        //         // printf!("delete event: {}", k);
+                        //     }
+                        // }
+                    }
                 });
 
                 self.inner = Box::new(move |msg: ws::Message| {
