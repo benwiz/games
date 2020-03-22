@@ -73,6 +73,7 @@ impl ws::Handler for Router {
                 thread::spawn(move || {
                     let prefix = "user/";
                     let mut events = db_clone.watch_prefix(prefix);
+
                     // TODO optimization: send all users on connection (like I'm doing here), then send updates here.
 
                     for event in events {
@@ -214,7 +215,7 @@ fn main() {
 
     // Listen on an address and call the closure for each connection
     if let Err(error) = ws::listen("0.0.0.0:3012", |out| {
-        let db = sled::open("my_db").unwrap();
+        let db = sled::open("game_db").unwrap();
         Router {
             sender: out,
             inner: Box::new(NotFound), // Default to returning a 404 when the route doesn't match. You could default to any handler here.
