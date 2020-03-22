@@ -19,9 +19,17 @@ Some notes about the general architecture:
 
  */
 
+
+
 #[derive(Serialize, Deserialize)]
 struct User {
     name: String,
+}
+
+#[derive(Serialize, Deserialize)]
+struct WsResponse {
+    status: i32,
+    message: String,
 }
 
 // A WebSocket handler that routes connections to different boxed handlers by resource
@@ -64,7 +72,9 @@ impl ws::Handler for Router {
                     let v = serde_json::to_vec(&user).unwrap();
                     db.insert(&k, v); // TODO I guess handle error by sending message to client if error?
 
-                    out.send("Idk what to send. Should not be updated list because the subscriber will do that.")
+                    let r = WsResponse { status: 200, message: "ok".to_owned() };
+                    let res = serde_json::to_string(&r).unwrap();
+                    out.send(res)
                 })
             }
 
