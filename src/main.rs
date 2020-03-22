@@ -9,7 +9,7 @@ use std::str;
 use std::thread;
 use serde::{Deserialize, Serialize};
 // use serde_json::Result;
-use sled::{Config, Event};
+use sled::{Config, Event, IVec};
 
 /*
 
@@ -22,6 +22,13 @@ Some notes about the general architecture:
   when the connection is created then send just the updates later.
 
  */
+
+/* TO DO
+
+- Clean database on boot
+- Eventually, add a last-touched date to each record and purge records that haven't been touched in 24 hours.
+
+*/
 
 #[derive(Serialize, Deserialize)]
 struct User {
@@ -64,11 +71,27 @@ impl ws::Handler for Router {
                 let db_clone = db.clone();
                 let out_clone = out.clone();
                 thread::spawn(move || {
-                    let mut events = db_clone.watch_prefix("user/");
+                    let prefix = "user/";
+                    let mut events = db_clone.watch_prefix(prefix);
                     // TODO optimization: send all users on connection (like I'm doing here), then send updates here.
 
                     for event in events {
-                        out_clone.send("Users was updated");
+                        let mut scan = db_clone.scan_prefix(prefix);
+                        let users: Vec<User> = scan.map(
+                            |v|
+                            {
+                                let data = v.unwrap();
+                                let k = IVec::from(data.0);
+                                let key = &str::from_utf8(&k).unwrap();
+                                let v = IVec::from(data.1);
+                                let value: User = serde_json::from_slice(&v).unwrap();
+                                // println!("k: {}, v: {}", key, value.name);
+                                value
+                            }
+                        ).collect();
+                        let users_response = serde_json::to_string(&users).unwrap();
+                        // println!("users: {}", users_response);
+                        out_clone.send(users_response);
 
                         // match event {
                         //     Event::Insert(k, v) => {
