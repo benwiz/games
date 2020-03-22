@@ -2,10 +2,28 @@ extern crate env_logger;
 /// WebSocket server using trait objects to route
 /// to an infinitely extensible number of handlers
 extern crate ws;
+// extern crate serde;
+// extern crate serde_json;
 
 use std::thread;
 use std::thread::sleep;
 use std::time::Duration;
+use serde::{Deserialize, Serialize};
+use serde_json::Result;
+
+/*
+
+Some notes about the general architecture:
+- Websockets with route
+- Each connection is for a single route
+- Each (routed) connection spawns a thread that listens for changes to the datastore and pushes updates to the client.\
+
+ */
+
+#[derive(Serialize, Deserialize)]
+struct User {
+    name: String,
+}
 
 // A WebSocket handler that routes connections to different boxed handlers by resource
 struct Router {
@@ -14,6 +32,7 @@ struct Router {
 }
 
 impl ws::Handler for Router {
+    /// on_request is called once for each new connection.
     fn on_request(&mut self, req: &ws::Request) -> ws::Result<ws::Response> {
         // Clone the sender so that we can move it into the child handler
         let out = self.sender.clone();
@@ -22,34 +41,33 @@ impl ws::Handler for Router {
         match req.resource() {
             "/echo" => self.inner = Box::new(Echo { ws: out }),
 
-            // Data handler (this will be useful for getting up to date list of users and games)
-            "/data/one" => {
-                self.inner = Box::new(Data {
-                    ws: out,
-                    data: vec!["one", "two", "three", "four", "five"],
-                })
-            }
+            // // Data handler (this will be useful for getting up to date list of users and games)
+            // "/data/one" => {
+            //     self.inner = Box::new(Data {
+            //         ws: out,
+            //         data: vec!["one", "two", "three", "four", "five"],
+            //     })
+            // }
 
-            // Use a closure as the child handler and auto close
-            "/closure" => {
+            "/users" => {
+                let out_clone = out.clone();
+                thread::spawn(move || {
+                    sleep(Duration::from_millis(2000));
+                    println!("Push from closure");
+                    out_clone.send("Hi, this is a push message from the /users endpoint.")
+                });
+
                 self.inner = Box::new(move |msg: ws::Message| {
                     println!("Got a message on a closure handler: {}", msg);
-                    out.send("I'll process some data and respond: hello!")
+                    let user: User = serde_json::from_str(&msg.to_string()).unwrap();
+                    println!("Name: {}", user.name);
+                    out.send(format!("Hello, {}", user.name))
                 })
             }
 
             // Use the default child handler, NotFound
             _ => (),
         }
-
-        // TODO need to figure out how to get route and msg inside the thread
-        // let req_clone = req.clone();
-        let out_clone = self.sender.clone();
-        thread::spawn(move || {
-            sleep(Duration::from_millis(2000));
-            // println!("hi {}", req_clone.resource());
-            out_clone.send("Hi, this is a push message at a later time.")
-        });
 
         // Delegate to the child handler
         self.inner.on_request(req)
