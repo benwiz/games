@@ -5,11 +5,12 @@ extern crate ws;
 // extern crate serde;
 // extern crate serde_json;
 
+use std::str;
 use std::thread;
 use std::thread::sleep;
 use std::time::Duration;
 use serde::{Deserialize, Serialize};
-use serde_json::Result;
+// use serde_json::Result;
 
 /*
 
@@ -29,6 +30,7 @@ struct User {
 struct Router {
     sender: ws::Sender,
     inner: Box<dyn ws::Handler>,
+    db: sled::Db,
 }
 
 impl ws::Handler for Router {
@@ -37,6 +39,13 @@ impl ws::Handler for Router {
         // Clone the sender so that we can move it into the child handler
         let out = self.sender.clone();
         println!("route: {}", req.resource());
+
+        // Example writing and reading from db
+        let u = vec![User { name: "brendan".to_owned() }];
+        let u_json = serde_json::to_vec(&u).unwrap();
+        self.db.insert("users", u_json);
+        let res = &self.db.get("users").unwrap().unwrap();
+        println!("hi: {}", str::from_utf8(&res).unwrap());
 
         match req.resource() {
             "/echo" => self.inner = Box::new(Echo { ws: out }),
@@ -53,12 +62,13 @@ impl ws::Handler for Router {
                 let out_clone = out.clone();
                 thread::spawn(move || {
                     sleep(Duration::from_millis(2000));
-                    println!("Push from closure");
+                    // println!("Push from closure");
                     out_clone.send("Hi, this is a push message from the /users endpoint.")
                 });
 
                 self.inner = Box::new(move |msg: ws::Message| {
-                    println!("Got a message on a closure handler: {}", msg);
+                    // TODO I need to store the name in a data store and emit an event to all listeners that the data store has been updated.
+
                     let user: User = serde_json::from_str(&msg.to_string()).unwrap();
                     println!("Name: {}", user.name);
                     out.send(format!("Hello, {}", user.name))
@@ -151,15 +161,14 @@ fn main() {
 
     // Listen on an address and call the closure for each connection
     if let Err(error) = ws::listen("0.0.0.0:3012", |out| {
-        // Use our router as the handler to route the new connection
+        let db = sled::open("my_db").unwrap();
         Router {
             sender: out,
-            // Default to returning a 404 when the route doesn't match.
-            // You could default to any handler here.
-            inner: Box::new(NotFound),
+            inner: Box::new(NotFound), // Default to returning a 404 when the route doesn't match. You could default to any handler here.
+            db: db,
         }
     }) {
         // Inform the user of failure
-        println!("Failed to create WebSocket due to {:?}", error);
+        println!("Failed to create WebSocket due to error: {:?}", error);
     }
 }
