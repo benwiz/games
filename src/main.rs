@@ -7,8 +7,6 @@ extern crate ws;
 
 use std::str;
 use std::thread;
-use std::thread::sleep;
-use std::time::Duration;
 use serde::{Deserialize, Serialize};
 // use serde_json::Result;
 
@@ -36,44 +34,47 @@ struct Router {
 impl ws::Handler for Router {
     /// on_request is called once for each new connection.
     fn on_request(&mut self, req: &ws::Request) -> ws::Result<ws::Response> {
-        // Clone the sender so that we can move it into the child handler
-        let out = self.sender.clone();
         println!("route: {}", req.resource());
 
-        // Example writing and reading from db
-        let u = vec![User { name: "brendan".to_owned() }];
-        let u_json = serde_json::to_vec(&u).unwrap();
-        self.db.insert("users", u_json);
-        let res = &self.db.get("users").unwrap().unwrap();
-        println!("hi: {}", str::from_utf8(&res).unwrap());
+        // Clone the sender and db so that we can move into the child handler
+        let out = self.sender.clone();
+        let db = self.db.clone();
+
+        // // Example writing and reading from db
+        // let u = vec![User { name: "brendan".to_owned() }];
+        // let u_json = serde_json::to_vec(&u).unwrap();
+        // self.db.insert("users", u_json);
+        // let res = &self.db.get("users").unwrap().unwrap();
+        // println!("hi: {}", str::from_utf8(&res).unwrap());
 
         match req.resource() {
             "/echo" => self.inner = Box::new(Echo { ws: out }),
 
-            // // Data handler (this will be useful for getting up to date list of users and games)
+            "/users" => {
+                let out_clone = out.clone();
+                thread::spawn(move || {
+                    // out_clone.send("Hi, this is a push message from the /users endpoint.")
+                });
+
+                self.inner = Box::new(move |msg: ws::Message| {
+                    let user: User = serde_json::from_str(&msg.to_string()).unwrap();
+                    println!("Name: {}", user.name);
+
+                    let k = format!("user/{}", user.name);
+                    let v = serde_json::to_vec(&user).unwrap();
+                    db.insert(&k, v); // TODO I guess handle error by sending message to client if error?
+
+                    out.send("Idk what to send. Should not be updated list because the subscriber will do that.")
+                })
+            }
+
+             // // Data handler (this will be useful for getting up to date list of users and games)
             // "/data/one" => {
             //     self.inner = Box::new(Data {
             //         ws: out,
             //         data: vec!["one", "two", "three", "four", "five"],
             //     })
             // }
-
-            "/users" => {
-                let out_clone = out.clone();
-                thread::spawn(move || {
-                    sleep(Duration::from_millis(2000));
-                    // println!("Push from closure");
-                    out_clone.send("Hi, this is a push message from the /users endpoint.")
-                });
-
-                self.inner = Box::new(move |msg: ws::Message| {
-                    // TODO I need to store the name in a data store and emit an event to all listeners that the data store has been updated.
-
-                    let user: User = serde_json::from_str(&msg.to_string()).unwrap();
-                    println!("Name: {}", user.name);
-                    out.send(format!("Hello, {}", user.name))
-                })
-            }
 
             // Use the default child handler, NotFound
             _ => (),
