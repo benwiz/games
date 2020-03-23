@@ -7,6 +7,7 @@ extern crate ws;
 
 use std::str;
 use std::thread;
+use std::sync::Arc;
 use serde::{Deserialize, Serialize};
 // use serde_json::Result;
 use sled::{Config, Event, IVec};
@@ -45,7 +46,7 @@ struct WsResponse {
 struct Router {
     sender: ws::Sender,
     inner: Box<dyn ws::Handler>,
-    db: sled::Db,
+    db: Arc<sled::Db>,
 }
 
 impl ws::Handler for Router {
@@ -213,13 +214,14 @@ impl ws::Handler for Data {
 fn main() {
     env_logger::init();
 
+    let db = Arc::new(sled::open("game_db").expect("Sled must start ok."));
+
     // Listen on an address and call the closure for each connection
     if let Err(error) = ws::listen("0.0.0.0:3012", |out| {
-        let db = sled::open("game_db").unwrap();
         Router {
             sender: out,
             inner: Box::new(NotFound), // Default to returning a 404 when the route doesn't match. You could default to any handler here.
-            db: db,
+            db: db.clone(),
         }
     }) {
         // Inform the user of failure
