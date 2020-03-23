@@ -83,14 +83,13 @@ impl ws::Handler for Router {
                     let prefix = "user/";
                     let mut events = db_clone.watch_prefix(prefix);
 
-                    // TODO optimization: send all users on connection (like I'm doing here), then send updates here.
-
                     for event in events {
                         let users: Vec<User> = all_users(db_clone.clone());
                         let users_response = serde_json::to_string(&users).unwrap();
                         // println!("users: {}", users_response);
                         out_clone.send(users_response);
 
+                        // TODO talk to brendan and send just updates
                         // match event {
                         //     Event::Insert(k, v) => {
                         //         let key = &str::from_utf8(&k).unwrap();
@@ -146,6 +145,9 @@ impl ws::Handler for Router {
     }
 
     fn on_open(&mut self, shake: ws::Handshake) -> ws::Result<()> {
+        let users: Vec<User> = all_users(self.db.clone());
+        let users_response = serde_json::to_string(&users).unwrap();
+        self.sender.send(users_response);
         self.inner.on_open(shake)
     }
 
