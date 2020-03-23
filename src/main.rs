@@ -37,6 +37,12 @@ struct User {
 }
 
 #[derive(Serialize, Deserialize)]
+struct Chat {
+    user: String,
+    message: String,
+}
+
+#[derive(Serialize, Deserialize)]
 struct WsResponse {
     status: i32,
     message: String,
@@ -119,6 +125,52 @@ impl ws::Handler for Router {
                 })
             }
 
+            "/chat" => {
+                // let db_clone = db.clone();
+                // let out_clone = out.clone();
+                // thread::spawn(move || {
+                //     let prefix = "chat";
+                //     let mut events = db_clone.watch_prefix(prefix);
+
+                //     for event in events {
+                //         let users: Vec<User> = all_users(db_clone.clone());
+                //         let users_response = serde_json::to_string(&users).unwrap();
+                //         // println!("users: {}", users_response);
+                //         out_clone.send(users_response);
+
+                //         // TODO talk to brendan and send just updates
+                //         // match event {
+                //         //     Event::Insert(k, v) => {
+                //         //         let key = &str::from_utf8(&k).unwrap();
+                //         //         let user: User = serde_json::from_slice(&v).unwrap();
+                //         //         println!("insert event: {:?} {:?}", key, user.name);
+                //         //     },
+                //         //     Event::Remove(k) => {
+                //         //         // printf!("delete event: {}", k);
+                //         //     }
+                //         // }
+                //     }
+                // });
+
+                self.inner = Box::new(move |msg: ws::Message| {
+                    let chat: Chat = serde_json::from_str(&msg.to_string()).unwrap();
+                    println!("{}: {}", chat.user, chat.message);
+
+                    let chats = db.get("chat");
+                    println!("chats: {:?}", chats);
+
+                    // let k = format!("chat", user.name);
+                    // let v = serde_json::to_vec(&user).unwrap();
+
+                    // TODO instead of using insert, use upsert or compare_and_swap
+                    // db.insert(&k, v); // TODO I guess handle error by sending message to client if error?
+
+                    let r = WsResponse { status: 200, message: "ok".to_owned() };
+                    let res = serde_json::to_string(&r).unwrap();
+                    out.send(res)
+                })
+            }
+
              // // Data handler (this will be useful for getting up to date list of users and games)
             // "/data/one" => {
             //     self.inner = Box::new(Data {
@@ -145,6 +197,7 @@ impl ws::Handler for Router {
     }
 
     fn on_open(&mut self, shake: ws::Handshake) -> ws::Result<()> {
+        // TODO need to match and only do appropriate
         let users: Vec<User> = all_users(self.db.clone());
         let users_response = serde_json::to_string(&users).unwrap();
         self.sender.send(users_response);

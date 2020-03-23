@@ -1,32 +1,59 @@
 <!DOCTYPE html>
 <html>
-	<head>
-		<meta charset="utf-8">
-		<title>WebSocket Test</title>
-	</head>
-	<body>
-		<script>
-			var socket = new WebSocket("ws://127.0.0.1:3012/users", "rust-websocket");
-			socket.onmessage = function (event) {
-				var received = document.getElementById("received");
-				var br = document.createElement("BR");
-				var text = document.createTextNode(event.data);
-				received.appendChild(br);
-				received.appendChild(text);
-			};
+  <head>
+	<meta charset="utf-8">
+	<title>WebSocket Test</title>
+  </head>
+  <body>
+    <div>
+	  <script>
+		var socket = new WebSocket("ws://127.0.0.1:3012/users", "rust-websocket");
+		socket.onmessage = function (event) {
+			var received = document.getElementById("received");
+			var br = document.createElement("BR");
+			var text = document.createTextNode(event.data);
+			received.appendChild(br);
+			received.appendChild(text);
+		};
 
-			function send(element) {
-				var input = document.getElementById(element);
-				socket.send(input.value);
-				input.value = "";
-			}
-		</script>
-			<p id="received">
-				<strong>Received Messages:</strong>
-			</p>
-			<form onsubmit="send('message'); return false">
-				<input type="text" id="message">
-				<input type="submit" value="Send">
-			</form>
-	</body>
+		function send(element) {
+			var input = document.getElementById(element);
+			socket.send(input.value);
+			input.value = "";
+		}
+	  </script>
+	  <p id="received">
+		<strong>Users:</strong>
+	  </p>
+	  <form onsubmit="send('message'); return false">
+		<input type="text" id="message">
+		<input type="submit" value="Send">
+	  </form>
+    </div>
+    <div>
+	  <script>
+		var socket = new WebSocket("ws://127.0.0.1:3012/chat", "rust-websocket");
+		socket.onmessage = function (event) {
+			var received = document.getElementById("received2");
+			var br = document.createElement("BR");
+			var text = document.createTextNode(event.data);
+			received.appendChild(br);
+			received.appendChild(text);
+		};
+
+		function send2(element) {
+			var input = document.getElementById(element);
+			socket.send(input.value);
+			input.value = "";
+		}
+	  </script>
+	  <p id="received2">
+		<strong>Chat:</strong>
+	  </p>
+	  <form onsubmit="send2('message2'); return false">
+		<input type="text" id="message2">
+		<input type="submit" value="Send">
+	  </form>
+    </div>
+  </body>
 </html>
