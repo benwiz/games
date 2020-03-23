@@ -10,7 +10,7 @@ use std::thread;
 use std::sync::Arc;
 use serde::{Deserialize, Serialize};
 // use serde_json::Result;
-use sled::{Config, Event, IVec};
+use sled::{Config, Event, IVec, Db};
 
 /*
 
@@ -42,28 +42,36 @@ struct WsResponse {
     message: String,
 }
 
+fn all_users(db: Arc<Db>) -> Vec<User> {
+    let mut scan = db.scan_prefix("user/");
+    scan.map(
+        |v|
+        {
+            let data = v.unwrap();
+            let k = IVec::from(data.0);
+            let key = &str::from_utf8(&k).unwrap();
+            let v = IVec::from(data.1);
+            let value: User = serde_json::from_slice(&v).unwrap();
+            // println!("k: {}, v: {}", key, value.name);
+            value
+        }
+    ).collect()
+}
+
 // A WebSocket handler that routes connections to different boxed handlers by resource
 struct Router {
     sender: ws::Sender,
     inner: Box<dyn ws::Handler>,
-    db: Arc<sled::Db>,
+    db: Arc<Db>,
 }
 
 impl ws::Handler for Router {
-    /// on_request is called once for each new connection.
     fn on_request(&mut self, req: &ws::Request) -> ws::Result<ws::Response> {
         println!("route: {}", req.resource());
 
         // Clone the sender and db so that we can move into the child handler
         let out = self.sender.clone();
         let db = self.db.clone();
-
-        // // Example writing and reading from db
-        // let u = vec![User { name: "brendan".to_owned() }];
-        // let u_json = serde_json::to_vec(&u).unwrap();
-        // self.db.insert("users", u_json);
-        // let res = &self.db.get("users").unwrap().unwrap();
-        // println!("hi: {}", str::from_utf8(&res).unwrap());
 
         match req.resource() {
             "/echo" => self.inner = Box::new(Echo { ws: out }),
@@ -78,19 +86,7 @@ impl ws::Handler for Router {
                     // TODO optimization: send all users on connection (like I'm doing here), then send updates here.
 
                     for event in events {
-                        let mut scan = db_clone.scan_prefix(prefix);
-                        let users: Vec<User> = scan.map(
-                            |v|
-                            {
-                                let data = v.unwrap();
-                                let k = IVec::from(data.0);
-                                let key = &str::from_utf8(&k).unwrap();
-                                let v = IVec::from(data.1);
-                                let value: User = serde_json::from_slice(&v).unwrap();
-                                // println!("k: {}, v: {}", key, value.name);
-                                value
-                            }
-                        ).collect();
+                        let users: Vec<User> = all_users(db_clone.clone());
                         let users_response = serde_json::to_string(&users).unwrap();
                         // println!("users: {}", users_response);
                         out_clone.send(users_response);
@@ -114,6 +110,8 @@ impl ws::Handler for Router {
 
                     let k = format!("user/{}", user.name);
                     let v = serde_json::to_vec(&user).unwrap();
+
+                    // TODO instead of using insert, use upsert or compare_and_swap
                     db.insert(&k, v); // TODO I guess handle error by sending message to client if error?
 
                     let r = WsResponse { status: 200, message: "ok".to_owned() };
