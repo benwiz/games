@@ -104,7 +104,7 @@ impl ws::Handler for Router {
                     for event in events {
                         let r = match event {
                             Event::Insert(_k, v) => {
-                                let user: User = serde_json::from_slice(&v).unwrap();
+                                let user: User = bincode::deserialize(&v).unwrap();
                                 let user_event = UserEvent {
                                     event: "create".to_owned(),
                                     user: user,
@@ -114,7 +114,7 @@ impl ws::Handler for Router {
                             Event::Remove(k) => {
                                 // TODO test this it is entirely untested
                                 let key = str::from_utf8(&k).unwrap().to_string();
-                                println!("delete event: {:?}", k);
+                                println!("delete {}", key);
                                 let user_event = UserEvent {
                                     event: "delete".to_owned(),
                                     user: User {name: key}
@@ -150,6 +150,7 @@ impl ws::Handler for Router {
                     for event in events {
                         match event {
                             Event::Insert(_k, v) => {
+                                // No need to wrap in event because it is always a create.
                                 let chat: Chat = bincode::deserialize(&v).unwrap();
                                 let r = serde_json::to_string(&chat).unwrap();
                                 out_clone.send(r);
@@ -157,6 +158,8 @@ impl ws::Handler for Router {
                             Event::Remove(k) => {
                                 let key = str::from_utf8(&k).unwrap().to_string();
                                 println!("deleted {}", key);
+                                // Do not forward this to the client, this is primarily
+                                // for cleanup.
                             }
                         };
                     }
