@@ -8,6 +8,7 @@ extern crate ws;
 use std::str;
 use std::thread;
 use std::sync::Arc;
+use uuid::Uuid;
 use serde::{Deserialize, Serialize};
 // use serde_json::Result;
 use sled::{Config, Event, IVec, Db};
@@ -52,7 +53,7 @@ struct Chat {
 
 #[derive(Serialize, Deserialize)]
 struct Chats {
-    chats: Vec<Chat>,
+    chats: Vec<String>,
 }
 
 #[derive(Serialize, Deserialize)]
@@ -133,9 +134,7 @@ impl ws::Handler for Router {
 
                     let k = format!("user/{}", user.name);
                     let v = bincode::serialize(&user).unwrap();
-
-                    // TODO instead of using insert, use upsert or compare_and_swap
-                    db.insert(&k, v); // TODO I guess handle error by sending message to client if error?
+                    db.insert(&k, v);
 
                     let r = WsResponse { status: 200, message: "ok".to_owned() };
                     let res = serde_json::to_string(&r).unwrap();
@@ -144,52 +143,53 @@ impl ws::Handler for Router {
             }
 
             "/chat" => {
-                // In the future, each Chat should probably get it's own record then Chats can reference
-                // a list of Chat keys. That way individual chats could be pushed to the user.
+                // let db_clone = db.clone();
+                // let out_clone = out.clone();
+                // thread::spawn(move || {
+                //     let mut events = db_clone.watch_prefix("chat/");
 
-                let db_clone = db.clone();
-                let out_clone = out.clone();
-                thread::spawn(move || {
-                    let mut events = db_clone.watch_prefix("chats");
-
-                    for event in events {
-                        let r = match event {
-                            Event::Insert(k, v) => {
-                                let chats_encoded: Vec<u8> = db_clone.get(&k).unwrap().unwrap_or(IVec::from(vec![])).to_vec(); // NOTE i needed some default. I can probably do this better.
-                                let chats: Chats = match chats_encoded.len() {
-                                    0 => Chats{chats: vec![]},
-                                    _ => bincode::deserialize(&chats_encoded[..]).unwrap(),
-                                };
-                                serde_json::to_string(&chats).unwrap()
-                            },
-                            Event::Remove(k) => {
-                                // TODO test this it is entirely untested
-                                let key = str::from_utf8(&k).unwrap().to_string();
-                                println!("delete event: {:?}", k);
-                                let chats = Chats{chats: vec![]};
-                                serde_json::to_string(&chats).unwrap()
-                            }
-                        };
-
-                        out_clone.send(r);
-                    }
-                });
+                //     for event in events {
+                //         match event {
+                //             Event::Insert(k, v) => {
+                //                 let chat: Chat = serde_json::from_slice(&v).unwrap();
+                //                 let r = serde_json::to_string(&chat).unwrap();
+                //                 out_clone.send(r);
+                //             },
+                //             Event::Remove(k) => {}
+                //         };
+                //     }
+                // });
 
                 self.inner = Box::new(move |msg: ws::Message| {
                     let chat: Chat = serde_json::from_str(&msg.to_string()).unwrap();
-                    println!("Chat: {} \"{}\" ", chat.user, chat.message);
-                    let k = "chats";
-                    let chats_encoded: Vec<u8> = db.get(k).unwrap().unwrap_or(IVec::from(vec![])).to_vec(); // NOTE i needed some default. I can probably do this better.
+
+                    // Add chat
+                    let k = format!("chat/{}", Uuid::new_v4().to_hyphenated());
+                    let v = bincode::serialize(&chat).unwrap();
+                    println!("{}: {} \"{}\" ", k, chat.user, chat.message);
+                    db.insert(&k, v);
+
+                    // Update chats list
+                    let chats_k = "chats";
+                    let chats_encoded: Vec<u8> = db.get(chats_k).unwrap().unwrap_or(IVec::from(vec![])).to_vec(); // NOTE i needed some default. I can probably do this better.
                     let mut chats: Chats = match chats_encoded.len() {
                         0 => Chats{chats: vec![]},
                         _ => bincode::deserialize(&chats_encoded[..]).unwrap(),
                     };
-                    chats.chats.insert(0, chat);
-                    chats.chats.truncate(100);
+                    chats.chats.insert(0, k.clone());
+                    let max_len = 2;
+                    let remove_ids: Vec<String> = match chats.chats.len() {
+                        l if l > max_len => chats.chats.drain(max_len..).collect(), // truncate
+                        _ => vec![],
+                    };
+                    let chats_v: Vec<u8> = bincode::serialize(&chats).unwrap();
+                    db.insert(&chats_k, chats_v);
 
-                    let mut v: Vec<u8> = bincode::serialize(&chats).unwrap();
-                    // TODO instead of using insert, use upsert or compare_and_swap
-                    db.insert(&k, v); // TODO I guess handle error by sending message to client if error?
+                    // TODO test this (I have no confirmed this yet). Can test using subscriber.
+                    // Remove chat records no longer in chat list
+                    for chat_id in remove_ids {
+                        db.remove(&k);
+                    }
 
                     let r = WsResponse { status: 200, message: "ok".to_owned() };
                     let res = serde_json::to_string(&r).unwrap();
