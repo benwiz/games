@@ -143,22 +143,22 @@ impl ws::Handler for Router {
             }
 
             "/chat" => {
-                // let db_clone = db.clone();
-                // let out_clone = out.clone();
-                // thread::spawn(move || {
-                //     let mut events = db_clone.watch_prefix("chat/");
+                let db_clone = db.clone();
+                let out_clone = out.clone();
+                thread::spawn(move || {
+                    let mut events = db_clone.watch_prefix("chat/");
 
-                //     for event in events {
-                //         match event {
-                //             Event::Insert(k, v) => {
-                //                 let chat: Chat = serde_json::from_slice(&v).unwrap();
-                //                 let r = serde_json::to_string(&chat).unwrap();
-                //                 out_clone.send(r);
-                //             },
-                //             Event::Remove(k) => {}
-                //         };
-                //     }
-                // });
+                    for event in events {
+                        match event {
+                            Event::Insert(k, v) => {
+                                let chat: Chat = bincode::deserialize(&v).unwrap();
+                                let r = serde_json::to_string(&chat).unwrap();
+                                out_clone.send(r);
+                            },
+                            Event::Remove(k) => {}
+                        };
+                    }
+                });
 
                 self.inner = Box::new(move |msg: ws::Message| {
                     let chat: Chat = serde_json::from_str(&msg.to_string()).unwrap();
