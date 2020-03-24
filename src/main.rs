@@ -174,7 +174,7 @@ impl ws::Handler for Router {
                     let k = format!("chat/{}", Uuid::new_v4().to_hyphenated());
                     let v = bincode::serialize(&chat).unwrap();
                     println!("{}: {} \"{}\" ", k, chat.user, chat.message);
-                    db.insert(&k, v);
+                    db.insert(&k.as_bytes(), v);
 
                     // Update chats list
                     let chats_k = "chats";
@@ -184,7 +184,7 @@ impl ws::Handler for Router {
                         _ => bincode::deserialize(&chats_encoded[..]).unwrap(),
                     };
                     chats.chats.insert(0, k.clone());
-                    let max_len = 2;
+                    let max_len = 100;
                     let remove_ids: Vec<String> = match chats.chats.len() {
                         l if l > max_len => chats.chats.drain(max_len..).collect(), // truncate
                         _ => vec![],
@@ -234,10 +234,7 @@ impl ws::Handler for Router {
                 };
                 let mut chats: Vec<Chat> = vec![];
                 for id in chat_ids.chats {
-                    println!("id {}", id);
-                    // FIXME something is wrong. I cannot get the data. Maybe I'm writing it with a bad key?
-                    let chat_encoded: Vec<u8> = self.db.get(id).unwrap().unwrap_or(IVec::from(vec![])).to_vec();
-                    println!("enc {:?}", chat_encoded);
+                    let chat_encoded: Vec<u8> = self.db.get(id.as_bytes()).unwrap().unwrap_or(IVec::from(vec![])).to_vec();
                     if chat_encoded.len() > 0 {
                         let chat: Chat = bincode::deserialize(&chat_encoded[..]).unwrap();
                         chats.push(chat);
