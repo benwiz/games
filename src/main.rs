@@ -42,6 +42,12 @@ struct Chat {
     message: String,
 }
 
+
+#[derive(Serialize, Deserialize)]
+struct Chats {
+    chats: Vec<Chat>,
+}
+
 #[derive(Serialize, Deserialize)]
 struct WsResponse {
     status: i32,
@@ -95,7 +101,7 @@ impl ws::Handler for Router {
                         // println!("users: {}", users_response);
                         out_clone.send(users_response);
 
-                        // TODO talk to brendan and send just updates
+                        // TODO send just updates
                         // match event {
                         //     Event::Insert(k, v) => {
                         //         let key = &str::from_utf8(&k).unwrap();
@@ -138,6 +144,9 @@ impl ws::Handler for Router {
                 //         // println!("users: {}", users_response);
                 //         out_clone.send(users_response);
 
+                //                     println!("json chats: {:?}", serde_json::to_string(&chats).unwrap());
+                // the above line is what i need to craft the message
+
                 //         // TODO talk to brendan and send just updates
                 //         // match event {
                 //         //     Event::Insert(k, v) => {
@@ -156,14 +165,18 @@ impl ws::Handler for Router {
                     let chat: Chat = serde_json::from_str(&msg.to_string()).unwrap();
                     println!("{}: {}", chat.user, chat.message);
 
-                    let chats = db.get("chat");
-                    println!("chats: {:?}", chats);
+                    let k = "chat";
 
-                    // let k = format!("chat", user.name);
-                    // let v = serde_json::to_vec(&user).unwrap();
+                    let chats_encoded: Vec<u8> = db.get(k).unwrap().unwrap_or(IVec::from(vec![])).to_vec(); // NOTE i needed some default. I can probably do this better.
+                    let mut chats: Chats = match chats_encoded.len() {
+                        0 => Chats{chats: vec![]},
+                        _ => bincode::deserialize(&chats_encoded[..]).unwrap(),
+                    };
+                    chats.chats.push(chat);
 
                     // TODO instead of using insert, use upsert or compare_and_swap
-                    // db.insert(&k, v); // TODO I guess handle error by sending message to client if error?
+                    let v: Vec<u8> = bincode::serialize(&chats).unwrap();
+                    db.insert(&k, v); // TODO I guess handle error by sending message to client if error?
 
                     let r = WsResponse { status: 200, message: "ok".to_owned() };
                     let res = serde_json::to_string(&r).unwrap();
@@ -198,9 +211,20 @@ impl ws::Handler for Router {
 
     fn on_open(&mut self, shake: ws::Handshake) -> ws::Result<()> {
         // TODO need to match and only do appropriate
-        let users: Vec<User> = all_users(self.db.clone());
-        let users_response = serde_json::to_string(&users).unwrap();
-        self.sender.send(users_response);
+        match shake.request.resource() {
+            "/users" => {
+                let users: Vec<User> = all_users(self.db.clone());
+                let users_response = serde_json::to_string(&users).unwrap();
+                self.sender.send(users_response);
+            }
+            "/chat" => {
+                // let users: Vec<User> = all_users(self.db.clone());
+                // let users_response = serde_json::to_string(&users).unwrap();
+                // self.sender.send(users_response);
+            }
+            _ => {}
+        }
+
         self.inner.on_open(shake)
     }
 
