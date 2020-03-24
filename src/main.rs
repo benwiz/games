@@ -20,7 +20,7 @@ Some notes about the general architecture:
 - Each (routed) connection spawns a thread that listens for changes to the datastore and pushes updates to the client.\
 
 - Currently I'm sending the entire users list each time there is an update. Instead, I should send the whole list
-  when the connection is created then send just the updates later.
+when the connection is created then send just the updates later.
 
  */
 
@@ -29,11 +29,17 @@ Some notes about the general architecture:
 - Clean database on boot
 - Eventually, add a last-touched date to each record and purge records that haven't been touched in 24 hours.
 
-*/
+ */
 
 #[derive(Serialize, Deserialize)]
 struct User {
     name: String,
+}
+
+#[derive(Serialize, Deserialize)]
+struct UserEvent {
+    event: String,
+    user: User,
 }
 
 #[derive(Serialize, Deserialize)]
@@ -96,22 +102,28 @@ impl ws::Handler for Router {
                     let mut events = db_clone.watch_prefix(prefix);
 
                     for event in events {
-                        let users: Vec<User> = all_users(db_clone.clone());
-                        let users_response = serde_json::to_string(&users).unwrap();
-                        // println!("users: {}", users_response);
-                        out_clone.send(users_response);
+                        let r = match event {
+                            Event::Insert(k, v) => {
+                                let user: User = serde_json::from_slice(&v).unwrap();
+                                let user_event = UserEvent {
+                                    event: "create".to_owned(),
+                                    user: user,
+                                };
+                                serde_json::to_string(&user_event).unwrap()
+                            },
+                            Event::Remove(k) => {
+                                // TODO test this it is entirely untested
+                                let key = str::from_utf8(&k).unwrap().to_string();
+                                println!("delete event: {:?}", k);
+                                let user_event = UserEvent {
+                                    event: "delete".to_owned(),
+                                    user: User {name: key}
+                                };
+                                serde_json::to_string(&user_event).unwrap()
+                            }
+                        };
 
-                        // TODO send just updates
-                        // match event {
-                        //     Event::Insert(k, v) => {
-                        //         let key = &str::from_utf8(&k).unwrap();
-                        //         let user: User = serde_json::from_slice(&v).unwrap();
-                        //         println!("insert event: {:?} {:?}", key, user.name);
-                        //     },
-                        //     Event::Remove(k) => {
-                        //         // printf!("delete event: {}", k);
-                        //     }
-                        // }
+                        out_clone.send(r);
                     }
                 });
 
@@ -132,35 +144,6 @@ impl ws::Handler for Router {
             }
 
             "/chat" => {
-                // let db_clone = db.clone();
-                // let out_clone = out.clone();
-                // thread::spawn(move || {
-                //     let prefix = "chat";
-                //     let mut events = db_clone.watch_prefix(prefix);
-
-                //     for event in events {
-                //         let users: Vec<User> = all_users(db_clone.clone());
-                //         let users_response = serde_json::to_string(&users).unwrap();
-                //         // println!("users: {}", users_response);
-                //         out_clone.send(users_response);
-
-                //                     println!("json chats: {:?}", serde_json::to_string(&chats).unwrap());
-                // the above line is what i need to craft the message
-
-                //         // TODO talk to brendan and send just updates
-                //         // match event {
-                //         //     Event::Insert(k, v) => {
-                //         //         let key = &str::from_utf8(&k).unwrap();
-                //         //         let user: User = serde_json::from_slice(&v).unwrap();
-                //         //         println!("insert event: {:?} {:?}", key, user.name);
-                //         //     },
-                //         //     Event::Remove(k) => {
-                //         //         // printf!("delete event: {}", k);
-                //         //     }
-                //         // }
-                //     }
-                // });
-
                 self.inner = Box::new(move |msg: ws::Message| {
                     let chat: Chat = serde_json::from_str(&msg.to_string()).unwrap();
                     println!("Chat: {} \"{}\" ", chat.user, chat.message);
@@ -182,7 +165,7 @@ impl ws::Handler for Router {
                 })
             }
 
-             // // Data handler (this will be useful for getting up to date list of users and games)
+            // // Data handler (this will be useful for getting up to date list of users and games)
             // "/data/one" => {
             //     self.inner = Box::new(Data {
             //         ws: out,
@@ -208,7 +191,6 @@ impl ws::Handler for Router {
     }
 
     fn on_open(&mut self, shake: ws::Handshake) -> ws::Result<()> {
-        // TODO need to match and only do appropriate
         match shake.request.resource() {
             "/users" => {
                 let users: Vec<User> = all_users(self.db.clone());
