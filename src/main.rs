@@ -99,8 +99,7 @@ impl ws::Handler for Router {
                 let db_clone = db.clone();
                 let out_clone = out.clone();
                 thread::spawn(move || {
-                    let prefix = "user/";
-                    let mut events = db_clone.watch_prefix(prefix);
+                    let mut events = db_clone.watch_prefix("user/");
 
                     for event in events {
                         let r = match event {
@@ -133,7 +132,6 @@ impl ws::Handler for Router {
                     println!("Name: {}", user.name);
 
                     let k = format!("user/{}", user.name);
-                    // let v = serde_json::to_vec(&user).unwrap();
                     let v = bincode::serialize(&user).unwrap();
 
                     // TODO instead of using insert, use upsert or compare_and_swap
@@ -146,10 +144,41 @@ impl ws::Handler for Router {
             }
 
             "/chat" => {
+                // In the future, each Chat should probably get it's own record then Chats can reference
+                // a list of Chat keys. That way individual chats could be pushed to the user.
+
+                let db_clone = db.clone();
+                let out_clone = out.clone();
+                thread::spawn(move || {
+                    let mut events = db_clone.watch_prefix("chats");
+
+                    for event in events {
+                        let r = match event {
+                            Event::Insert(k, v) => {
+                                let chats_encoded: Vec<u8> = db_clone.get(&k).unwrap().unwrap_or(IVec::from(vec![])).to_vec(); // NOTE i needed some default. I can probably do this better.
+                                let chats: Chats = match chats_encoded.len() {
+                                    0 => Chats{chats: vec![]},
+                                    _ => bincode::deserialize(&chats_encoded[..]).unwrap(),
+                                };
+                                serde_json::to_string(&chats).unwrap()
+                            },
+                            Event::Remove(k) => {
+                                // TODO test this it is entirely untested
+                                let key = str::from_utf8(&k).unwrap().to_string();
+                                println!("delete event: {:?}", k);
+                                let chats = Chats{chats: vec![]};
+                                serde_json::to_string(&chats).unwrap()
+                            }
+                        };
+
+                        out_clone.send(r);
+                    }
+                });
+
                 self.inner = Box::new(move |msg: ws::Message| {
                     let chat: Chat = serde_json::from_str(&msg.to_string()).unwrap();
                     println!("Chat: {} \"{}\" ", chat.user, chat.message);
-                    let k = "chat";
+                    let k = "chats";
                     let chats_encoded: Vec<u8> = db.get(k).unwrap().unwrap_or(IVec::from(vec![])).to_vec(); // NOTE i needed some default. I can probably do this better.
                     let mut chats: Chats = match chats_encoded.len() {
                         0 => Chats{chats: vec![]},
@@ -191,7 +220,7 @@ impl ws::Handler for Router {
                 self.sender.send(r);
             }
             "/chat" => {
-                let chats_encoded: Vec<u8> = self.db.get("chat").unwrap().unwrap_or(IVec::from(vec![])).to_vec(); // NOTE i needed some default. I can probably do this better.
+                let chats_encoded: Vec<u8> = self.db.get("chats").unwrap().unwrap_or(IVec::from(vec![])).to_vec(); // NOTE i needed some default. I can probably do this better.
                 let chats: Chats = match chats_encoded.len() {
                     0 => Chats{chats: vec![]},
                     _ => bincode::deserialize(&chats_encoded[..]).unwrap(),
