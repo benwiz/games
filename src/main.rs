@@ -27,6 +27,7 @@ when the connection is created then send just the updates later.
 
 /* TO DO
 
+- Identify who the chat is coming from automatically
 - Clean database on boot (probably just make it a temporary db)
 - Eventually, add a last-touched date to each record and purge records that haven't been touched in 24 hours.
 - Endpoint for pinging connection so that front end can display a "connected" symbol
@@ -216,6 +217,7 @@ impl ws::Handler for Router {
     // Pass through any other methods that should be delegated to the child.
     //
     fn on_shutdown(&mut self) {
+        // TODO delete the record for this connection and children.
         self.inner.on_shutdown()
     }
 
@@ -294,6 +296,7 @@ fn main() {
 
     // Listen on an address and call the closure for each connection
     if let Err(error) = ws::listen("0.0.0.0:3012", |out| {
+        println!("{}", Uuid::new_v4().to_hyphenated());
         Router {
             sender: out,
             inner: Box::new(NotFound), // Default to returning a 404 when the route doesn't match. You could default to any handler here.
