@@ -27,9 +27,11 @@ when the connection is created then send just the updates later.
 
 /* TO DO
 
-- Clean database on boot
+- Clean database on boot (probably just make it a temporary db)
 - Eventually, add a last-touched date to each record and purge records that haven't been touched in 24 hours.
 - Endpoint for pinging connection so that front end can display a "connected" symbol
+- Error handling and messaging to client when error occured
+- Validation on chat that user exists
 
  */
 
@@ -190,12 +192,12 @@ impl ws::Handler for Router {
                     let chats_v: Vec<u8> = bincode::serialize(&chats).unwrap();
                     db.insert(&chats_k, chats_v);
 
-                    // TODO test this (I have no confirmed this yet). Can test using subscriber.
                     // Remove chat records no longer in chat list
                     for chat_id in remove_ids {
                         db.remove(&k);
                     }
 
+                    // Repond to client
                     let r = WsResponse { status: 200, message: "ok".to_owned() };
                     let res = serde_json::to_string(&r).unwrap();
                     out.send(res)
@@ -226,10 +228,21 @@ impl ws::Handler for Router {
             }
             "/chat" => {
                 let chats_encoded: Vec<u8> = self.db.get("chats").unwrap().unwrap_or(IVec::from(vec![])).to_vec(); // NOTE i needed some default. I can probably do this better.
-                let chats: Chats = match chats_encoded.len() {
+                let chat_ids: Chats = match chats_encoded.len() {
                     0 => Chats{chats: vec![]},
                     _ => bincode::deserialize(&chats_encoded[..]).unwrap(),
                 };
+                let mut chats: Vec<Chat> = vec![];
+                for id in chat_ids.chats {
+                    println!("id {}", id);
+                    // FIXME something is wrong. I cannot get the data. Maybe I'm writing it with a bad key?
+                    let chat_encoded: Vec<u8> = self.db.get(id).unwrap().unwrap_or(IVec::from(vec![])).to_vec();
+                    println!("enc {:?}", chat_encoded);
+                    if chat_encoded.len() > 0 {
+                        let chat: Chat = bincode::deserialize(&chat_encoded[..]).unwrap();
+                        chats.push(chat);
+                    }
+                }
                 let r = serde_json::to_string(&chats).unwrap();
                 self.sender.send(r);
             }
