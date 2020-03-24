@@ -50,7 +50,6 @@ struct Chat {
     message: String,
 }
 
-
 #[derive(Serialize, Deserialize)]
 struct Chats {
     chats: Vec<String>,
@@ -104,7 +103,7 @@ impl ws::Handler for Router {
 
                     for event in events {
                         let r = match event {
-                            Event::Insert(k, v) => {
+                            Event::Insert(_k, v) => {
                                 let user: User = serde_json::from_slice(&v).unwrap();
                                 let user_event = UserEvent {
                                     event: "create".to_owned(),
@@ -150,12 +149,15 @@ impl ws::Handler for Router {
 
                     for event in events {
                         match event {
-                            Event::Insert(k, v) => {
+                            Event::Insert(_k, v) => {
                                 let chat: Chat = bincode::deserialize(&v).unwrap();
                                 let r = serde_json::to_string(&chat).unwrap();
                                 out_clone.send(r);
                             },
-                            Event::Remove(k) => {}
+                            Event::Remove(k) => {
+                                let key = str::from_utf8(&k).unwrap().to_string();
+                                println!("deleted {}", key);
+                            }
                         };
                     }
                 });
