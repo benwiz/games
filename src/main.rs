@@ -28,6 +28,7 @@ when the connection is created then send just the updates later.
 
 - Clean database on boot
 - Eventually, add a last-touched date to each record and purge records that haven't been touched in 24 hours.
+- Endpoint for pinging connection so that front end can display a "connected" symbol
 
  */
 
@@ -69,7 +70,7 @@ fn all_users(db: Arc<Db>) -> Vec<User> {
             let k = IVec::from(data.0);
             let key = &str::from_utf8(&k).unwrap();
             let v = IVec::from(data.1);
-            let value: User = serde_json::from_slice(&v).unwrap();
+            let value: User = bincode::deserialize(&v).unwrap();
             // println!("k: {}, v: {}", key, value.name);
             value
         }
@@ -132,7 +133,8 @@ impl ws::Handler for Router {
                     println!("Name: {}", user.name);
 
                     let k = format!("user/{}", user.name);
-                    let v = serde_json::to_vec(&user).unwrap();
+                    // let v = serde_json::to_vec(&user).unwrap();
+                    let v = bincode::serialize(&user).unwrap();
 
                     // TODO instead of using insert, use upsert or compare_and_swap
                     db.insert(&k, v); // TODO I guess handle error by sending message to client if error?
@@ -153,10 +155,11 @@ impl ws::Handler for Router {
                         0 => Chats{chats: vec![]},
                         _ => bincode::deserialize(&chats_encoded[..]).unwrap(),
                     };
-                    chats.chats.push(chat);
+                    chats.chats.insert(0, chat);
+                    chats.chats.truncate(100);
 
+                    let mut v: Vec<u8> = bincode::serialize(&chats).unwrap();
                     // TODO instead of using insert, use upsert or compare_and_swap
-                    let v: Vec<u8> = bincode::serialize(&chats).unwrap();
                     db.insert(&k, v); // TODO I guess handle error by sending message to client if error?
 
                     let r = WsResponse { status: 200, message: "ok".to_owned() };
@@ -164,14 +167,6 @@ impl ws::Handler for Router {
                     out.send(res)
                 })
             }
-
-            // // Data handler (this will be useful for getting up to date list of users and games)
-            // "/data/one" => {
-            //     self.inner = Box::new(Data {
-            //         ws: out,
-            //         data: vec!["one", "two", "three", "four", "five"],
-            //     })
-            // }
 
             // Use the default child handler, NotFound
             _ => (),
@@ -181,11 +176,9 @@ impl ws::Handler for Router {
         self.inner.on_request(req)
     }
 
+    //
     // Pass through any other methods that should be delegated to the child.
     //
-    // You could probably use a macro for this if you have many different
-    // routers or were building some sort of routing framework.
-
     fn on_shutdown(&mut self) {
         self.inner.on_shutdown()
     }
@@ -247,28 +240,6 @@ impl ws::Handler for Echo {
     fn on_message(&mut self, msg: ws::Message) -> ws::Result<()> {
         println!("Echo handler received a message: {}", msg);
         self.ws.send(msg)
-    }
-}
-
-// This handler sends some data to the client and then terminates the connection on the first
-// message received, presumably confirming receipt of the data
-struct Data {
-    ws: ws::Sender,
-    data: Vec<&'static str>,
-}
-
-impl ws::Handler for Data {
-    fn on_open(&mut self, _: ws::Handshake) -> ws::Result<()> {
-        for msg in &self.data {
-            self.ws.send(*msg)?
-        }
-        Ok(())
-    }
-
-    fn on_message(&mut self, msg: ws::Message) -> ws::Result<()> {
-        println!("Data handler received a message: {}", msg);
-        println!("Data handler going down.");
-        self.ws.close(ws::CloseCode::Normal)
     }
 }
 

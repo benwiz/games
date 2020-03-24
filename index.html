@@ -7,7 +7,7 @@
   <body>
     <div>
 	  <script>
-		var socket = new WebSocket("ws://127.0.0.1:3012/users");
+		var socket = new WebSocket("ws://127.0.0.1:3012/chat");
 		socket.onmessage = function (event) {
 			var received = document.getElementById("received");
 			var br = document.createElement("BR");
