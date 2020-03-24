@@ -163,10 +163,8 @@ impl ws::Handler for Router {
 
                 self.inner = Box::new(move |msg: ws::Message| {
                     let chat: Chat = serde_json::from_str(&msg.to_string()).unwrap();
-                    println!("{}: {}", chat.user, chat.message);
-
+                    println!("Chat: {} \"{}\" ", chat.user, chat.message);
                     let k = "chat";
-
                     let chats_encoded: Vec<u8> = db.get(k).unwrap().unwrap_or(IVec::from(vec![])).to_vec(); // NOTE i needed some default. I can probably do this better.
                     let mut chats: Chats = match chats_encoded.len() {
                         0 => Chats{chats: vec![]},
@@ -214,13 +212,17 @@ impl ws::Handler for Router {
         match shake.request.resource() {
             "/users" => {
                 let users: Vec<User> = all_users(self.db.clone());
-                let users_response = serde_json::to_string(&users).unwrap();
-                self.sender.send(users_response);
+                let r = serde_json::to_string(&users).unwrap();
+                self.sender.send(r);
             }
             "/chat" => {
-                // let users: Vec<User> = all_users(self.db.clone());
-                // let users_response = serde_json::to_string(&users).unwrap();
-                // self.sender.send(users_response);
+                let chats_encoded: Vec<u8> = self.db.get("chat").unwrap().unwrap_or(IVec::from(vec![])).to_vec(); // NOTE i needed some default. I can probably do this better.
+                let chats: Chats = match chats_encoded.len() {
+                    0 => Chats{chats: vec![]},
+                    _ => bincode::deserialize(&chats_encoded[..]).unwrap(),
+                };
+                let r = serde_json::to_string(&chats).unwrap();
+                self.sender.send(r);
             }
             _ => {}
         }
