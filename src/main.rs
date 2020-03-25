@@ -59,6 +59,8 @@ fn all_users(db: Arc<Db>) -> Vec<User> {
 
 impl ws::Handler for Server {
     fn on_open(&mut self, _shake: ws::Handshake) -> ws::Result<()> {
+        // TODO turn each of these sections into its own fn
+
         // Send all users
         let users: Vec<User> = all_users(self.db.clone());
         let users_body = serde_json::to_value(&users).unwrap();
@@ -91,6 +93,41 @@ impl ws::Handler for Server {
         let chats_r = serde_json::to_string(&chats_msg).unwrap();
         self.ws.send(chats_r);
 
+        // Initialize users subscriber
+        let db_users = self.db.clone();
+        let ws_users = self.ws.clone();
+        thread::spawn(move || {
+            let mut events = db_users.watch_prefix("user/");
+            for event in events {
+                let e = match event {
+                    Event::Insert(_k, v) => {
+                        let user: User = bincode::deserialize(&v).unwrap();
+                        let user_event = UserEvent {
+                            event: "create".to_owned(),
+                            user: user,
+                        };
+                        serde_json::to_value(&user_event).unwrap()
+                    },
+                    Event::Remove(k) => {
+                        // TODO test this it is entirely untested
+                        let key = str::from_utf8(&k).unwrap().to_string();
+                        let user_event = UserEvent {
+                            event: "delete".to_owned(),
+                            user: User {name: key}
+                        };
+                        serde_json::to_value(&user_event).unwrap()
+                    }
+                };
+
+                let msg = Message {
+                    route: "/users".to_owned(),
+                    body: e,
+                };
+                let r = serde_json::to_string(&msg).unwrap();
+                ws_users.send(r);
+            }
+        });
+
         Ok(())
     }
 
@@ -105,38 +142,6 @@ impl ws::Handler for Server {
                 "echo"
             },
             "/users" => {
-                let db = self.db.clone();
-                let ws = self.ws.clone();
-                thread::spawn(move || {
-                    println!("thread");
-                    let mut events = db.watch_prefix("user/");
-                    for event in events {
-                        let r = match event {
-                            Event::Insert(_k, v) => {
-                                println!("create");
-                                let user: User = bincode::deserialize(&v).unwrap();
-                                let user_event = UserEvent {
-                                    event: "create".to_owned(),
-                                    user: user,
-                                };
-                                serde_json::to_string(&user_event).unwrap()
-                            },
-                            Event::Remove(k) => {
-                                // TODO test this it is entirely untested
-                                let key = str::from_utf8(&k).unwrap().to_string();
-                                println!("delete {}", key);
-                                let user_event = UserEvent {
-                                    event: "delete".to_owned(),
-                                    user: User {name: key}
-                                };
-                                serde_json::to_string(&user_event).unwrap()
-                            }
-                        };
-
-                        ws.send(r);
-                    }
-                });
-
                 let user: User = serde_json::from_value(m.body).unwrap();
                 let k = format!("user/{}", user.name);
                 let v = bincode::serialize(&user).unwrap();
