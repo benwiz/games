@@ -104,6 +104,46 @@ impl ws::Handler for Server {
                 println!("echo");
                 "echo"
             },
+            "/users" => {
+                let db = self.db.clone();
+                let ws = self.ws.clone();
+                thread::spawn(move || {
+                    println!("thread");
+                    let mut events = db.watch_prefix("user/");
+                    for event in events {
+                        let r = match event {
+                            Event::Insert(_k, v) => {
+                                println!("create");
+                                let user: User = bincode::deserialize(&v).unwrap();
+                                let user_event = UserEvent {
+                                    event: "create".to_owned(),
+                                    user: user,
+                                };
+                                serde_json::to_string(&user_event).unwrap()
+                            },
+                            Event::Remove(k) => {
+                                // TODO test this it is entirely untested
+                                let key = str::from_utf8(&k).unwrap().to_string();
+                                println!("delete {}", key);
+                                let user_event = UserEvent {
+                                    event: "delete".to_owned(),
+                                    user: User {name: key}
+                                };
+                                serde_json::to_string(&user_event).unwrap()
+                            }
+                        };
+
+                        ws.send(r);
+                    }
+                });
+
+                let user: User = serde_json::from_value(m.body).unwrap();
+                let k = format!("user/{}", user.name);
+                let v = bincode::serialize(&user).unwrap();
+                self.db.insert(&k, v);
+
+                "ok"
+            },
             _ => {
                 println!("Unknown route");
                 "unknown"
