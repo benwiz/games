@@ -29,6 +29,13 @@
 		<input type="text" id="message">
 		<input type="submit" value="Send">
 	  </form>
+
+      <div>
+        <h4>Example Requests:</h4>
+        Create User: {"route":"/users","event":"create","body":{"name":"menashi"}}
+        <br>
+        Send chat: {"route":"/chat","event":"create","body":{"message":"hi guys"}}
+      </div>
     </div>
   </body>
 </html>

@@ -16,18 +16,13 @@ struct Server {
 #[derive(Serialize, Deserialize)]
 struct Message {
     route: String,
+    event: String,
     body: Value,
 }
 
 #[derive(Serialize, Deserialize)]
 struct User {
     name: String,
-}
-
-#[derive(Serialize, Deserialize)]
-struct UserEvent {
-    event: String,
-    user: User,
 }
 
 #[derive(Serialize, Deserialize)]
@@ -66,6 +61,7 @@ impl ws::Handler for Server {
         let users_body = serde_json::to_value(&users).unwrap();
         let users_msg = Message {
             route: "/users".to_owned(),
+            event: "info".to_owned(),
             body: users_body
         };
         let users_r = serde_json::to_string(&users_msg).unwrap();
@@ -88,6 +84,7 @@ impl ws::Handler for Server {
         let chats_body = serde_json::to_value(&chats).unwrap();
         let chats_msg = Message {
             route: "/chats".to_owned(),
+            event: "info".to_owned(),
             body: chats_body,
         };
         let chats_r = serde_json::to_string(&chats_msg).unwrap();
@@ -99,32 +96,53 @@ impl ws::Handler for Server {
         thread::spawn(move || {
             let mut events = db_users.watch_prefix("user/");
             for event in events {
-                let e = match event {
+                let msg = match event {
                     Event::Insert(_k, v) => {
                         let user: User = bincode::deserialize(&v).unwrap();
-                        let user_event = UserEvent {
+                        Message {
+                            route: "/users".to_owned(),
                             event: "create".to_owned(),
-                            user: user,
-                        };
-                        serde_json::to_value(&user_event).unwrap()
+                            body: serde_json::to_value(user).unwrap(),
+                        }
                     },
                     Event::Remove(k) => {
-                        // TODO test this it is entirely untested
                         let key = str::from_utf8(&k).unwrap().to_string();
-                        let user_event = UserEvent {
+                        let user = User { name: key };
+                        Message {
+                            route: "/users".to_owned(),
                             event: "delete".to_owned(),
-                            user: User {name: key}
-                        };
-                        serde_json::to_value(&user_event).unwrap()
+                            body: serde_json::to_value(user).unwrap(),
+                        }
                     }
                 };
 
-                let msg = Message {
-                    route: "/users".to_owned(),
-                    body: e,
-                };
                 let r = serde_json::to_string(&msg).unwrap();
+                println!("r {}", r);
                 ws_users.send(r);
+            }
+        });
+
+        // Subscribe to chat events
+        let db_chat = self.db.clone();
+        let ws_chat = self.ws.clone();
+        thread::spawn(move || {
+            let mut events = db_chat.watch_prefix("chat/");
+            for event in events {
+                match event {
+                    Event::Insert(_k, v) => {
+                        // No need to wrap in event because it is always a create.
+                        let chat: Chat = bincode::deserialize(&v).unwrap();
+                        let v = serde_json::to_value(&chat).unwrap();
+                        let msg = Message {
+                            route: "/chat".to_owned(),
+                            event: "create".to_owned(),
+                            body: v,
+                        };
+                        let r = serde_json::to_string(&msg).unwrap();
+                        ws_chat.send(r);
+                    },
+                    Event::Remove(k) => {} // No delete
+                };
             }
         });
 
@@ -149,9 +167,41 @@ impl ws::Handler for Server {
 
                 "ok"
             },
+            "/chat" => {
+                let chat: Chat = serde_json::from_value(m.body).unwrap();
+
+                // Add chat
+                let k = format!("chat/{}", Uuid::new_v4().to_hyphenated());
+                let v = bincode::serialize(&chat).unwrap();
+                println!("{}: {} \"{}\" ", k, chat.user, chat.message);
+                self.db.insert(&k.as_bytes(), v);
+
+                // Update chats list
+                let chats_k = "chats";
+                let chats_encoded: Vec<u8> = self.db.get(chats_k).unwrap().unwrap_or(IVec::from(vec![])).to_vec(); // NOTE I needed some default. I can probably do this better.
+                let mut chats: Chats = match chats_encoded.len() {
+                    0 => Chats{chats: vec![]},
+                    _ => bincode::deserialize(&chats_encoded[..]).unwrap(), // TODO I think chats_encoded.as_str() would also work
+                };
+                chats.chats.insert(0, k.clone());
+                let max_len = 100;
+                let remove_ids: Vec<String> = match chats.chats.len() {
+                    l if l > max_len => chats.chats.drain(max_len..).collect(), // truncate
+                    _ => vec![],
+                };
+                let chats_v: Vec<u8> = bincode::serialize(&chats).unwrap();
+                self.db.insert(&chats_k, chats_v);
+
+                // Remove chat records no longer in chat list
+                for chat_id in remove_ids {
+                    self.db.remove(&k);
+                }
+
+                "ok"
+            },
             _ => {
-                println!("Unknown route");
-                "unknown"
+                println!("Unknown route: {}", m.route);
+                "unknown route"
             }
         };
         self.ws.send(r)
