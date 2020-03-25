@@ -101,7 +101,7 @@ impl ws::Handler for Server {
         // Initialize users subscriber
         let db_users = self.db.clone();
         let ws_users = self.ws.clone();
-        thread::spawn(move || {
+        thread::spawn(move ||  -> ws::Result<()> {
             let events = db_users.watch_prefix("user/");
             for event in events {
                 let msg = match event {
@@ -125,14 +125,15 @@ impl ws::Handler for Server {
                 };
 
                 let r = serde_json::to_string(&msg).unwrap();
-                ws_users.send(r);
+                ws_users.send(r)?
             }
+            Ok(())
         });
 
         // Subscribe to chat events
         let db_chat = self.db.clone();
         let ws_chat = self.ws.clone();
-        thread::spawn(move || {
+        thread::spawn(move ||  -> ws::Result<()> {
             let events = db_chat.watch_prefix("chat/");
             for event in events {
                 match event {
@@ -146,11 +147,12 @@ impl ws::Handler for Server {
                             body: v,
                         };
                         let r = serde_json::to_string(&msg).unwrap();
-                        ws_chat.send(r);
+                        ws_chat.send(r)?
                     },
                     Event::Remove(_k) => {} // No delete
                 };
             }
+            Ok(())
         });
 
         Ok(())
