@@ -27,7 +27,6 @@ struct User {
 
 #[derive(Serialize, Deserialize)]
 struct Chat {
-    user: String,
     message: String,
 }
 
@@ -152,7 +151,7 @@ impl ws::Handler for Server {
     fn on_message(&mut self, msg: ws::Message) -> ws::Result<()> {
         println!("Message: {}", msg);
         let m: Message = serde_json::from_str(&msg.to_string()).unwrap();
-        println!("{} {}", m.route, m.body);
+        println!("{} {} {}", m.route, m.event, m.body);
 
         let r = match m.route.as_str() {
             "/echo" => {
@@ -170,10 +169,10 @@ impl ws::Handler for Server {
             "/chat" => {
                 let chat: Chat = serde_json::from_value(m.body).unwrap();
 
-                // Add chat
+                // // Add chat
                 let k = format!("chat/{}", Uuid::new_v4().to_hyphenated());
                 let v = bincode::serialize(&chat).unwrap();
-                println!("{}: {} \"{}\" ", k, chat.user, chat.message);
+                println!("{}: \"{}\" ", k, chat.message);
                 self.db.insert(&k.as_bytes(), v);
 
                 // Update chats list
