@@ -161,9 +161,10 @@ impl ws::Handler for Server {
     fn on_message(&mut self, msg: ws::Message) -> ws::Result<()> {
         println!("Message: {}", msg);
         let m: Message = serde_json::from_str(&msg.to_string()).unwrap();
-        let r = match m.route.as_str() {
+        match m.route.as_str() {
             "/echo" => {
-                "TODO handle echo route"
+                // TODO actually echo
+                Ok(())
             },
             "/users" => {
                 let user: User = serde_json::from_value(m.body).unwrap();
@@ -176,7 +177,7 @@ impl ws::Handler for Server {
                     }
                 }
 
-                "ok"
+                Ok(())
             },
             "/chat" => {
                 let chat: Chat = serde_json::from_value(m.body).unwrap();
@@ -222,14 +223,13 @@ impl ws::Handler for Server {
                     }
                 }
 
-                "ok"
+                Ok(())
             },
             _ => {
                 println!("Unknown route: {}", m.route);
-                "unknown route"
+                Ok(())
             }
-        };
-        self.ws.send(r)
+        }
     }
 }
 
