@@ -9,7 +9,10 @@ use serde_json::{json, Value};
 use sled::{Event, IVec, Db};
 
 // TODO
-// temp database
+// associate connection with user
+// -- user record should be generated when Server is created
+// -- User struct is assigned as the value
+// chat requires a user
 
 struct Server {
     ws: ws::Sender,
@@ -30,6 +33,7 @@ struct User {
 
 #[derive(Serialize, Deserialize)]
 struct Chat {
+    // TODO bring back user
     message: String,
 }
 
