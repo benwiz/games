@@ -5,14 +5,16 @@ use std::thread;
 use std::sync::Arc;
 use uuid::Uuid;
 use serde::{Deserialize, Serialize};
-use serde_json::{json, Value};
+use serde_json::{Value};
 use sled::{Event, IVec, Db};
 
 // TODO
 // associate connection with user
 // -- user record should be generated when Server is created
 // -- User struct is assigned as the value
-// chat requires a user
+// chat struct requires a User
+// rooms route
+
 
 struct Server {
     ws: ws::Sender,
@@ -43,13 +45,13 @@ struct Chats {
 }
 
 fn all_users(db: Arc<Db>) -> Vec<User> {
-    let mut scan = db.scan_prefix("user/");
+    let scan = db.scan_prefix("user/");
     scan.map(
         |v|
         {
             let data = v.unwrap();
-            let k = IVec::from(data.0);
-            let key = &str::from_utf8(&k).unwrap();
+            // let k = IVec::from(data.0);
+            // let key = &str::from_utf8(&k).unwrap();
             let v = IVec::from(data.1);
             let value: User = bincode::deserialize(&v).unwrap();
             // println!("k: {}, v: {}", key, value.name);
@@ -100,7 +102,7 @@ impl ws::Handler for Server {
         let db_users = self.db.clone();
         let ws_users = self.ws.clone();
         thread::spawn(move || {
-            let mut events = db_users.watch_prefix("user/");
+            let events = db_users.watch_prefix("user/");
             for event in events {
                 let msg = match event {
                     Event::Insert(_k, v) => {
@@ -132,7 +134,7 @@ impl ws::Handler for Server {
         let db_chat = self.db.clone();
         let ws_chat = self.ws.clone();
         thread::spawn(move || {
-            let mut events = db_chat.watch_prefix("chat/");
+            let events = db_chat.watch_prefix("chat/");
             for event in events {
                 match event {
                     Event::Insert(_k, v) => {
@@ -147,7 +149,7 @@ impl ws::Handler for Server {
                         let r = serde_json::to_string(&msg).unwrap();
                         ws_chat.send(r);
                     },
-                    Event::Remove(k) => {} // No delete
+                    Event::Remove(_k) => {} // No delete
                 };
             }
         });
@@ -200,7 +202,7 @@ impl ws::Handler for Server {
 
                 // Remove chat records no longer in chat list
                 for chat_id in remove_ids {
-                    self.db.remove(&k);
+                    self.db.remove(&chat_id);
                 }
 
                 "ok"
