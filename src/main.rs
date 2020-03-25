@@ -161,10 +161,23 @@ impl ws::Handler for Server {
     fn on_message(&mut self, msg: ws::Message) -> ws::Result<()> {
         println!("Message: {}", msg);
         let m: Message = serde_json::from_str(&msg.to_string()).unwrap();
+        // TODO finish bad message error handling
+        // {
+        //     Ok(m) => m,
+        //     Err(e) => {
+        //         let out_msg = Message {
+        //             route: "/error".to_owned(),
+        //             event: "error".to_owned(),
+        //             body: serde_json::to_value(&msg.to_string()).unwrap(),
+        //         };
+        //         let r = serde_json::to_string(&out_msg).unwrap();
+        //         self.ws.send(r);
+        //         // TODO need to be able to return an error, then return early after the `m` closure
+        //     }
+        // };
         match m.route.as_str() {
             "/echo" => {
-                // TODO actually echo
-                Ok(())
+                self.ws.send(msg)
             },
             "/users" => {
                 let user: User = serde_json::from_value(m.body).unwrap();
@@ -182,7 +195,7 @@ impl ws::Handler for Server {
             "/chat" => {
                 let chat: Chat = serde_json::from_value(m.body).unwrap();
 
-                // // Add chat
+                // Add chat
                 let k = format!("chat/{}", Uuid::new_v4().to_hyphenated());
                 let v = bincode::serialize(&chat).unwrap();
                 match self.db.insert(&k.as_bytes(), v) {
