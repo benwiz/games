@@ -73,7 +73,7 @@ impl ws::Handler for Server {
             body: users_body
         };
         let users_r = serde_json::to_string(&users_msg).unwrap();
-        self.ws.send(users_r);
+        self.ws.send(users_r)?;
 
         // Send all chats
         let chats_encoded: Vec<u8> = self.db.get("chats").unwrap().unwrap_or(IVec::from(vec![])).to_vec(); // NOTE i needed some default. I can probably do this better.
@@ -96,7 +96,7 @@ impl ws::Handler for Server {
             body: chats_body,
         };
         let chats_r = serde_json::to_string(&chats_msg).unwrap();
-        self.ws.send(chats_r);
+        self.ws.send(chats_r)?;
 
         // Initialize users subscriber
         let db_users = self.db.clone();
@@ -125,7 +125,6 @@ impl ws::Handler for Server {
                 };
 
                 let r = serde_json::to_string(&msg).unwrap();
-                println!("r {}", r);
                 ws_users.send(r);
             }
         });
@@ -160,12 +159,9 @@ impl ws::Handler for Server {
     fn on_message(&mut self, msg: ws::Message) -> ws::Result<()> {
         println!("Message: {}", msg);
         let m: Message = serde_json::from_str(&msg.to_string()).unwrap();
-        println!("{} {} {}", m.route, m.event, m.body);
-
         let r = match m.route.as_str() {
             "/echo" => {
-                println!("echo");
-                "echo"
+                "TODO handle echo route"
             },
             "/users" => {
                 let user: User = serde_json::from_value(m.body).unwrap();
@@ -181,7 +177,6 @@ impl ws::Handler for Server {
                 // // Add chat
                 let k = format!("chat/{}", Uuid::new_v4().to_hyphenated());
                 let v = bincode::serialize(&chat).unwrap();
-                println!("{}: \"{}\" ", k, chat.message);
                 self.db.insert(&k.as_bytes(), v);
 
                 // Update chats list
