@@ -6,7 +6,10 @@ use std::sync::Arc;
 use uuid::Uuid;
 use serde::{Deserialize, Serialize};
 use serde_json::{json, Value};
-use sled::{Config, Event, IVec, Db};
+use sled::{Event, IVec, Db};
+
+// TODO
+// temp database
 
 struct Server {
     ws: ws::Sender,
@@ -208,7 +211,9 @@ impl ws::Handler for Server {
 }
 
 fn main() {
-    let db = Arc::new(sled::open("game_db").expect("Sled must start ok."));
+    // let db = Arc::new(sled::open("game_db").expect("Sled must start ok."));
+    let db = Arc::new(sled::Config::new().temporary(true).open().expect("Sled must start ok."));
+
     ws::listen("127.0.0.1:3012", |out| {
         Server {
             ws: out,
