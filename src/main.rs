@@ -169,7 +169,12 @@ impl ws::Handler for Server {
                 let user: User = serde_json::from_value(m.body).unwrap();
                 let k = format!("user/{}", user.name);
                 let v = bincode::serialize(&user).unwrap();
-                self.db.insert(&k, v);
+                match self.db.insert(&k, v) {
+                    Ok(_t) => {},
+                    Err(_e) => {
+                        // TODO do something
+                    }
+                }
 
                 "ok"
             },
@@ -179,7 +184,12 @@ impl ws::Handler for Server {
                 // // Add chat
                 let k = format!("chat/{}", Uuid::new_v4().to_hyphenated());
                 let v = bincode::serialize(&chat).unwrap();
-                self.db.insert(&k.as_bytes(), v);
+                match self.db.insert(&k.as_bytes(), v) {
+                    Ok(_t) => {},
+                    Err(_e) => {
+                        // TODO do something
+                    }
+                }
 
                 // Update chats list
                 let chats_k = "chats";
@@ -195,11 +205,21 @@ impl ws::Handler for Server {
                     _ => vec![],
                 };
                 let chats_v: Vec<u8> = bincode::serialize(&chats).unwrap();
-                self.db.insert(&chats_k, chats_v);
+                match self.db.insert(&chats_k, chats_v) {
+                    Ok(_t) => {},
+                    Err(_e) => {
+                        // TODO do something
+                    }
+                }
 
                 // Remove chat records no longer in chat list
                 for chat_id in remove_ids {
-                    self.db.remove(&chat_id);
+                    match self.db.remove(&chat_id) {
+                        Ok(_t) => {},
+                        Err(_e) => {
+                            // TODO do something
+                        }
+                    }
                 }
 
                 "ok"
