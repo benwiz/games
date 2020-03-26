@@ -308,10 +308,7 @@ impl ws::Handler for Server {
             // EXPIRE timeout has occured, this means that the connection is inactive, let's close
             EXPIRE => self.ws.close(ws::CloseCode::Away),
             // No other timeouts are possible
-            _ => Err(ws::Error::new(
-                ws::ErrorKind::Internal,
-                "Invalid timeout token encountered!",
-            )),
+            _ => Err(ws::Error::new(ws::ErrorKind::Internal, "Invalid timeout token encountered!")),
         }
     }
 
