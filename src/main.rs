@@ -21,8 +21,8 @@ use ws::util::Token;
 
 const PING: Token = Token(1);
 const EXPIRE: Token = Token(2);
-const PING_TIMEOUT = 5_000;
-const EXPIRE_TIMEOUT = 30_000;
+const PING_TIMEOUT: u64 = 5_000;
+const EXPIRE_TIMEOUT: u64 = 30_000;
 
 struct Server {
     id: Uuid,
