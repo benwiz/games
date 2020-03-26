@@ -9,8 +9,8 @@ use uuid::Uuid;
 use serde::{Deserialize, Serialize};
 use serde_json::{Value};
 use sled::{Event, IVec, Db};
-use mio_extras::timer::Timeout;
-use ws::util::Token;
+// use mio_extras::timer::Timeout;
+// use ws::util::Token;
 
 // TODO
 // Rename server.ws to server.out
@@ -27,8 +27,8 @@ struct Server {
     id: Uuid,
     ws: ws::Sender,
     db: Arc<Db>,
-    ping_timeout: Option<Timeout>,
-    expire_timeout: Option<Timeout>,
+    // ping_timeout: Option<Timeout>,
+    // expire_timeout: Option<Timeout>,
 }
 
 #[derive(Serialize, Deserialize)]
@@ -270,13 +270,13 @@ impl ws::Handler for Server {
     fn on_close(&mut self, code: ws::CloseCode, reason: &str) {
         println!("WebSocket closing for ({:?}) {}", code, reason);
 
-        // Clean up timeouts
-        if let Some(t) = self.ping_timeout.take() {
-            self.ws.cancel(t).unwrap();
-        }
-        if let Some(t) = self.expire_timeout.take() {
-            self.ws.cancel(t).unwrap();
-        }
+        // // Clean up timeouts
+        // if let Some(t) = self.ping_timeout.take() {
+        //     self.ws.cancel(t).unwrap();
+        // }
+        // if let Some(t) = self.expire_timeout.take() {
+        //     self.ws.cancel(t).unwrap();
+        // }
 
         let user = format!("user/{}", self.id);
         println!("Removing {}", user);
@@ -349,9 +349,8 @@ impl ws::Handler for Server {
     // }
 }
 
-struct DefaultHandler;
-
-impl ws::Handler for DefaultHandler {}
+// struct DefaultHandler;
+// impl ws::Handler for DefaultHandler {}
 
 fn main() {
     // let db = Arc::new(sled::open("game_db").expect("Sled must start ok."));
@@ -362,8 +361,8 @@ fn main() {
             id: Uuid::new_v4(),
             ws: out,
             db: db.clone(),
-            ping_timeout: None,
-            expire_timeout: None,
+            // ping_timeout: None,
+            // expire_timeout: None,
         }
     }).unwrap()
 }
