@@ -15,3 +15,5 @@ serde_bytes = "0.11"
 sled = "0.31.0"
 bincode = "1.0"
 uuid = { version = "0.8.1", features = ["v4"] }
+time = "0.1.4"
+mio-extras = "2.0.6"

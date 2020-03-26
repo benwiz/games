@@ -1,3 +1,5 @@
+extern crate mio_extras;
+extern crate time;
 extern crate ws;
 
 use std::str;
@@ -7,20 +9,27 @@ use uuid::Uuid;
 use serde::{Deserialize, Serialize};
 use serde_json::{Value};
 use sled::{Event, IVec, Db};
+use mio_extras::timer::Timeout;
+use ws::util::Token;
 
 // TODO
 // Implement ping-ping
-// associate connection with user
-// -- user record should be generated when Server is created
-// -- User struct is assigned as the value
+// Rename server.ws to server.out
 // chat struct requires a User
 // rooms route
 
+
+const PING: Token = Token(1);
+const EXPIRE: Token = Token(2);
+const PING_TIMEOUT = 5_000;
+const EXPIRE_TIMEOUT = 30_000;
 
 struct Server {
     id: Uuid,
     ws: ws::Sender,
     db: Arc<Db>,
+    ping_timeout: Option<Timeout>,
+    expire_timeout: Option<Timeout>,
 }
 
 #[derive(Serialize, Deserialize)]
@@ -70,6 +79,10 @@ fn all_users(db: Arc<Db>) -> Vec<User> {
 
 impl ws::Handler for Server {
     fn on_open(&mut self, _shake: ws::Handshake) -> ws::Result<()> {
+        // Ping Pong
+        self.ws.timeout(PING_TIMEOUT, PING)?; // ping every 5 seconds
+        self.ws.timeout(EXPIRE_TIMEOUT, EXPIRE)?; // close conn if no activity for 30 seconds
+
         // Send all users
         let users: Vec<User> = all_users(self.db.clone());
         let users_body = serde_json::to_value(&users).unwrap();
@@ -257,6 +270,15 @@ impl ws::Handler for Server {
 
     fn on_close(&mut self, code: ws::CloseCode, reason: &str) {
         println!("WebSocket closing for ({:?}) {}", code, reason);
+
+        // Clean up timeouts
+        if let Some(t) = self.ping_timeout.take() {
+            self.ws.cancel(t).unwrap();
+        }
+        if let Some(t) = self.expire_timeout.take() {
+            self.ws.cancel(t).unwrap();
+        }
+
         let user = format!("user/{}", self.id);
         println!("Removing {}", user);
         match self.db.remove(user) {
@@ -265,6 +287,7 @@ impl ws::Handler for Server {
                 // TODO do something
             }
         }
+
         // TODO I want to return ws::Result but getting error when I do.
         // Once i do I should be able to return this line, and the db remove
         // can use a `?`.
@@ -273,7 +296,66 @@ impl ws::Handler for Server {
             Err(_e) => {},
         }
     }
+
+    fn on_timeout(&mut self, event: Token) -> ws::Result<()> {
+        match event {
+            // PING timeout has occured, send a ping and reschedule
+            PING => {
+                self.ws.ping(time::precise_time_ns().to_string().into())?;
+                self.ping_timeout.take();
+                self.ws.timeout(PING_TIMEOUT, PING)
+            }
+            // EXPIRE timeout has occured, this means that the connection is inactive, let's close
+            EXPIRE => self.ws.close(ws::CloseCode::Away),
+            // No other timeouts are possible
+            _ => Err(ws::Error::new(
+                ws::ErrorKind::Internal,
+                "Invalid timeout token encountered!",
+            )),
+        }
+    }
+
+    fn on_new_timeout(&mut self, event: Token, timeout: Timeout) -> ws::Result<()> {
+        // Cancel the old timeout and replace.
+        if event == EXPIRE {
+            if let Some(t) = self.expire_timeout.take() {
+                self.ws.cancel(t)?
+            }
+            self.expire_timeout = Some(timeout)
+        } else {
+            // This ensures there is only one ping timeout at a time
+            if let Some(t) = self.ping_timeout.take() {
+                self.ws.cancel(t)?
+            }
+            self.ping_timeout = Some(timeout)
+        }
+
+        Ok(())
+    }
+
+    fn on_frame(&mut self, frame: ws::Frame) -> ws::Result<Option<ws::Frame>> {
+        // If the frame is a pong, print the round-trip time.
+        // The pong should contain data from out ping, but it isn't guaranteed to.
+        if frame.opcode() == ws::OpCode::Pong {
+            if let Ok(pong) = str::from_utf8(frame.payload())?.parse::<u64>() {
+                let now = time::precise_time_ns();
+                println!("RTT is {:.3}ms.", (now - pong) as f64 / 1_000_000f64);
+            } else {
+                println!("Received bad pong.");
+            }
+        }
+
+        // Some activity has occured, so reset the expiration
+        self.ws.timeout(EXPIRE_TIMEOUT, EXPIRE)?;
+
+        // Run default frame validation
+        DefaultHandler.on_frame(frame)
+    }
 }
+
+struct DefaultHandler;
+
+impl ws::Handler for DefaultHandler {}
 
 fn main() {
     // let db = Arc::new(sled::open("game_db").expect("Sled must start ok."));
@@ -284,6 +366,8 @@ fn main() {
             id: Uuid::new_v4(),
             ws: out,
             db: db.clone(),
+            ping_timeout: None,
+            expire_timeout: None,
         }
     }).unwrap()
 }
