@@ -9,6 +9,7 @@ use serde_json::{Value};
 use sled::{Event, IVec, Db};
 
 // TODO
+// Implement ping-ping
 // associate connection with user
 // -- user record should be generated when Server is created
 // -- User struct is assigned as the value
@@ -17,6 +18,7 @@ use sled::{Event, IVec, Db};
 
 
 struct Server {
+    id: Uuid,
     ws: ws::Sender,
     db: Arc<Db>,
 }
@@ -62,8 +64,6 @@ fn all_users(db: Arc<Db>) -> Vec<User> {
 
 impl ws::Handler for Server {
     fn on_open(&mut self, _shake: ws::Handshake) -> ws::Result<()> {
-        // TODO turn each of these sections into its own fn
-
         // Send all users
         let users: Vec<User> = all_users(self.db.clone());
         let users_body = serde_json::to_value(&users).unwrap();
@@ -181,7 +181,8 @@ impl ws::Handler for Server {
             },
             "/users" => {
                 let user: User = serde_json::from_value(m.body).unwrap();
-                let k = format!("user/{}", user.name);
+                let k = format!("user/{}", self.id.to_hyphenated());
+                println!("{}", k);
                 let v = bincode::serialize(&user).unwrap();
                 match self.db.insert(&k, v) {
                     Ok(_t) => {},
@@ -244,6 +245,14 @@ impl ws::Handler for Server {
             }
         }
     }
+
+    fn on_close(&mut self, code: ws::CloseCode, reason: &str) {
+        println!("WebSocket closing for ({:?}) {}", code, reason);
+        let user = format!("user/{}", self.id);
+        println!("Removing {}", user);
+        self.db.remove(user);
+        self.ws.close(code); // TODO I want to return ws::Result but getting error when I do
+    }
 }
 
 fn main() {
@@ -252,6 +261,7 @@ fn main() {
 
     ws::listen("127.0.0.1:3012", |out| {
         Server {
+            id: Uuid::new_v4(),
             ws: out,
             db: db.clone(),
         }
