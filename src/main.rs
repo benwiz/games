@@ -31,7 +31,13 @@ struct Message {
 }
 
 #[derive(Serialize, Deserialize)]
+struct Id {
+    id: String,
+}
+
+#[derive(Serialize, Deserialize)]
 struct User {
+    id: String,
     name: String,
 }
 
@@ -115,11 +121,12 @@ impl ws::Handler for Server {
                     },
                     Event::Remove(k) => {
                         let key = str::from_utf8(&k).unwrap().to_string();
-                        let user = User { name: key };
+                        let split: Vec<&str> = key.split("/").collect();
+                        let id = Id { id: split[1].to_owned() };
                         Message {
                             route: "/users".to_owned(),
                             event: "delete".to_owned(),
-                            body: serde_json::to_value(user).unwrap(),
+                            body: serde_json::to_value(id).unwrap(),
                         }
                     }
                 };
@@ -160,7 +167,7 @@ impl ws::Handler for Server {
 
     fn on_message(&mut self, msg: ws::Message) -> ws::Result<()> {
         println!("Message: {}", msg);
-        let m: Message = serde_json::from_str(&msg.to_string()).unwrap();
+        let mut m: Message = serde_json::from_str(&msg.to_string()).unwrap();
         // TODO finish bad message error handling
         // {
         //     Ok(m) => m,
@@ -180,7 +187,9 @@ impl ws::Handler for Server {
                 self.ws.send(msg)
             },
             "/users" => {
+                m.body["id"] = Value::String(self.id.to_hyphenated().to_string());
                 let user: User = serde_json::from_value(m.body).unwrap();
+                // user.id = self.id.to_hyphenated().to_string();
                 let k = format!("user/{}", self.id.to_hyphenated());
                 println!("{}", k);
                 let v = bincode::serialize(&user).unwrap();
@@ -250,8 +259,19 @@ impl ws::Handler for Server {
         println!("WebSocket closing for ({:?}) {}", code, reason);
         let user = format!("user/{}", self.id);
         println!("Removing {}", user);
-        self.db.remove(user);
-        self.ws.close(code); // TODO I want to return ws::Result but getting error when I do
+        match self.db.remove(user) {
+            Ok(_t) => {},
+            Err(_e) => {
+                // TODO do something
+            }
+        }
+        // TODO I want to return ws::Result but getting error when I do.
+        // Once i do I should be able to return this line, and the db remove
+        // can use a `?`.
+        match self.ws.close(code) {
+            Ok(_t) => {},
+            Err(_e) => {},
+        }
     }
 }
 
