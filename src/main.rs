@@ -13,16 +13,15 @@ use mio_extras::timer::Timeout;
 use ws::util::Token;
 
 // TODO
-// Implement ping-ping
 // Rename server.ws to server.out
 // chat struct requires a User
 // rooms route
 
 
-const PING: Token = Token(1);
-const EXPIRE: Token = Token(2);
-const PING_TIMEOUT: u64 = 5_000;
-const EXPIRE_TIMEOUT: u64 = 30_000;
+// const PING: Token = Token(1);
+// const EXPIRE: Token = Token(2);
+// const PING_TIMEOUT: u64 = 5_000;
+// const EXPIRE_TIMEOUT: u64 = 30_000;
 
 struct Server {
     id: Uuid,
@@ -79,9 +78,9 @@ fn all_users(db: Arc<Db>) -> Vec<User> {
 
 impl ws::Handler for Server {
     fn on_open(&mut self, _shake: ws::Handshake) -> ws::Result<()> {
-        // Ping Pong
-        self.ws.timeout(PING_TIMEOUT, PING)?; // ping every 5 seconds
-        self.ws.timeout(EXPIRE_TIMEOUT, EXPIRE)?; // close conn if no activity for 30 seconds
+        // // Ping Pong
+        // self.ws.timeout(PING_TIMEOUT, PING)?; // ping every 5 seconds
+        // self.ws.timeout(EXPIRE_TIMEOUT, EXPIRE)?; // close conn if no activity for 30 seconds
 
         // Send all users
         let users: Vec<User> = all_users(self.db.clone());
@@ -297,57 +296,57 @@ impl ws::Handler for Server {
         }
     }
 
-    fn on_timeout(&mut self, event: Token) -> ws::Result<()> {
-        match event {
-            // PING timeout has occured, send a ping and reschedule
-            PING => {
-                self.ws.ping(time::precise_time_ns().to_string().into())?;
-                self.ping_timeout.take();
-                self.ws.timeout(PING_TIMEOUT, PING)
-            }
-            // EXPIRE timeout has occured, this means that the connection is inactive, let's close
-            EXPIRE => self.ws.close(ws::CloseCode::Away),
-            // No other timeouts are possible
-            _ => Err(ws::Error::new(ws::ErrorKind::Internal, "Invalid timeout token encountered!")),
-        }
-    }
+    // fn on_timeout(&mut self, event: Token) -> ws::Result<()> {
+    //     match event {
+    //         // PING timeout has occured, send a ping and reschedule
+    //         PING => {
+    //             self.ws.ping(time::precise_time_ns().to_string().into())?;
+    //             self.ping_timeout.take();
+    //             self.ws.timeout(PING_TIMEOUT, PING)
+    //         }
+    //         // EXPIRE timeout has occured, this means that the connection is inactive, let's close
+    //         EXPIRE => self.ws.close(ws::CloseCode::Away),
+    //         // No other timeouts are possible
+    //         _ => Err(ws::Error::new(ws::ErrorKind::Internal, "Invalid timeout token encountered!")),
+    //     }
+    // }
 
-    fn on_new_timeout(&mut self, event: Token, timeout: Timeout) -> ws::Result<()> {
-        // Cancel the old timeout and replace.
-        if event == EXPIRE {
-            if let Some(t) = self.expire_timeout.take() {
-                self.ws.cancel(t)?
-            }
-            self.expire_timeout = Some(timeout)
-        } else {
-            // This ensures there is only one ping timeout at a time
-            if let Some(t) = self.ping_timeout.take() {
-                self.ws.cancel(t)?
-            }
-            self.ping_timeout = Some(timeout)
-        }
+    // fn on_new_timeout(&mut self, event: Token, timeout: Timeout) -> ws::Result<()> {
+    //     // Cancel the old timeout and replace.
+    //     if event == EXPIRE {
+    //         if let Some(t) = self.expire_timeout.take() {
+    //             self.ws.cancel(t)?
+    //         }
+    //         self.expire_timeout = Some(timeout)
+    //     } else {
+    //         // This ensures there is only one ping timeout at a time
+    //         if let Some(t) = self.ping_timeout.take() {
+    //             self.ws.cancel(t)?
+    //         }
+    //         self.ping_timeout = Some(timeout)
+    //     }
 
-        Ok(())
-    }
+    //     Ok(())
+    // }
 
-    fn on_frame(&mut self, frame: ws::Frame) -> ws::Result<Option<ws::Frame>> {
-        // If the frame is a pong, print the round-trip time.
-        // The pong should contain data from out ping, but it isn't guaranteed to.
-        if frame.opcode() == ws::OpCode::Pong {
-            if let Ok(pong) = str::from_utf8(frame.payload())?.parse::<u64>() {
-                let now = time::precise_time_ns();
-                println!("RTT is {:.3}ms.", (now - pong) as f64 / 1_000_000f64);
-            } else {
-                println!("Received bad pong.");
-            }
-        }
+    // fn on_frame(&mut self, frame: ws::Frame) -> ws::Result<Option<ws::Frame>> {
+    //     // If the frame is a pong, print the round-trip time.
+    //     // The pong should contain data from out ping, but it isn't guaranteed to.
+    //     if frame.opcode() == ws::OpCode::Pong {
+    //         if let Ok(pong) = str::from_utf8(frame.payload())?.parse::<u64>() {
+    //             let now = time::precise_time_ns();
+    //             println!("RTT is {:.3}ms.", (now - pong) as f64 / 1_000_000f64);
+    //         } else {
+    //             println!("Received bad pong.");
+    //         }
+    //     }
 
-        // Some activity has occured, so reset the expiration
-        self.ws.timeout(EXPIRE_TIMEOUT, EXPIRE)?;
+    //     // Some activity has occured, so reset the expiration
+    //     self.ws.timeout(EXPIRE_TIMEOUT, EXPIRE)?;
 
-        // Run default frame validation
-        DefaultHandler.on_frame(frame)
-    }
+    //     // Run default frame validation
+    //     DefaultHandler.on_frame(frame)
+    // }
 }
 
 struct DefaultHandler;
@@ -358,7 +357,7 @@ fn main() {
     // let db = Arc::new(sled::open("game_db").expect("Sled must start ok."));
     let db = Arc::new(sled::Config::new().temporary(true).open().expect("Sled must start ok."));
 
-    ws::listen("127.0.0.1:3012", |out| {
+    ws::listen("0.0.0.0:3012", |out| {
         Server {
             id: Uuid::new_v4(),
             ws: out,
