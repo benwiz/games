@@ -3,7 +3,7 @@ extern crate time;
 extern crate ws;
 
 use serde::{Deserialize, Serialize};
-use serde_json::Value;
+use serde_json::{Value, json};
 use sled::{Db, Event, IVec};
 use std::str;
 use std::sync::Arc;
@@ -47,6 +47,12 @@ struct User {
 }
 
 #[derive(Serialize, Deserialize)]
+struct Room {
+    name: String,
+    users: Vec<User>,
+}
+
+#[derive(Serialize, Deserialize)]
 struct Chat {
     user: User,
     message: String,
@@ -61,12 +67,19 @@ fn all_users(db: Arc<Db>) -> Vec<User> {
     let scan = db.scan_prefix("user/");
     scan.map(|v| {
         let data = v.unwrap();
-        // let k = IVec::from(data.0);
-        // let key = &str::from_utf8(&k).unwrap();
         let v = IVec::from(data.1);
         let value: User = bincode::deserialize(&v).unwrap();
-        // println!("k: {}, v: {}", key, value.name);
         value
+    })
+    .collect()
+}
+
+fn all_rooms(db: Arc<Db>) -> Vec<Room> {
+    let scan = db.scan_prefix("room/");
+    scan.map(|v| -> Room {
+        let data = v.unwrap();
+        let v = IVec::from(data.1);
+        bincode::deserialize(&v).unwrap()
     })
     .collect()
 }
@@ -87,6 +100,17 @@ impl ws::Handler for Server {
         };
         let users_r = serde_json::to_string(&users_msg).unwrap();
         self.out.send(users_r)?;
+
+        // Send all rooms
+        let rooms: Vec<Room> = all_rooms(self.db.clone());
+        let rooms_body = serde_json::to_value(&rooms).unwrap();
+        let rooms_msg = Message {
+            route: "/rooms".to_owned(),
+            event: "info".to_owned(),
+            body: rooms_body,
+        };
+        let rooms_r = serde_json::to_string(&rooms_msg).unwrap();
+        self.out.send(rooms_r)?;
 
         // Send all chats
         let chats_encoded: Vec<u8> = self
@@ -121,7 +145,7 @@ impl ws::Handler for Server {
         let chats_r = serde_json::to_string(&chats_msg).unwrap();
         self.out.send(chats_r)?;
 
-        // Initialize users subscriber
+        // Subscribe to user events
         let db_users = self.db.clone();
         let out_users = self.out.clone();
         thread::spawn(move || -> ws::Result<()> {
@@ -137,6 +161,7 @@ impl ws::Handler for Server {
                         }
                     }
                     Event::Remove(k) => {
+                        // TODO must scan all rooms and delte User from room
                         let key = str::from_utf8(&k).unwrap().to_string();
                         let split: Vec<&str> = key.split("/").collect();
                         let id = Id {
@@ -152,6 +177,41 @@ impl ws::Handler for Server {
 
                 let r = serde_json::to_string(&msg).unwrap();
                 out_users.send(r)?
+            }
+            Ok(())
+        });
+
+        // Subscribe to room events
+        let db_rooms = self.db.clone();
+        let out_rooms = self.out.clone();
+        thread::spawn(move || -> ws::Result<()> {
+            let events = db_rooms.watch_prefix("room/");
+            for event in events {
+                let msg = match event {
+                    Event::Insert(_k, v) => {
+                        let room: Room = bincode::deserialize(&v).unwrap();
+                        Message {
+                            route: "/rooms".to_owned(),
+                            event: "create".to_owned(),
+                            body: serde_json::to_value(room).unwrap(),
+                        }
+                    }
+                    Event::Remove(k) => {
+                        let key = str::from_utf8(&k).unwrap().to_string();
+                        let split: Vec<&str> = key.split("/").collect();
+                        let id = Id {
+                            id: split[1].to_owned(),
+                        };
+                        Message {
+                            route: "/rooms".to_owned(),
+                            event: "delete".to_owned(),
+                            body: serde_json::to_value(id).unwrap(),
+                        }
+                    }
+                };
+
+                let r = serde_json::to_string(&msg).unwrap();
+                out_rooms.send(r)?
             }
             Ok(())
         });
@@ -212,7 +272,7 @@ impl ws::Handler for Server {
                     Ok(_t) => {}
                     Err(_e) => {
                         // TODO do something
-                        println!("Silently failing to insert user.")
+                        println!("Silently failing to insert user.");
                     }
                 }
 
@@ -221,22 +281,46 @@ impl ws::Handler for Server {
             "/rooms" => {
                 match m.event.as_str() {
                     "create" => {
-                        println!("create room");
-                    }
+                        let k = format!("room/{}", m.body["name"]);
+                        match self.db.get(&k).unwrap() {
+                            Some(_r) => {
+                                println!("{} already exists", k);
+                                return Ok(())
+                            }, // TODO inform client that room already exists
+                            _ => {
+                                let user_k = format!("user/{}", self.id.to_hyphenated());
+                                if let Some(user_ivec) = self.db.get(&user_k).unwrap() {
+                                    let user_encoded: Vec<u8> = user_ivec.to_vec();
+                                    let user: User = bincode::deserialize(&user_encoded).unwrap();
+                                    m.body["users"] = json!([user]);
+                                    let room: Room = serde_json::from_value(m.body).unwrap();
+                                    let v = bincode::serialize(&room).unwrap();
+                                    match self.db.insert(&k, v) {
+                                        Ok(_t) => {},
+                                        Err(_e) => {
+                                            // TODO do something
+                                            println!("Silently failing to insert room.");
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
                     "join" => {
                         println!("join room");
-                    }
-                    _ => {}
+                    },
+                    "leave" => {
+                        println!("leave room");
+                    },
+                    _ => {},
                 }
 
                 Ok(())
             }
             "/chat" => {
                 let user_k = format!("user/{}", self.id.to_hyphenated());
-                println!("user_k {}", user_k);
                 if let Some(user_ivec) = self.db.get(&user_k).unwrap() {
                     let user_encoded: Vec<u8> = user_ivec.to_vec();
-                    println!("user encoded: {:?}", user_encoded);
                     let user: User = bincode::deserialize(&user_encoded).unwrap();
                     m.body["user"] = serde_json::to_value(user).unwrap();
                     let chat: Chat = serde_json::from_value(m.body).unwrap();
