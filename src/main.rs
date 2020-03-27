@@ -25,7 +25,7 @@ use sled::{Event, IVec, Db};
 
 struct Server {
     id: Uuid,
-    ws: ws::Sender,
+    out: ws::Sender,
     db: Arc<Db>,
     // ping_timeout: Option<Timeout>,
     // expire_timeout: Option<Timeout>,
@@ -79,8 +79,8 @@ fn all_users(db: Arc<Db>) -> Vec<User> {
 impl ws::Handler for Server {
     fn on_open(&mut self, _shake: ws::Handshake) -> ws::Result<()> {
         // // Ping Pong
-        // self.ws.timeout(PING_TIMEOUT, PING)?; // ping every 5 seconds
-        // self.ws.timeout(EXPIRE_TIMEOUT, EXPIRE)?; // close conn if no activity for 30 seconds
+        // self.out.timeout(PING_TIMEOUT, PING)?; // ping every 5 seconds
+        // self.out.timeout(EXPIRE_TIMEOUT, EXPIRE)?; // close conn if no activity for 30 seconds
 
         // Send all users
         let users: Vec<User> = all_users(self.db.clone());
@@ -91,7 +91,7 @@ impl ws::Handler for Server {
             body: users_body
         };
         let users_r = serde_json::to_string(&users_msg).unwrap();
-        self.ws.send(users_r)?;
+        self.out.send(users_r)?;
 
         // Send all chats
         let chats_encoded: Vec<u8> = self.db.get("chats").unwrap().unwrap_or(IVec::from(vec![])).to_vec(); // NOTE i needed some default. I can probably do this better.
@@ -114,11 +114,11 @@ impl ws::Handler for Server {
             body: chats_body,
         };
         let chats_r = serde_json::to_string(&chats_msg).unwrap();
-        self.ws.send(chats_r)?;
+        self.out.send(chats_r)?;
 
         // Initialize users subscriber
         let db_users = self.db.clone();
-        let ws_users = self.ws.clone();
+        let out_users = self.out.clone();
         thread::spawn(move ||  -> ws::Result<()> {
             let events = db_users.watch_prefix("user/");
             for event in events {
@@ -144,14 +144,14 @@ impl ws::Handler for Server {
                 };
 
                 let r = serde_json::to_string(&msg).unwrap();
-                ws_users.send(r)?
+                out_users.send(r)?
             }
             Ok(())
         });
 
         // Subscribe to chat events
         let db_chat = self.db.clone();
-        let ws_chat = self.ws.clone();
+        let out_chat = self.out.clone();
         thread::spawn(move ||  -> ws::Result<()> {
             let events = db_chat.watch_prefix("chat/");
             for event in events {
@@ -166,7 +166,7 @@ impl ws::Handler for Server {
                             body: v,
                         };
                         let r = serde_json::to_string(&msg).unwrap();
-                        ws_chat.send(r)?
+                        out_chat.send(r)?
                     },
                     Event::Remove(_k) => {} // No delete
                 };
@@ -190,13 +190,13 @@ impl ws::Handler for Server {
         //             body: serde_json::to_value(&msg.to_string()).unwrap(),
         //         };
         //         let r = serde_json::to_string(&out_msg).unwrap();
-        //         self.ws.send(r);
+        //         self.out.send(r);
         //         // TODO need to be able to return an error, then return early after the `m` closure
         //     }
         // };
         match m.route.as_str() {
             "/echo" => {
-                self.ws.send(msg)
+                self.out.send(msg)
             },
             "/users" => {
                 m.body["id"] = Value::String(self.id.to_hyphenated().to_string());
@@ -272,10 +272,10 @@ impl ws::Handler for Server {
 
         // // Clean up timeouts
         // if let Some(t) = self.ping_timeout.take() {
-        //     self.ws.cancel(t).unwrap();
+        //     self.out.cancel(t).unwrap();
         // }
         // if let Some(t) = self.expire_timeout.take() {
-        //     self.ws.cancel(t).unwrap();
+        //     self.out.cancel(t).unwrap();
         // }
 
         let user = format!("user/{}", self.id);
@@ -290,7 +290,7 @@ impl ws::Handler for Server {
         // TODO I want to return ws::Result but getting error when I do.
         // Once i do I should be able to return this line, and the db remove
         // can use a `?`.
-        match self.ws.close(code) {
+        match self.out.close(code) {
             Ok(_t) => {},
             Err(_e) => {},
         }
@@ -300,12 +300,12 @@ impl ws::Handler for Server {
     //     match event {
     //         // PING timeout has occured, send a ping and reschedule
     //         PING => {
-    //             self.ws.ping(time::precise_time_ns().to_string().into())?;
+    //             self.out.ping(time::precise_time_ns().to_string().into())?;
     //             self.ping_timeout.take();
-    //             self.ws.timeout(PING_TIMEOUT, PING)
+    //             self.out.timeout(PING_TIMEOUT, PING)
     //         }
     //         // EXPIRE timeout has occured, this means that the connection is inactive, let's close
-    //         EXPIRE => self.ws.close(ws::CloseCode::Away),
+    //         EXPIRE => self.out.close(ws::CloseCode::Away),
     //         // No other timeouts are possible
     //         _ => Err(ws::Error::new(ws::ErrorKind::Internal, "Invalid timeout token encountered!")),
     //     }
@@ -315,13 +315,13 @@ impl ws::Handler for Server {
     //     // Cancel the old timeout and replace.
     //     if event == EXPIRE {
     //         if let Some(t) = self.expire_timeout.take() {
-    //             self.ws.cancel(t)?
+    //             self.out.cancel(t)?
     //         }
     //         self.expire_timeout = Some(timeout)
     //     } else {
     //         // This ensures there is only one ping timeout at a time
     //         if let Some(t) = self.ping_timeout.take() {
-    //             self.ws.cancel(t)?
+    //             self.out.cancel(t)?
     //         }
     //         self.ping_timeout = Some(timeout)
     //     }
@@ -342,7 +342,7 @@ impl ws::Handler for Server {
     //     }
 
     //     // Some activity has occured, so reset the expiration
-    //     self.ws.timeout(EXPIRE_TIMEOUT, EXPIRE)?;
+    //     self.out.timeout(EXPIRE_TIMEOUT, EXPIRE)?;
 
     //     // Run default frame validation
     //     DefaultHandler.on_frame(frame)
@@ -359,7 +359,7 @@ fn main() {
     ws::listen("0.0.0.0:3012", |out| {
         Server {
             id: Uuid::new_v4(),
-            ws: out,
+            out: out,
             db: db.clone(),
             // ping_timeout: None,
             // expire_timeout: None,
