@@ -13,6 +13,7 @@ use uuid::Uuid;
 // use ws::util::Token;
 
 // TODO
+// allow client to "recover" user by providing a UUID
 // on user delete, scan all rooms and remove user from rooms
 // on room update, if no users left in room, delete room
 // a room will have a REFERENCE to a Game or Board. This is the only
@@ -454,15 +455,15 @@ impl ws::Handler for Server {
         //     self.out.cancel(t).unwrap();
         // }
 
-        let user = format!("user/{}", self.id);
-        println!("Removing {}", user);
-        match self.db.remove(user) {
-            Ok(_t) => {}
-            Err(_e) => {
-                // TODO do something
-                println!("Silently failing removing user on close.");
-            }
-        }
+        // let user = format!("user/{}", self.id);
+        // println!("Removing {}", user);
+        // match self.db.remove(user) {
+        //     Ok(_t) => {}
+        //     Err(_e) => {
+        //         // TODO do something
+        //         println!("Silently failing removing user on close.");
+        //     }
+        // }
 
         // TODO I want to return ws::Result but getting error when I do.
         // Once i do I should be able to return this line, and the db remove
@@ -532,13 +533,13 @@ impl ws::Handler for Server {
 // impl ws::Handler for DefaultHandler {}
 
 fn main() {
-    // let db = Arc::new(sled::open("game_db").expect("Sled must start ok."));
-    let db = Arc::new(
-        sled::Config::new()
-            .temporary(true)
-            .open()
-            .expect("Sled must start ok."),
-    );
+    let db = Arc::new(sled::open("game_db").expect("Sled must start ok."));
+    // let db = Arc::new(
+    //     sled::Config::new()
+    //         .temporary(true)
+    //         .open()
+    //         .expect("Sled must start ok."),
+    // );
 
     ws::listen("0.0.0.0:3012", |out| {
         Server {
