@@ -308,6 +308,9 @@ impl ws::Handler for Server {
                                             println!("Silently failing to insert room.");
                                         }
                                     }
+                                } else {
+                                    // TODO do something
+                                    println!("Silently preventing user without a user name from creating a room.");
                                 }
                             }
                         }
@@ -335,6 +338,9 @@ impl ws::Handler for Server {
                                         // TODO do something
                                         println!("Silently preventing user from joining full room.");
                                     }
+                                } else {
+                                    // TODO do something
+                                    println!("Silently preventing user without a user name from joining a room.");
                                 }
                             },
                             _ => {
@@ -344,7 +350,25 @@ impl ws::Handler for Server {
                         }
                     },
                     "leave" => {
-                        println!("leave room");
+                        let k = format!("room/{}", m.body["name"]);
+                        match self.db.get(&k).unwrap() {
+                            Some(r) => {
+                                let mut room: Room = bincode::deserialize(&r.to_vec()).unwrap();
+                                room.users.retain(|u| u.id != self.id.to_hyphenated().to_string());
+                                let v = bincode::serialize(&room).unwrap();
+                                match self.db.insert(&k, v) {
+                                    Ok(_t) => {},
+                                    Err(_e) => {
+                                        // TODO do something
+                                        println!("Silently failing to update room.");
+                                    }
+                                }
+                            },
+                            _ => {
+                                // TODO inform client that room does not exists
+                                println!("Silently failing to leave room because it does not exist.");
+                            }
+                        }
                     },
                     _ => {},
                 }
