@@ -14,6 +14,12 @@ use uuid::Uuid;
 
 // TODO
 // rooms route
+// a room will have a REFERENCE to a Game or Board. This is the only
+//   reference in the schema. The reason is that a client will subscribe
+//   to updates from a specific Game (Board). Everyone subscribes to all
+//   room updates. That is because everyone needs to know if a room is open
+//   or full. Only the people playing the game need to see the board and
+//   associated chat.
 
 // const PING: Token = Token(1);
 // const EXPIRE: Token = Token(2);
@@ -192,7 +198,7 @@ impl ws::Handler for Server {
                         let room: Room = bincode::deserialize(&v).unwrap();
                         Message {
                             route: "/rooms".to_owned(),
-                            event: "create".to_owned(),
+                            event: "update".to_owned(), // create or join or leave
                             body: serde_json::to_value(room).unwrap(),
                         }
                     }
@@ -307,7 +313,35 @@ impl ws::Handler for Server {
                         }
                     },
                     "join" => {
-                        println!("join room");
+                        let k = format!("room/{}", m.body["name"]);
+                        match self.db.get(&k).unwrap() {
+                            Some(r) => {
+                                let user_k = format!("user/{}", self.id.to_hyphenated());
+                                if let Some(user_ivec) = self.db.get(&user_k).unwrap() {
+                                    let user_encoded: Vec<u8> = user_ivec.to_vec();
+                                    let user: User = bincode::deserialize(&user_encoded).unwrap();
+                                    let mut room: Room = bincode::deserialize(&r.to_vec()).unwrap();
+                                    if room.users.len() < 2 {
+                                        room.users.push(user);
+                                        let v = bincode::serialize(&room).unwrap();
+                                        match self.db.insert(&k, v) {
+                                            Ok(_t) => {},
+                                            Err(_e) => {
+                                                // TODO do something
+                                                println!("Silently failing to update room.");
+                                            }
+                                        }
+                                    } else {
+                                        // TODO do something
+                                        println!("Silently preventing user from joining full room.");
+                                    }
+                                }
+                            },
+                            _ => {
+                                // TODO inform client that room does not exists
+                                println!("Silently failing to update room because it does not exist.");
+                            }
+                        }
                     },
                     "leave" => {
                         println!("leave room");
