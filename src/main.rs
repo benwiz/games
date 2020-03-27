@@ -13,7 +13,6 @@ use sled::{Event, IVec, Db};
 // use ws::util::Token;
 
 // TODO
-// Rename server.ws to server.out
 // chat struct requires a User
 // rooms route
 
@@ -51,7 +50,7 @@ struct User {
 
 #[derive(Serialize, Deserialize)]
 struct Chat {
-    // TODO bring back user
+    user: User,
     message: String,
 }
 
@@ -201,9 +200,7 @@ impl ws::Handler for Server {
             "/users" => {
                 m.body["id"] = Value::String(self.id.to_hyphenated().to_string());
                 let user: User = serde_json::from_value(m.body).unwrap();
-                // user.id = self.id.to_hyphenated().to_string();
                 let k = format!("user/{}", self.id.to_hyphenated());
-                println!("{}", k);
                 let v = bincode::serialize(&user).unwrap();
                 match self.db.insert(&k, v) {
                     Ok(_t) => {},
@@ -215,49 +212,59 @@ impl ws::Handler for Server {
                 Ok(())
             },
             "/chat" => {
-                let chat: Chat = serde_json::from_value(m.body).unwrap();
+                let user_k = format!("user/{}", self.id.to_hyphenated());
+                println!("user_k {}", user_k);
+                if let Some(user_ivec) = self.db.get(&user_k).unwrap() {
+                    let user_encoded: Vec<u8> = user_ivec.to_vec();
+                    println!("user encoded: {:?}", user_encoded);
+                    let user: User = bincode::deserialize(&user_encoded).unwrap();
+                    m.body["user"] = serde_json::to_value(user).unwrap();
+                    let chat: Chat = serde_json::from_value(m.body).unwrap();
 
-                // Add chat
-                let k = format!("chat/{}", Uuid::new_v4().to_hyphenated());
-                let v = bincode::serialize(&chat).unwrap();
-                match self.db.insert(&k.as_bytes(), v) {
-                    Ok(_t) => {},
-                    Err(_e) => {
-                        // TODO do something
-                    }
-                }
-
-                // Update chats list
-                let chats_k = "chats";
-                let chats_encoded: Vec<u8> = self.db.get(chats_k).unwrap().unwrap_or(IVec::from(vec![])).to_vec(); // NOTE I needed some default. I can probably do this better.
-                let mut chats: Chats = match chats_encoded.len() {
-                    0 => Chats{chats: vec![]},
-                    _ => bincode::deserialize(&chats_encoded[..]).unwrap(), // TODO I think chats_encoded.as_str() would also work
-                };
-                chats.chats.insert(0, k.clone());
-                let max_len = 100;
-                let remove_ids: Vec<String> = match chats.chats.len() {
-                    l if l > max_len => chats.chats.drain(max_len..).collect(), // truncate
-                    _ => vec![],
-                };
-                let chats_v: Vec<u8> = bincode::serialize(&chats).unwrap();
-                match self.db.insert(&chats_k, chats_v) {
-                    Ok(_t) => {},
-                    Err(_e) => {
-                        // TODO do something
-                    }
-                }
-
-                // Remove chat records no longer in chat list
-                for chat_id in remove_ids {
-                    match self.db.remove(&chat_id) {
+                    // Add chat
+                    let k = format!("chat/{}", Uuid::new_v4().to_hyphenated());
+                    let v = bincode::serialize(&chat).unwrap();
+                    match self.db.insert(&k.as_bytes(), v) {
                         Ok(_t) => {},
                         Err(_e) => {
                             // TODO do something
+                            println!("Silently failing when tring to insert chat.");
+                        }
+                    }
+
+                    // Update chats list
+                    let chats_k = "chats";
+                    let chats_encoded: Vec<u8> = self.db.get(chats_k).unwrap().unwrap_or(IVec::from(vec![])).to_vec(); // NOTE I needed some default. I can probably do this better.
+                    let mut chats: Chats = match chats_encoded.len() {
+                        0 => Chats{chats: vec![]},
+                        _ => bincode::deserialize(&chats_encoded[..]).unwrap(), // TODO I think chats_encoded.as_str() would also work
+                    };
+                    chats.chats.insert(0, k.clone());
+                    let max_len = 100;
+                    let remove_ids: Vec<String> = match chats.chats.len() {
+                        l if l > max_len => chats.chats.drain(max_len..).collect(), // truncate
+                        _ => vec![],
+                    };
+                    let chats_v: Vec<u8> = bincode::serialize(&chats).unwrap();
+                    match self.db.insert(&chats_k, chats_v) {
+                        Ok(_t) => {},
+                        Err(_e) => {
+                            // TODO do something
+                            println!("Silently failing when trying to inserts chats list.");
+                        }
+                    }
+
+                    // Remove chat records no longer in chat list
+                    for chat_id in remove_ids {
+                        match self.db.remove(&chat_id) {
+                            Ok(_t) => {},
+                            Err(_e) => {
+                                // TODO do something
+                                println!("Silently failing when trying to remove chat.");
+                            }
                         }
                     }
                 }
-
                 Ok(())
             },
             _ => {
