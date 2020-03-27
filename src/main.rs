@@ -13,7 +13,8 @@ use uuid::Uuid;
 // use ws::util::Token;
 
 // TODO
-// rooms route
+// on user delete, scan all rooms and remove user from rooms
+// on room update, if no users left in room, delete room
 // a room will have a REFERENCE to a Game or Board. This is the only
 //   reference in the schema. The reason is that a client will subscribe
 //   to updates from a specific Game (Board). Everyone subscribes to all
@@ -196,6 +197,7 @@ impl ws::Handler for Server {
                 let msg = match event {
                     Event::Insert(_k, v) => {
                         let room: Room = bincode::deserialize(&v).unwrap();
+                        // TODO if last person has left room, delete room
                         Message {
                             route: "/rooms".to_owned(),
                             event: "update".to_owned(), // create or join or leave
