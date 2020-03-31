@@ -54,11 +54,6 @@ struct User {
     name: String,
 }
 
-#[derive(Serialize, Deserialize)]
-struct Room {
-    name: String,
-    users: Vec<String>,
-}
 
 #[derive(Serialize, Deserialize)]
 struct Chat {
@@ -69,6 +64,12 @@ struct Chat {
 #[derive(Serialize, Deserialize)]
 struct Chats {
     chats: Vec<String>,
+}
+
+#[derive(Serialize, Deserialize)]
+struct Room {
+    name: String,
+    users: Vec<String>,
 }
 
 fn all_users(db: Arc<Db>) -> Vec<User> {
