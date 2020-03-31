@@ -13,11 +13,11 @@ use uuid::Uuid;
 // use ws::util::Token;
 
 // TODO
-// allow client to "recover" user by providing a UUID
-// on user delete, scan all rooms and remove user from rooms
-// on room update, if no users left in room, delete room
-// a room will have a REFERENCE to a Game or Board. This is the only
-//   reference in the schema. The reason is that a client will subscribe
+// - allow client to "recover" user by providing a UUID
+// - on user delete, scan all rooms and remove user from rooms
+// - on room update, if no users left in room, delete room
+// - a room will have a REFERENCE to a Game or Board. The reason is that
+//   a client will subscribe
 //   to updates from a specific Game (Board). Everyone subscribes to all
 //   room updates. That is because everyone needs to know if a room is open
 //   or full. Only the people playing the game need to see the board and
@@ -57,12 +57,12 @@ struct User {
 #[derive(Serialize, Deserialize)]
 struct Room {
     name: String,
-    users: Vec<User>,
+    users: Vec<String>,
 }
 
 #[derive(Serialize, Deserialize)]
 struct Chat {
-    user: User,
+    user: String,
     message: String,
 }
 
@@ -301,7 +301,7 @@ impl ws::Handler for Server {
                                 if let Some(user_ivec) = self.db.get(&user_k).unwrap() {
                                     let user_encoded: Vec<u8> = user_ivec.to_vec();
                                     let user: User = bincode::deserialize(&user_encoded).unwrap();
-                                    m.body["users"] = json!([user]);
+                                    m.body["users"] = json!([user.id]);
                                     let room: Room = serde_json::from_value(m.body).unwrap();
                                     let v = bincode::serialize(&room).unwrap();
                                     match self.db.insert(&k, v) {
@@ -328,7 +328,7 @@ impl ws::Handler for Server {
                                     let user: User = bincode::deserialize(&user_encoded).unwrap();
                                     let mut room: Room = bincode::deserialize(&r.to_vec()).unwrap();
                                     if room.users.len() < 2 {
-                                        room.users.push(user);
+                                        room.users.push(user.id);
                                         let v = bincode::serialize(&room).unwrap();
                                         match self.db.insert(&k, v) {
                                             Ok(_t) => {},
@@ -357,7 +357,7 @@ impl ws::Handler for Server {
                         match self.db.get(&k).unwrap() {
                             Some(r) => {
                                 let mut room: Room = bincode::deserialize(&r.to_vec()).unwrap();
-                                room.users.retain(|u| u.id != self.id.to_hyphenated().to_string());
+                                room.users.retain(|u| u != &self.id.to_hyphenated().to_string());
                                 let v = bincode::serialize(&room).unwrap();
                                 match self.db.insert(&k, v) {
                                     Ok(_t) => {},
@@ -383,7 +383,7 @@ impl ws::Handler for Server {
                 if let Some(user_ivec) = self.db.get(&user_k).unwrap() {
                     let user_encoded: Vec<u8> = user_ivec.to_vec();
                     let user: User = bincode::deserialize(&user_encoded).unwrap();
-                    m.body["user"] = serde_json::to_value(user).unwrap();
+                    m.body["user"] = serde_json::to_value(user.id).unwrap();
                     let chat: Chat = serde_json::from_value(m.body).unwrap();
 
                     // Add chat
