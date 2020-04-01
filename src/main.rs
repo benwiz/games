@@ -70,7 +70,16 @@ struct Chats {
 struct Room {
     name: String,
     users: Vec<String>,
+    // game: String,
 }
+
+
+// #[derive(Serialize, Deserialize)]
+// struct Game {
+//     board: Vec<Vec<i32>>,
+//     winning_path: Vec<Vec<i32>>,
+//     winner: String,
+// }
 
 fn all_users(db: Arc<Db>) -> Vec<User> {
     let scan = db.scan_prefix("user/");
@@ -534,13 +543,13 @@ impl ws::Handler for Server {
 // impl ws::Handler for DefaultHandler {}
 
 fn main() {
-    let db = Arc::new(sled::open("game_db").expect("Sled must start ok."));
-    // let db = Arc::new(
-    //     sled::Config::new()
-    //         .temporary(true)
-    //         .open()
-    //         .expect("Sled must start ok."),
-    // );
+    // let db = Arc::new(sled::open("game_db").expect("Sled must start ok."));
+    let db = Arc::new(
+        sled::Config::new()
+            .temporary(true)
+            .open()
+            .expect("Sled must start ok."),
+    );
 
     ws::listen("0.0.0.0:3012", |out| {
         Server {
