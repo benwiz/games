@@ -102,6 +102,33 @@ fn all_rooms(db: Arc<Db>) -> Vec<Room> {
     .collect()
 }
 
+fn remove_user_from_rooms(db: Arc<Db>, user_id: String) {
+    println!("Remove user from all rooms: {}", user_id);
+    let scan = db.scan_prefix("room/");
+    for (_i, r) in scan.enumerate() {
+        let data = r.unwrap();
+        let k = data.0;
+        let value = IVec::from(data.1);
+        let mut room: Room = bincode::deserialize(&value).unwrap();
+        let count_before = room.users.len();
+        room.users.retain(|u| u != &user_id);
+        let count_after = room.users.len();
+        println!("Check this room: {}", room.name);
+        if count_before != count_after {
+            println!("Remove!");
+            // let k = format!("room/{}", room.name);
+            let v = bincode::serialize(&room).unwrap();
+            match db.insert(&k, v) {
+                Ok(_t) => {},
+                Err(_e) => {
+                    // TODO do something
+                    println!("Silently failing to remove user from room.");
+                }
+            }
+        }
+   }
+}
+
 impl ws::Handler for Server {
     fn on_open(&mut self, _shake: ws::Handshake) -> ws::Result<()> {
         // // Ping Pong
@@ -179,7 +206,6 @@ impl ws::Handler for Server {
                         }
                     }
                     Event::Remove(k) => {
-                        // TODO must scan all rooms and delte User from room
                         let key = str::from_utf8(&k).unwrap().to_string();
                         let split: Vec<&str> = key.split("/").collect();
                         let id = Id {
@@ -455,7 +481,7 @@ impl ws::Handler for Server {
     }
 
     fn on_close(&mut self, code: ws::CloseCode, reason: &str) {
-        println!("WebSocket closing for ({:?}) {}", code, reason);
+        println!("WebSocket closing for ({:?}) {} {}", code, reason, self.id);
 
         // // Clean up timeouts
         // if let Some(t) = self.ping_timeout.take() {
@@ -465,15 +491,16 @@ impl ws::Handler for Server {
         //     self.out.cancel(t).unwrap();
         // }
 
-        // let user = format!("user/{}", self.id);
-        // println!("Removing {}", user);
-        // match self.db.remove(user) {
-        //     Ok(_t) => {}
-        //     Err(_e) => {
-        //         // TODO do something
-        //         println!("Silently failing removing user on close.");
-        //     }
-        // }
+        // Remove user
+        let user = format!("user/{}", self.id);
+        println!("Removing {}", user);
+        match self.db.remove(user) {
+            Ok(_t) => {}
+            Err(_e) => {
+                // TODO do something
+                println!("Silently failing removing user on close.");
+            }
+        }
 
         // TODO I want to return ws::Result but getting error when I do.
         // Once i do I should be able to return this line, and the db remove
@@ -551,6 +578,22 @@ fn main() {
             .expect("Sled must start ok."),
     );
 
+    // Subscribe to user events
+    let db_users = db.clone();
+    thread::spawn(move || {
+        let events = db_users.watch_prefix("user/");
+        for event in events {
+            match event {
+                Event::Insert(_k, _v) => {}
+                Event::Remove(k) => {
+                    let key = str::from_utf8(&k).unwrap().to_string();
+                    let split: Vec<&str> = key.split("/").collect();
+                    remove_user_from_rooms(db_users.clone(), split[1].to_owned());
+                }
+            };
+        }
+    });
+
     ws::listen("0.0.0.0:3012", |out| {
         Server {
             id: Uuid::new_v4(),
@@ -560,5 +603,5 @@ fn main() {
             // expire_timeout: None,
         }
     })
-    .unwrap()
+        .unwrap()
 }
