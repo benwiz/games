@@ -234,7 +234,6 @@ impl ws::Handler for Server {
                 let msg = match event {
                     Event::Insert(_k, v) => {
                         let room: Room = bincode::deserialize(&v).unwrap();
-                        // TODO if last person has left room, delete room
                         Message {
                             route: "/rooms".to_owned(),
                             event: "update".to_owned(), // create or join or leave
@@ -590,6 +589,29 @@ fn main() {
                     let split: Vec<&str> = key.split("/").collect();
                     remove_user_from_rooms(db_users.clone(), split[1].to_owned());
                 }
+            };
+        }
+    });
+
+    // Subscribe to user events
+    let db_rooms = db.clone();
+    thread::spawn(move || {
+        let events = db_rooms.watch_prefix("room/");
+        for event in events {
+            match event {
+                Event::Insert(k, v) => {
+                    let room: Room = bincode::deserialize(&v).unwrap();
+                    if room.users.len() == 0 {
+                        match db_rooms.remove(&k) {
+                            Ok(_t) => {}
+                            Err(_e) => {
+                                // TODO do something
+                                println!("Silently failing when trying to remove room.");
+                            }
+                        }
+                    }
+                }
+                Event::Remove(_k) => {}
             };
         }
     });
