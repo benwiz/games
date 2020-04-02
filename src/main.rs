@@ -325,7 +325,7 @@ impl ws::Handler for Server {
             "/rooms" => {
                 match m.event.as_str() {
                     "create" => {
-                        let k = format!("room/{}", m.body["name"]);
+                        let k = format!("room/{}", m.body["name"].as_str().unwrap());
                         match self.db.get(&k).unwrap() {
                             Some(_r) => {
                                 println!("{} already exists", k);
@@ -354,7 +354,7 @@ impl ws::Handler for Server {
                         }
                     },
                     "join" => {
-                        let k = format!("room/{}", m.body["name"]);
+                        let k = format!("room/{}", m.body["name"].as_str().unwrap());
                         match self.db.get(&k).unwrap() {
                             Some(r) => {
                                 let user_k = format!("user/{}", self.id.to_hyphenated());
@@ -388,7 +388,7 @@ impl ws::Handler for Server {
                         }
                     },
                     "leave" => {
-                        let k = format!("room/{}", m.body["name"]);
+                        let k = format!("room/{}", m.body["name"].as_str().unwrap());
                         match self.db.get(&k).unwrap() {
                             Some(r) => {
                                 let mut room: Room = bincode::deserialize(&r.to_vec()).unwrap();
