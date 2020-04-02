@@ -490,16 +490,16 @@ impl ws::Handler for Server {
         //     self.out.cancel(t).unwrap();
         // }
 
-        // Remove user
-        let user = format!("user/{}", self.id);
-        println!("Removing {}", user);
-        match self.db.remove(user) {
-            Ok(_t) => {}
-            Err(_e) => {
-                // TODO do something
-                println!("Silently failing removing user on close.");
-            }
-        }
+        // // Remove user
+        // let user = format!("user/{}", self.id);
+        // println!("Removing {}", user);
+        // match self.db.remove(user) {
+        //     Ok(_t) => {}
+        //     Err(_e) => {
+        //         // TODO do something
+        //         println!("Silently failing removing user on close.");
+        //     }
+        // }
 
         // TODO I want to return ws::Result but getting error when I do.
         // Once i do I should be able to return this line, and the db remove
