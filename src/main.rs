@@ -15,6 +15,7 @@ use uuid::Uuid;
 // TODO
 // - Room needs a Game
 // - allow client to "recover" user by providing a UUID
+// - there will definitely be some bugs related to users leaving rooms. Maybe they shouldn't be moved? Or the game should auto reset?
 // - push errors to client
 
 // const PING: Token = Token(1);
@@ -406,6 +407,30 @@ impl ws::Handler for Server {
                             }
                         }
                     },
+                    "play" => {
+                        let k = format!("room/{}", m.body["name"].as_str().unwrap());
+                        match self.db.get(&k).unwrap() {
+                            Some(r) => {
+                                let mut room: Room = bincode::deserialize(&r.to_vec()).unwrap();
+                                let user_index: usize = room.users.iter().position(|u| u == &self.id.to_hyphenated().to_string()).unwrap();
+                                let loc: Vec<i32> = serde_json::from_value(m.body["location"].clone()).unwrap();
+                                let location = vec!(user_index as i32, loc[0], loc[1]);
+                                room.game.board.push(location);
+                                let v = bincode::serialize(&room).unwrap();
+                                match self.db.insert(&k, v) {
+                                    Ok(_t) => {},
+                                    Err(_e) => {
+                                        // TODO do something
+                                        println!("Silently failing to update room.game with new location.");
+                                    }
+                                }
+                            },
+                            _ => {
+                                // TODO do something
+                                println!("Silently failing to update room because it does not exist.");
+                            }
+                        }
+                    },
                     _ => {},
                 }
 
@@ -488,16 +513,16 @@ impl ws::Handler for Server {
         //     self.out.cancel(t).unwrap();
         // }
 
-        // // Remove user
-        // let user = format!("user/{}", self.id);
-        // println!("Removing {}", user);
-        // match self.db.remove(user) {
-        //     Ok(_t) => {}
-        //     Err(_e) => {
-        //         // TODO do something
-        //         println!("Silently failing removing user on close.");
-        //     }
-        // }
+        // Remove user
+        let user = format!("user/{}", self.id);
+        println!("Removing {}", user);
+        match self.db.remove(user) {
+            Ok(_t) => {}
+            Err(_e) => {
+                // TODO do something
+                println!("Silently failing removing user on close.");
+            }
+        }
 
         // TODO I want to return ws::Result but getting error when I do.
         // Once i do I should be able to return this line, and the db remove
