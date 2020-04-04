@@ -13,7 +13,8 @@ use uuid::Uuid;
 // use ws::util::Token;
 
 // TODO
-// - Room needs a Game
+// - identify winner
+// - OPTIMIZATION: Because all clients are getting updates on all rooms and all games EITHER separate out game resource so client can subscribe to game of interest OR do filtering at the client level to not update if the changes are in the game sub-struct. Idk if this is easily doable.
 // - allow client to "recover" user by providing a UUID
 // - there will definitely be some bugs related to users leaving rooms. Maybe they shouldn't be moved? Or the game should auto reset?
 // - push errors to client
