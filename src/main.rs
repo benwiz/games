@@ -420,14 +420,20 @@ impl ws::Handler for Server {
                                 if user_index as i32 != last_user_index {
                                     let loc: Vec<i32> = serde_json::from_value(m.body["location"].clone()).unwrap();
                                     let location = vec!(user_index as i32, loc[0], loc[1]);
-                                    room.game.board.push(location);
-                                    let v = bincode::serialize(&room).unwrap();
-                                    match self.db.insert(&k, v) {
-                                        Ok(_t) => {},
-                                        Err(_e) => {
-                                            // TODO do something
-                                            println!("Silently failing to update room.game with new location.");
+                                    let overlap = room.game.board.iter().any(|l| vec!(l[1], l[2]) == loc);
+                                    if !overlap {
+                                        room.game.board.push(location);
+                                        let v = bincode::serialize(&room).unwrap();
+                                        match self.db.insert(&k, v) {
+                                            Ok(_t) => {},
+                                            Err(_e) => {
+                                                // TODO do something
+                                                println!("Silently failing to update room.game with new location.");
+                                            }
                                         }
+                                    } else {
+                                        // TODO do something
+                                        println!("Silently failing because location is already taken.");
                                     }
                                 } else {
                                     // TODO do something
