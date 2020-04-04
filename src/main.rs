@@ -305,16 +305,22 @@ impl ws::Handler for Server {
                 m.body["id"] = Value::String(self.id.to_hyphenated().to_string());
                 let user: User = serde_json::from_value(m.body).unwrap();
                 let users: Vec<User> = all_users(self.db.clone());
-                let overlap = users.iter().any(|u| u.name == user.name);
-                if !overlap {
-                    let k = format!("user/{}", self.id.to_hyphenated());
-                    let v = bincode::serialize(&user).unwrap();
-                    match self.db.insert(&k, v) {
-                        Ok(_t) => {}
-                        Err(_e) => {
-                            // TODO do something
-                            println!("Silently failing to insert user.");
+                let overlap_name = users.iter().any(|u| u.name == user.name);
+                if !overlap_name {
+                    let overlap_id = users.iter().any(|u| u.id == user.id);
+                    if !overlap_id {
+                        let k = format!("user/{}", self.id.to_hyphenated());
+                        let v = bincode::serialize(&user).unwrap();
+                        match self.db.insert(&k, v) {
+                            Ok(_t) => {}
+                            Err(_e) => {
+                                // TODO do something
+                                println!("Silently failing to insert user.");
+                            }
                         }
+                    } else {
+                        // TODO do something
+                        println!("Silently failing to create new user since a user already exists for this id.");
                     }
                 } else {
                     // TODO do something
