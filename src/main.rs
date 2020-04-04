@@ -413,16 +413,25 @@ impl ws::Handler for Server {
                             Some(r) => {
                                 let mut room: Room = bincode::deserialize(&r.to_vec()).unwrap();
                                 let user_index: usize = room.users.iter().position(|u| u == &self.id.to_hyphenated().to_string()).unwrap();
-                                let loc: Vec<i32> = serde_json::from_value(m.body["location"].clone()).unwrap();
-                                let location = vec!(user_index as i32, loc[0], loc[1]);
-                                room.game.board.push(location);
-                                let v = bincode::serialize(&room).unwrap();
-                                match self.db.insert(&k, v) {
-                                    Ok(_t) => {},
-                                    Err(_e) => {
-                                        // TODO do something
-                                        println!("Silently failing to update room.game with new location.");
+                                let last_user_index: i32 = match room.game.board.last() {
+                                    Some(play) => play[0],
+                                    None => -1, // no last move, so anyone can go first
+                                };
+                                if user_index as i32 != last_user_index {
+                                    let loc: Vec<i32> = serde_json::from_value(m.body["location"].clone()).unwrap();
+                                    let location = vec!(user_index as i32, loc[0], loc[1]);
+                                    room.game.board.push(location);
+                                    let v = bincode::serialize(&room).unwrap();
+                                    match self.db.insert(&k, v) {
+                                        Ok(_t) => {},
+                                        Err(_e) => {
+                                            // TODO do something
+                                            println!("Silently failing to update room.game with new location.");
+                                        }
                                     }
+                                } else {
+                                    // TODO do something
+                                    println!("Silently failing because same player cannot go twice in a row.");
                                 }
                             },
                             _ => {
