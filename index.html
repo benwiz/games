@@ -21,6 +21,15 @@
 			socket.send(input.value);
 			input.value = "";
 		}
+
+        function copy() {    
+            const el = document.createElement("textarea");
+            el.value = event.target.innerHTML;
+            document.body.appendChild(el);
+            el.select();
+            document.execCommand("copy");
+            document.body.removeChild(el);
+        }
 	  </script>
 	  <p id="received">
 		<strong>Received Messages:</strong>
@@ -32,17 +41,17 @@
 
       <div>
         <h4>Example Requests:</h4>
-        Echo: <tt>{"route":"/echo","event":"","body":{"testing":123}}</tt>
+        Echo: <tt onclick="copy()">{"route":"/echo","event":"","body":{"testing":123}}</tt>
         <br>
-        Create User: <tt>{"route":"/users","event":"create","body":{"name":"menashi"}}</tt>
+        Create User: <tt onclick="copy()">{"route":"/users","event":"create","body":{"name":"menashi"}}</tt>
         <br>
-        Send Chat: <tt>{"route":"/chat","event":"create","body":{"message":"hi guys"}}</tt>
+        Send Chat: <tt onclick="copy()">{"route":"/chat","event":"create","body":{"message":"hi guys"}}</tt>
         <br>
-        Create Room: <tt>{"route":"/rooms","event":"create","body":{"name":"myroom"}}</tt>
+        Create Room: <tt onclick="copy()">{"route":"/rooms","event":"create","body":{"name":"myroom"}}</tt>
         <br>
-        Join Room: <tt>{"route":"/rooms","event":"join","body":{"name":"myroom"}}</tt>
+        Join Room: <tt onclick="copy()">{"route":"/rooms","event":"join","body":{"name":"myroom"}}</tt>
         <br>
-        Leave Room: <tt>{"route":"/rooms","event":"leave","body":{"name":"myroom"}}</tt>
+        Leave Room: <tt onclick="copy()">{"route":"/rooms","event":"leave","body":{"name":"myroom"}}</tt>
       </div>
     </div>
   </body>

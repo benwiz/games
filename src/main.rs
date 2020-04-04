@@ -13,15 +13,9 @@ use uuid::Uuid;
 // use ws::util::Token;
 
 // TODO
+// - Room needs a Game
 // - allow client to "recover" user by providing a UUID
-// - on user delete, scan all rooms and remove user from rooms
-// - on room update, if no users left in room, delete room
-// - a room will have a REFERENCE to a Game or Board. The reason is that
-//   a client will subscribe
-//   to updates from a specific Game (Board). Everyone subscribes to all
-//   room updates. That is because everyone needs to know if a room is open
-//   or full. Only the people playing the game need to see the board and
-//   associated chat.
+// - push errors to client
 
 // const PING: Token = Token(1);
 // const EXPIRE: Token = Token(2);
@@ -70,16 +64,15 @@ struct Chats {
 struct Room {
     name: String,
     users: Vec<String>,
-    // game: String,
+    game: Game,
 }
 
-
-// #[derive(Serialize, Deserialize)]
-// struct Game {
-//     board: Vec<Vec<i32>>,
-//     winning_path: Vec<Vec<i32>>,
-//     winner: String,
-// }
+#[derive(Serialize, Deserialize)]
+struct Game {
+    board: Vec<Vec<i32>>,
+    winning_path: Vec<Vec<i32>>,
+    winner: String,
+}
 
 fn all_users(db: Arc<Db>) -> Vec<User> {
     let scan = db.scan_prefix("user/");
@@ -337,6 +330,11 @@ impl ws::Handler for Server {
                                     let user_encoded: Vec<u8> = user_ivec.to_vec();
                                     let user: User = bincode::deserialize(&user_encoded).unwrap();
                                     m.body["users"] = json!([user.id]);
+                                    m.body["game"] = json!({
+                                        "board": [],
+                                        "winning_path": [],
+                                        "winner": "",
+                                    });
                                     let room: Room = serde_json::from_value(m.body).unwrap();
                                     let v = bincode::serialize(&room).unwrap();
                                     match self.db.insert(&k, v) {
