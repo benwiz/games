@@ -13,11 +13,13 @@ use uuid::Uuid;
 // use ws::util::Token;
 
 // TODO
-// - identify winner
-// - OPTIMIZATION: Because all clients are getting updates on all rooms and all games EITHER separate out game resource so client can subscribe to game of interest OR do filtering at the client level to not update if the changes are in the game sub-struct. Idk if this is easily doable.
 // - allow client to "recover" user by providing a UUID
-// - there will definitely be some bugs related to users leaving rooms. Maybe they shouldn't be moved? Or the game should auto reset?
 // - push errors to client
+// - identify winner
+// - delete user
+// - there will definitely be some bugs related to users leaving rooms. Maybe they shouldn't be moved? Or the game should auto reset?
+// - OPTIMIZATION: Because all clients are getting updates on all rooms and all games EITHER separate out game resource so client can subscribe to game of interest OR do filtering at the client level to not update if the changes are in the game sub-struct. Idk if this is easily doable.
+// - OPTIMIZATION: Using the recovery feature it is possible to hijack someone's "account". In order to prevent this I would need to provide a secret ID on open.
 
 // const PING: Token = Token(1);
 // const EXPIRE: Token = Token(2);
@@ -39,7 +41,7 @@ struct Message {
     body: Value,
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize)] // This is unnecessary, I could use the json! macro in its place.
 struct Id {
     id: String,
 }
@@ -49,7 +51,6 @@ struct User {
     id: String,
     name: String,
 }
-
 
 #[derive(Serialize, Deserialize)]
 struct Chat {
@@ -303,30 +304,38 @@ impl ws::Handler for Server {
         match m.route.as_str() {
             "/echo" => self.out.send(msg),
             "/users" => {
-                m.body["id"] = Value::String(self.id.to_hyphenated().to_string());
+                match &m.body["id"] {
+                    _id @ Value::Null {..} => {
+                        m.body["id"] = Value::String(self.id.to_hyphenated().to_string());
+                    },
+                    _ => {},
+                };
                 let user: User = serde_json::from_value(m.body).unwrap();
                 let users: Vec<User> = all_users(self.db.clone());
-                let overlap_name = users.iter().any(|u| u.name == user.name);
-                if !overlap_name {
-                    let overlap_id = users.iter().any(|u| u.id == user.id);
-                    if !overlap_id {
-                        let k = format!("user/{}", self.id.to_hyphenated());
-                        let v = bincode::serialize(&user).unwrap();
-                        match self.db.insert(&k, v) {
-                            Ok(_t) => {}
-                            Err(_e) => {
-                                // TODO do something
-                                println!("Silently failing to insert user.");
-                            }
-                        }
-                    } else {
-                        // TODO do something
-                        println!("Silently failing to create new user since a user already exists for this id.");
-                    }
-                } else {
-                    // TODO do something
-                    println!("Silently failing to create user since name is already taken.");
+                let overlap_id_exists: bool = users.iter().any(|u| u.id == user.id);
+                if overlap_id_exists {
+                    // Recover and/or update user name (NOTE this is easily hackable, someone can hijack a current users "account")
+                    // Update self.id
+                    self.id = Uuid::parse_str(&user.id).unwrap(); // TODO probably important to handle malformed uuid
                 }
+
+                // Upsert user record
+                let k = format!("user/{}", self.id.to_hyphenated());
+                let v = bincode::serialize(&user).unwrap();
+                match self.db.insert(&k, v) {
+                    Ok(_t) => {}
+                    Err(_e) => {
+                        // TODO do something
+                        println!("Silently failing to insert user.");
+                    }
+                }
+
+                // let overlap_name = users.iter().any(|u| u.name == user.name);
+                // if !overlap_name {
+                // } else {
+                //     // TODO do something
+                //     println!("Silently failing to create user since name is already taken.");
+                // }
 
                 Ok(())
             }
@@ -676,6 +685,5 @@ fn main() {
             // ping_timeout: None,
             // expire_timeout: None,
         }
-    })
-        .unwrap()
+    }).unwrap()
 }
