@@ -97,7 +97,7 @@ const selectLocationAndRole = () => {
     const pack = shuffle(OPTIONS.slice(), SEED)[0];
     const location = pack.location;
     const index = PLAYER_ID_MAP[PLAYER];
-    let roles = shuffle(pack.roles.slice(), SEED).slice(0, PLAYER_COUNT); // randomly keep PLAYER_COUNT - 1 roles (max 7)
+    let roles = shuffle(pack.roles.slice(), SEED).slice(0, PLAYER_COUNT - 1); // randomly keep PLAYER_COUNT - 1 roles (max 7)
     roles.push('Spy'); // append spy
     roles = shuffle(roles, SEED); // shuffle again to mix in spy
     const role = roles[index];
