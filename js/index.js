@@ -29,7 +29,7 @@ const OPTIONS = [{location: "Beach", roles: ["Beach Waitress", "Kite Surfer", "L
                  // {location: "Cemetary", roles: ["Priest", "Grave Robber", "Poet", "Mourner", "Gatekeeper", "Dead Person", "Relative", "Flower Seller", "Grave Digger", "Goth Girl/Boy"]},
                  {location: "Polar Station", roles: ["Medic", "Expedition Leader", "Biologist", "Radioman", "Hydrologist", "Meteorologist", "Geologist"]},
                  {location: "Space Station", roles: ["Engineer", "Alien", "Pilot", "Commander", "Scientist", "Doctor", "Space Tourist"]},
-                 {location: "Wolrd War II Squadron", roles: ["Resistance Fighter", "Radioman", "Scout", "Medic", "Cook", "Imprisoned Nazi", "Soldier"]},
+                 {location: "World War II Squadron", roles: ["Resistance Fighter", "Radioman", "Scout", "Medic", "Cook", "Imprisoned Nazi", "Soldier"]},
                  {location: "Retirement Home", roles: ["Relative", "Cribbage Player", "Old Person", "Nurse", "Janitor", "Cook", "Blind Soul", "Psychologist"]},
                  // {location: "Subway", roles: ["Tourist", "Subway Operator", "Ticket Inspector", "Pregnant Lady", "Pickpocket", "Cleaner", "Businessman", "Ticket Seller", "Old Lady", "Blind Man", "Performer"]},
                  // {location: "Coal Mine", roles: ["Safety Inspector", "Miner", "Overseet", "Dump Truck Operator", "Driller", "Coordinator", "Blasting Engineer", "Solid Waste Engineer", "Worker"]},
@@ -44,6 +44,7 @@ const OPTIONS = [{location: "Beach", roles: ["Beach Waitress", "Kite Surfer", "L
 let PLAYER = null;
 let CONFIRMED_COLOR = false;
 let SEED = -1;
+let PLAYER_COUNT = 0;
 let PLAYER_ID_MAP = {"a": 0,
                      "b": 1,
                      "c": 2,
@@ -95,7 +96,7 @@ const selectLocationAndRole = () => {
     const pack = shuffle(OPTIONS.slice(), SEED)[0];
     const location = pack.location;
     const index = PLAYER_ID_MAP[PLAYER];
-    let roles = shuffle(pack.roles.slice(), SEED).slice(0, 7); // randomly keep 7 of the roles
+    let roles = shuffle(pack.roles.slice(), SEED).slice(0, PLAYER_COUNT); // randomly keep PLAYER_COUNT - 1 roles (max 7)
     roles.push('Spy'); // append spy
     roles = shuffle(roles, SEED); // shuffle again to mix in spy
     const role = roles[index];
@@ -126,24 +127,130 @@ const playerColor = game.querySelector('#player-color');
 
 // Run a render cycle
 const render = () => {
-    if (!PLAYER && !CONFIRMED_COLOR) {
+    if (PLAYER_COUNT && !PLAYER && !CONFIRMED_COLOR) {
         colorPicker.classList.remove('hidden');
         confirmColors.classList.add('hidden');
         game.classList.add('hidden');
-    } else if (PLAYER && !CONFIRMED_COLOR) {
+
+        // Clunky PLAYER_COUNT solution. TODO make this more elegant.
+        console.log('pc:', PLAYER_COUNT);
+        console.log(colorPicker.querySelector('.a'));
+        switch (PLAYER_COUNT) {
+        case 0:
+            colorPicker.querySelector('.a').classList.add('hidden');
+            colorPicker.querySelector('.b').classList.add('hidden');
+            colorPicker.querySelector('.c').classList.add('hidden');
+            colorPicker.querySelector('.d').classList.add('hidden');
+            colorPicker.querySelector('.e').classList.add('hidden');
+            colorPicker.querySelector('.f').classList.add('hidden');
+            colorPicker.querySelector('.g').classList.add('hidden');
+            colorPicker.querySelector('.h').classList.add('hidden');
+            break;
+        case 1:
+            colorPicker.querySelector('.a').classList.remove('hidden');
+            colorPicker.querySelector('.b').classList.add('hidden');
+            colorPicker.querySelector('.c').classList.add('hidden');
+            colorPicker.querySelector('.d').classList.add('hidden');
+            colorPicker.querySelector('.e').classList.add('hidden');
+            colorPicker.querySelector('.f').classList.add('hidden');
+            colorPicker.querySelector('.g').classList.add('hidden');
+            colorPicker.querySelector('.h').classList.add('hidden');
+            break;
+        case 2:
+            colorPicker.querySelector('.a').classList.remove('hidden');
+            colorPicker.querySelector('.b').classList.remove('hidden');
+            colorPicker.querySelector('.c').classList.add('hidden');
+            colorPicker.querySelector('.d').classList.add('hidden');
+            colorPicker.querySelector('.e').classList.add('hidden');
+            colorPicker.querySelector('.f').classList.add('hidden');
+            colorPicker.querySelector('.g').classList.add('hidden');
+            colorPicker.querySelector('.h').classList.add('hidden');
+            break;
+        case 3:
+            colorPicker.querySelector('.a').classList.remove('hidden');
+            colorPicker.querySelector('.b').classList.remove('hidden');
+            colorPicker.querySelector('.c').classList.remove('hidden');
+            colorPicker.querySelector('.d').classList.add('hidden');
+            colorPicker.querySelector('.e').classList.add('hidden');
+            colorPicker.querySelector('.f').classList.add('hidden');
+            colorPicker.querySelector('.g').classList.add('hidden');
+            colorPicker.querySelector('.h').classList.add('hidden');
+            break;
+        case 4:
+            colorPicker.querySelector('.a').classList.remove('hidden');
+            colorPicker.querySelector('.b').classList.remove('hidden');
+            colorPicker.querySelector('.c').classList.remove('hidden');
+            colorPicker.querySelector('.d').classList.remove('hidden');
+            colorPicker.querySelector('.e').classList.add('hidden');
+            colorPicker.querySelector('.f').classList.add('hidden');
+            colorPicker.querySelector('.g').classList.add('hidden');
+            colorPicker.querySelector('.h').classList.add('hidden');
+            break;
+        case 5:
+            colorPicker.querySelector('.a').classList.remove('hidden');
+            colorPicker.querySelector('.b').classList.remove('hidden');
+            colorPicker.querySelector('.c').classList.remove('hidden');
+            colorPicker.querySelector('.d').classList.remove('hidden');
+            colorPicker.querySelector('.e').classList.remove('hidden');
+            colorPicker.querySelector('.f').classList.add('hidden');
+            colorPicker.querySelector('.g').classList.add('hidden');
+            colorPicker.querySelector('.h').classList.add('hidden');
+            break;
+        case 6:
+            colorPicker.querySelector('.a').classList.remove('hidden');
+            colorPicker.querySelector('.b').classList.remove('hidden');
+            colorPicker.querySelector('.c').classList.remove('hidden');
+            colorPicker.querySelector('.d').classList.remove('hidden');
+            colorPicker.querySelector('.e').classList.remove('hidden');
+            colorPicker.querySelector('.f').classList.remove('hidden');
+            colorPicker.querySelector('.g').classList.add('hidden');
+            colorPicker.querySelector('.h').classList.add('hidden');
+            break;
+        case 7:
+            colorPicker.querySelector('.a').classList.remove('hidden');
+            colorPicker.querySelector('.b').classList.remove('hidden');
+            colorPicker.querySelector('.c').classList.remove('hidden');
+            colorPicker.querySelector('.d').classList.remove('hidden');
+            colorPicker.querySelector('.e').classList.remove('hidden');
+            colorPicker.querySelector('.f').classList.remove('hidden');
+            colorPicker.querySelector('.g').classList.remove('hidden');
+            colorPicker.querySelector('.h').classList.add('hidden');
+            break;
+        case 8:
+            colorPicker.querySelector('.a').classList.remove('hidden');
+            colorPicker.querySelector('.b').classList.remove('hidden');
+            colorPicker.querySelector('.c').classList.remove('hidden');
+            colorPicker.querySelector('.d').classList.remove('hidden');
+            colorPicker.querySelector('.e').classList.remove('hidden');
+            colorPicker.querySelector('.f').classList.remove('hidden');
+            colorPicker.querySelector('.g').classList.remove('hidden');
+            colorPicker.querySelector('.h').classList.remove('hidden');
+            break;
+        default:
+            colorPicker.querySelector('.a').classList.remove('hidden');
+            colorPicker.querySelector('.b').classList.remove('hidden');
+            colorPicker.querySelector('.c').classList.remove('hidden');
+            colorPicker.querySelector('.d').classList.remove('hidden');
+            colorPicker.querySelector('.e').classList.remove('hidden');
+            colorPicker.querySelector('.f').classList.remove('hidden');
+            colorPicker.querySelector('.g').classList.remove('hidden');
+            colorPicker.querySelector('.h').classList.remove('hidden');
+        }
+
+    } else if (PLAYER_COUNT && PLAYER && !CONFIRMED_COLOR) {
         colorPicker.classList.add('hidden');
         confirmColors.classList.remove('hidden');
         confirmColorItem.classList.add(PLAYER);
         game.classList.add('hidden');
         playerColor.classList.add(PLAYER);
-    } else if (PLAYER && CONFIRMED_COLOR) {
+    } else if (PLAYER_COUNT && PLAYER && CONFIRMED_COLOR) {
         colorPicker.classList.add('hidden');
         confirmColors.classList.add('hidden');
         game.classList.remove('hidden');
         playerColor.classList.add(PLAYER);
         selectLocationAndRole();
     } else {
-        const s = `Unknown state: PLAYER: ${PLAYER}; CONFIRMED_COLOR: ${CONFIRMED_COLOR}`;
+        const s = `Unknown state: PLAYER_COUNT: ${PLAYER_COUNT}; PLAYER: ${PLAYER}; CONFIRMED_COLOR: ${CONFIRMED_COLOR}`;
         console.log(s);
         document.querySelector('#error').innerHTML = s;
     }
@@ -192,6 +299,16 @@ const updateSeed = (e) => {
 const seedInput = document.querySelector('#seed');
 seedInput.addEventListener('keyup', updateSeed);
 seedInput.addEventListener('change', updateSeed);
+
+// Number of players
+const updatePlayerCount = (e) => {
+    const playerCount = e.target.value;
+    PLAYER_COUNT = parseInt(playerCount);
+    render();
+};
+const playerCountInput = document.querySelector('#player-count');
+playerCountInput.addEventListener('keyup', updatePlayerCount);
+playerCountInput.addEventListener('change', updatePlayerCount);
 
 // Hide button
 const locationAndRole = game.querySelector('#location-and-role');
