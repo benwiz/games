@@ -127,8 +127,7 @@ const game = document.querySelector('#game');
 const playerColor = game.querySelector('#player-color');
 
 // Run a render cycle
-const
-render = () => {
+const render = () => {
     if (PLAYER_COUNT && !PLAYER && !CONFIRMED_COLOR) {
         colorPicker.classList.remove('hidden');
         confirmColors.classList.add('hidden');
@@ -136,8 +135,6 @@ render = () => {
         document.querySelector('#error').innerHTML = "";
 
         // Clunky PLAYER_COUNT solution. TODO make this more elegant.
-        console.log('pc:', PLAYER_COUNT);
-        console.log(colorPicker.querySelector('.a'));
         switch (PLAYER_COUNT) {
         case 0:
             colorPicker.querySelector('.a').classList.add('hidden');
@@ -239,12 +236,13 @@ render = () => {
             colorPicker.querySelector('.g').classList.remove('hidden');
             colorPicker.querySelector('.h').classList.remove('hidden');
         }
-
     } else if (PLAYER_COUNT && PLAYER && !CONFIRMED_COLOR) {
         colorPicker.classList.add('hidden');
         confirmColors.classList.remove('hidden');
+        confirmColorItem.className = 'color-item-confirm'; // this is breakable but gets the job done
         confirmColorItem.classList.add(PLAYER);
         game.classList.add('hidden');
+        playerColor.className = "";
         playerColor.classList.add(PLAYER);
         document.querySelector('#error').innerHTML = "";
     } else if (PLAYER_COUNT && PLAYER && CONFIRMED_COLOR) {
@@ -266,7 +264,7 @@ validation(OPTIONS);
 
 // Back button
 document.querySelector('#back-button').addEventListener('click', (e) => {
-    // purposely not modifying seed
+    // purposely not modifying seed or player count
     PLAYER = null;
     CONFIRMED_COLOR = false;
     render();
@@ -324,7 +322,6 @@ hideShowButton.addEventListener('click', (_e) => {
         hideShowButton.innerHTML = '(show)';
     } else {
         locationAndRole.classList.remove('invisible');
-        console.log('remove invisible');
         hideShowButton.innerHTML = '(hide)';
     }
 });
