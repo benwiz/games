@@ -13,11 +13,10 @@ use uuid::Uuid;
 // use ws::util::Token;
 
 // TODO
-// - allow client to "recover" user by providing a UUID
 // - push errors to client
 // - identify winner
 // - delete user
-// - there will definitely be some bugs related to users leaving rooms. Maybe they shouldn't be moved? Or the game should auto reset?
+// - there will definitely be some bugs related to users leaving rooms. Maybe they shouldn't be removed? Or the game should auto reset?
 // - OPTIMIZATION: Because all clients are getting updates on all rooms and all games EITHER separate out game resource so client can subscribe to game of interest OR do filtering at the client level to not update if the changes are in the game sub-struct. Idk if this is easily doable.
 // - OPTIMIZATION: Using the recovery feature it is possible to hijack someone's "account". In order to prevent this I would need to provide a secret ID on open.
 
@@ -303,6 +302,17 @@ impl ws::Handler for Server {
         // };
         match m.route.as_str() {
             "/echo" => self.out.send(msg),
+            "/error" => {
+                // TODO functionalize this
+                let r = json!({
+                    "route": "/error",
+                    "event": "error",
+                    "error": "This is an example error message.",
+                    "message": m,
+                });
+                let res = serde_json::to_string(&r).unwrap();
+                self.out.send(res)
+            },
             "/users" => {
                 match &m.body["id"] {
                     _id @ Value::Null {..} => {

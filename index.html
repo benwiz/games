@@ -41,7 +41,7 @@
 
       <div>
         <h4>Example Requests:</h4>
-        Echo: <tt onclick="copy()">{"route":"/echo","event":"","body":{"testing":123}}</tt>
+        Echo: <tt onclick="copy()">{"route":"/echo","event":"[any]","body":{"testing":123}}</tt>
         <br>
         Create User: <tt onclick="copy()">{"route":"/users","event":"create","body":{"name":"menashi"}}</tt>
         <br>
@@ -54,6 +54,8 @@
         Leave Room: <tt onclick="copy()">{"route":"/rooms","event":"leave","body":{"name":"myroom"}}</tt>
         <br>
         Play Move: <tt onclick="copy()">{"route":"/rooms","event":"play","body":{"name":"myroom","location":[0,0]}}</tt>
+        <br>
+        Error: <tt onclick="copy()">{"route":"/error","event":"[any]","body":{"this":"is an","example":123}}</tt>
       </div>
     </div>
   </body>
