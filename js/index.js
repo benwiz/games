@@ -120,6 +120,7 @@ const populateLocationsList = (options) => {
     });
 };
 
+const numPlayers = document.querySelector('#num-players');
 const colorPicker = document.querySelector('#color-picker');
 const confirmColors = document.querySelector('#confirm-colors');
 const confirmColorItem = confirmColors.querySelector('.color-item-confirm');
@@ -129,6 +130,7 @@ const playerColor = game.querySelector('#player-color');
 // Run a render cycle
 const render = () => {
     if (PLAYER_COUNT && !PLAYER && !CONFIRMED_COLOR) {
+        numPlayers.classList.remove('hidden');
         colorPicker.classList.remove('hidden');
         confirmColors.classList.add('hidden');
         game.classList.add('hidden');
@@ -237,6 +239,7 @@ const render = () => {
             colorPicker.querySelector('.h').classList.remove('hidden');
         }
     } else if (PLAYER_COUNT && PLAYER && !CONFIRMED_COLOR) {
+        numPlayers.classList.add('hidden');
         colorPicker.classList.add('hidden');
         confirmColors.classList.remove('hidden');
         confirmColorItem.className = 'color-item-confirm'; // this is breakable but gets the job done
@@ -246,6 +249,7 @@ const render = () => {
         playerColor.classList.add(PLAYER);
         document.querySelector('#error').innerHTML = "";
     } else if (PLAYER_COUNT && PLAYER && CONFIRMED_COLOR) {
+        numPlayers.classList.add('hidden');
         colorPicker.classList.add('hidden');
         confirmColors.classList.add('hidden');
         game.classList.remove('hidden');
