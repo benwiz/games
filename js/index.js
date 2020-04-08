@@ -39,7 +39,7 @@ const OPTIONS = [{location: "Beach", roles: ["Beach Waitress", "Kite Surfer", "L
                  {location: "Gas Station", roles: ["Car Enthusiast", "Service Attendant", "Shopkeeper", "Customer", "Car Washer", "Cashier", "Climate Change Activist", "Manager"]},
                  // {location: "Harbor Docks", roles: ["Loader", "Salty Old Pirate", "Captain", "Sailor", "Fisherman", "Exporter", "Cargo Overseer", "Cargo Inspector", "Smuggler", "Old Man"]},
                  // {location: "Sightseeing Bus", roles: ["Old Man", "Lone Tourist", "Driver", "Annoying Child", "Tourist", "Tour Guide", "Photographer", "Lost Person"]},
-                 // School
+                 // TODO school
                 ];
 
 let PLAYER = null;
@@ -127,11 +127,13 @@ const game = document.querySelector('#game');
 const playerColor = game.querySelector('#player-color');
 
 // Run a render cycle
-const render = () => {
+const
+render = () => {
     if (PLAYER_COUNT && !PLAYER && !CONFIRMED_COLOR) {
         colorPicker.classList.remove('hidden');
         confirmColors.classList.add('hidden');
         game.classList.add('hidden');
+        document.querySelector('#error').innerHTML = "";
 
         // Clunky PLAYER_COUNT solution. TODO make this more elegant.
         console.log('pc:', PLAYER_COUNT);
@@ -244,12 +246,14 @@ const render = () => {
         confirmColorItem.classList.add(PLAYER);
         game.classList.add('hidden');
         playerColor.classList.add(PLAYER);
+        document.querySelector('#error').innerHTML = "";
     } else if (PLAYER_COUNT && PLAYER && CONFIRMED_COLOR) {
         colorPicker.classList.add('hidden');
         confirmColors.classList.add('hidden');
         game.classList.remove('hidden');
         playerColor.classList.add(PLAYER);
         selectLocationAndRole();
+        document.querySelector('#error').innerHTML = "";
     } else {
         const s = `Unknown state: PLAYER_COUNT: ${PLAYER_COUNT}; PLAYER: ${PLAYER}; CONFIRMED_COLOR: ${CONFIRMED_COLOR}`;
         console.log(s);
