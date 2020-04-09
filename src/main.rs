@@ -124,6 +124,16 @@ fn remove_user_from_rooms(db: Arc<Db>, user_id: String) {
    }
 }
 
+fn error_message(request: Message, response: String) -> String {
+    let r = json!({
+        "route": "/error",
+        "event": "error",
+        "error": response,
+        "message": request,
+    });
+    serde_json::to_string(&r).unwrap()
+}
+
 impl ws::Handler for Server {
     fn on_open(&mut self, _shake: ws::Handshake) -> ws::Result<()> {
         // // Ping Pong
@@ -303,15 +313,8 @@ impl ws::Handler for Server {
         match m.route.as_str() {
             "/echo" => self.out.send(msg),
             "/error" => {
-                // TODO functionalize this
-                let r = json!({
-                    "route": "/error",
-                    "event": "error",
-                    "error": "This is an example error message.",
-                    "message": m,
-                });
-                let res = serde_json::to_string(&r).unwrap();
-                self.out.send(res)
+                let r = error_message(m, "This is an example error message.".to_owned());
+                self.out.send(r)
             },
             "/users" => {
                 match &m.body["id"] {
