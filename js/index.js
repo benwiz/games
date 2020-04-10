@@ -115,6 +115,7 @@ const populateLocationsList = (options) => {
     locations.map((loc, i) => {
         const location = document.createElement('span');
         location.style.cssFloat = i % 2 === 0 ? 'left' : 'right';
+        location.style.textAlign = i % 2 === 0 ? 'left' : 'right';
         location.classList.add('location-item');
         location.innerHTML = loc;
         locationsList.appendChild(location);
