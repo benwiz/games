@@ -112,8 +112,9 @@ const selectLocationAndRole = () => {
 const populateLocationsList = (options) => {
     const locationsList = document.querySelector('#locations-list');
     const locations = options.map(option => option.location).sort();
-    locations.map((loc) => {
-        const location = document.createElement('div');
+    locations.map((loc, i) => {
+        const location = document.createElement('span');
+        location.style.cssFloat = i % 2 === 0 ? 'left' : 'right';
         location.classList.add('location-item');
         location.innerHTML = loc;
         locationsList.appendChild(location);
