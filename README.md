@@ -400,5 +400,4 @@ Push to master
 
 ## To Do
 
-- Maybe categorize locations
-- Maybe only show a subset of locations if it's too hard
+- "Easy mode" where there is a predefined subset of locations
