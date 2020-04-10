@@ -112,14 +112,17 @@ const selectLocationAndRole = () => {
 const populateLocationsList = (options) => {
     const locationsList = document.querySelector('#locations-list');
     const locations = options.map(option => option.location).sort();
-    locations.map((loc, i) => {
+    const height = 20;
+    locations.forEach((loc, i) => {
         const location = document.createElement('span');
         location.style.cssFloat = i % 2 === 0 ? 'left' : 'right';
         location.style.textAlign = i % 2 === 0 ? 'left' : 'right';
+        location.style.height = height + 'px'; // This is a little janky
         location.classList.add('location-item');
         location.innerHTML = loc;
         locationsList.appendChild(location);
     });
+    locationsList.style.height = height / 2 * locations.length + 'px'; // this is janky pt. 2, this is the reason for janky pt. 1
 };
 
 const numPlayers = document.querySelector('#num-players');

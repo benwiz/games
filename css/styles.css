@@ -107,3 +107,24 @@ u {
 .invisible {
     visibility: hidden;
 }
+
+#links {
+    width: 100%;
+    margin-top: 50px;
+    margin-bottom: 50px;
+}
+
+/* TODO figure out how to center */
+#links > div {
+    float: right;
+}
+
+i {
+    margin: 2px;
+    font-size: 22px;
+    color: gray;
+}
+
+i:hover {
+    color: lightgray;
+}
