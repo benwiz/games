@@ -134,7 +134,19 @@ const playerColor = game.querySelector('#player-color');
 
 // Run a render cycle
 const render = () => {
-    if (PLAYER_COUNT && !PLAYER && !CONFIRMED_COLOR) {
+    if (PLAYER_COUNT && PLAYER && !CONFIRMED_COLOR) {
+        // Second Stage
+        numPlayers.classList.add('hidden');
+        colorPicker.classList.add('hidden');
+        confirmColors.classList.remove('hidden');
+        confirmColorItem.className = 'color-item-confirm'; // this is breakable but gets the job done
+        confirmColorItem.classList.add(PLAYER);
+        game.classList.add('hidden');
+        playerColor.className = "";
+        playerColor.classList.add(PLAYER);
+        document.querySelector('#error').innerHTML = "";
+    } else if (PLAYER_COUNT && !PLAYER && !CONFIRMED_COLOR) {
+        // First Stage
         numPlayers.classList.remove('hidden');
         colorPicker.classList.remove('hidden');
         confirmColors.classList.add('hidden');
@@ -243,16 +255,6 @@ const render = () => {
             colorPicker.querySelector('.g').classList.remove('hidden');
             colorPicker.querySelector('.h').classList.remove('hidden');
         }
-    } else if (PLAYER_COUNT && PLAYER && !CONFIRMED_COLOR) {
-        numPlayers.classList.add('hidden');
-        colorPicker.classList.add('hidden');
-        confirmColors.classList.remove('hidden');
-        confirmColorItem.className = 'color-item-confirm'; // this is breakable but gets the job done
-        confirmColorItem.classList.add(PLAYER);
-        game.classList.add('hidden');
-        playerColor.className = "";
-        playerColor.classList.add(PLAYER);
-        document.querySelector('#error').innerHTML = "";
     } else if (PLAYER_COUNT && PLAYER && CONFIRMED_COLOR) {
         numPlayers.classList.add('hidden');
         colorPicker.classList.add('hidden');
