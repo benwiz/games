@@ -656,12 +656,6 @@ impl ws::Handler for Server {
 fn main() {
     println!("Launching hex-server.");
 
-    let key = "PORT";
-    match std::env::var(key) {
-        Ok(val) => println!("{}: {:?}", key, val),
-        Err(e) => println!("couldn't interpret {}: {}", key, e),
-    }
-
     // let db = Arc::new(sled::open("game_db").expect("Sled must start ok."));
     let db = Arc::new(
         sled::Config::new()
@@ -709,8 +703,13 @@ fn main() {
         }
     });
 
-    println!("Starting server.");
-    ws::listen("0.0.0.0:37751", |out| {
+    let port = match std::env::var("PORT") {
+        Ok(val) => val,
+        Err(_) => "3012".to_string(),
+    };
+    let uri = format!("0.0.0.0:{}", port);
+    println!("Starting server at {}", uri);
+    ws::listen(uri, |out| {
         Server {
             id: Uuid::new_v4(),
             out: out,
