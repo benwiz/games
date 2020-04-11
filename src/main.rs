@@ -712,5 +712,6 @@ fn main() {
             // ping_timeout: None,
             // expire_timeout: None,
         }
-    }).unwrap()
+    }).unwrap();
+    println!("End of main fn.");
 }
