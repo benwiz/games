@@ -656,6 +656,12 @@ impl ws::Handler for Server {
 fn main() {
     println!("Launching hex-server.");
 
+    let key = "PORT";
+    match env::var(key) {
+        Ok(val) => println!("{}: {:?}", key, val),
+        Err(e) => println!("couldn't interpret {}: {}", key, e),
+    }
+
     // let db = Arc::new(sled::open("game_db").expect("Sled must start ok."));
     let db = Arc::new(
         sled::Config::new()
