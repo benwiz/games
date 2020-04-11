@@ -13,6 +13,7 @@ use uuid::Uuid;
 // use ws::util::Token;
 
 // TODO
+// - ability to wipe the entire db through a message
 // - identify winner
 // - finish sending error messages to client
 // - NOTE: there will definitely be some bugs related to users leaving rooms. Maybe they shouldn't be removed? Or the game should auto reset?
