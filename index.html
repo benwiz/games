@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html>
+  <head>
+	<meta charset="utf-8">
+	<title>WebSocket Test</title>
+  </head>
+  <body>
+    <div>
+	  <p id="received">
+		<strong>Received Messages:</strong>
+	  </p>
+	  <form onsubmit="send('message'); return false">
+		<input type="text" id="message">
+		<input type="submit" value="Send">
+	  </form>
+
+      <div>
+        <h4>Example Requests (click to copy):</h4>
+        Echo: <tt onclick="copy()">{"route":"/echo","event":"[any]","body":{"testing":123}}</tt>
+        <br>
+        Create User: <tt onclick="copy()">{"route":"/users","event":"create","body":{"name":"menashi"}}</tt>
+        <br>
+        Send Chat: <tt onclick="copy()">{"route":"/chat","event":"create","body":{"message":"hi guys"}}</tt>
+        <br>
+        Create Room: <tt onclick="copy()">{"route":"/rooms","event":"create","body":{"name":"myroom"}}</tt>
+        <br>
+        Join Room: <tt onclick="copy()">{"route":"/rooms","event":"join","body":{"name":"myroom"}}</tt>
+        <br>
+        Leave Room: <tt onclick="copy()">{"route":"/rooms","event":"leave","body":{"name":"myroom"}}</tt>
+        <br>
+        Play Move: <tt onclick="copy()">{"route":"/rooms","event":"play","body":{"name":"myroom","location":[0,0]}}</tt>
+        <br>
+        Error: <tt onclick="copy()">{"route":"/error","event":"[any]","body":{"this":"is an","example":123}}</tt>
+      </div>
+
+      <div style="margin-top:60px;">
+        <div>Connected to <span id="connected-uri"></span></div>
+        <a id="other-link">Connect to <span id="other-uri"></span></a>
+      </div>
+    </div>
+
+    <script>
+      const localUri = 'ws://127.0.0.1:3012';
+      const prodUri = 'ws://nashhex.herokuapp.com';
+
+      const params = new URLSearchParams(window.location.search);
+      let uri;
+      if (params.get('uri') === 'local') {
+          uri = localUri;
+          document.querySelector('#other-link').href = '?uri=prod';
+          document.querySelector('#other-uri').innerHTML = prodUri;
+          document.querySelector('#connected-uri').innerHTML = localUri;
+      } else {
+          uri = prodUri;
+          document.querySelector('#other-link').href = '?uri=local';
+          document.querySelector('#other-uri').innerHTML = localUri;
+          document.querySelector('#connected-uri').innerHTML = prodUri;
+      }
+      console.log('Connecting to ' + uri);
+      var socket = new WebSocket(uri);
+	  socket.onmessage = function (event) {
+		  var received = document.getElementById("received");
+		  var br = document.createElement("BR");
+		  var text = document.createTextNode(event.data);
+		  received.appendChild(br);
+		  received.appendChild(text);
+	  };
+
+	  function send(element) {
+		  var input = document.getElementById(element);
+		  socket.send(input.value);
+		  input.value = "";
+	  }
+
+      function copy() {
+          const el = document.createElement("textarea");
+          el.value = event.target.innerHTML;
+          document.body.appendChild(el);
+          el.select();
+          document.execCommand("copy");
+          document.body.removeChild(el);
+      }
+	</script>
+  </body>
+</html>
