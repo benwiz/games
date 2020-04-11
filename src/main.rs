@@ -710,7 +710,7 @@ fn main() {
     });
 
     println!("Starting server.");
-    ws::listen("0.0.0.0:3000", |out| {
+    ws::listen("0.0.0.0:37751", |out| {
         Server {
             id: Uuid::new_v4(),
             out: out,
