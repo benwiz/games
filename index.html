@@ -7,7 +7,8 @@
   <body>
     <div>
 	  <script>
-		var socket = new WebSocket("ws://127.0.0.1:3012");
+		// var socket = new WebSocket("ws://127.0.0.1:3012");
+        var socket = new WebSocket('ws://infinite-hamlet-29121.herokuapp.com');
 		socket.onmessage = function (event) {
 			var received = document.getElementById("received");
 			var br = document.createElement("BR");
@@ -22,7 +23,7 @@
 			input.value = "";
 		}
 
-        function copy() {    
+        function copy() {
             const el = document.createElement("textarea");
             el.value = event.target.innerHTML;
             document.body.appendChild(el);

@@ -701,7 +701,7 @@ fn main() {
         }
     });
 
-    ws::listen("0.0.0.0:3012", |out| {
+    ws::listen("0.0.0.0:3000", |out| {
         Server {
             id: Uuid::new_v4(),
             out: out,
