@@ -256,6 +256,7 @@ const render = () => {
             colorPicker.querySelector('.h').classList.remove('hidden');
         }
     } else if (PLAYER_COUNT && PLAYER && CONFIRMED_COLOR) {
+        // Stage Three
         numPlayers.classList.add('hidden');
         colorPicker.classList.add('hidden');
         confirmColors.classList.add('hidden');
