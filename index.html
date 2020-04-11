@@ -7,6 +7,7 @@
   <body>
     <div>
       <h2>Hex-Server Debugger</h2>
+      <p>Muse use http since not using a secure ws connection.</p>
 
 	  <p id="received">
 		<strong>Received Messages:</strong>
@@ -43,7 +44,7 @@
 
     <script>
       const localUri = 'ws://127.0.0.1:3012';
-      const prodUri = 'ws://nashhex.herokuapp.com';
+      const prodUri = 'wss://nashhex.herokuapp.com';
 
       const params = new URLSearchParams(window.location.search);
       let uri;
