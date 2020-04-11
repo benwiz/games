@@ -33,7 +33,7 @@ struct Server {
     // expire_timeout: Option<Timeout>,
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Clone)]
 struct Message {
     route: String,
     event: String,
@@ -313,7 +313,7 @@ impl ws::Handler for Server {
         match m.route.as_str() {
             "/echo" => self.out.send(msg),
             "/error" => {
-                let r = error_message(m, "This is an example error message.".to_owned());
+                let r = error_message(m.clone(), "This is an example error message.".to_owned());
                 self.out.send(r)
             },
             "/users" => {
@@ -323,7 +323,7 @@ impl ws::Handler for Server {
                     },
                     _ => {},
                 };
-                let user: User = serde_json::from_value(m.body).unwrap();
+                let user: User = serde_json::from_value(m.body.clone()).unwrap();
                 let users: Vec<User> = all_users(self.db.clone());
                 let overlap_id_exists: bool = users.iter().any(|u| u.id == user.id);
                 if overlap_id_exists {
@@ -338,29 +338,24 @@ impl ws::Handler for Server {
                 match self.db.insert(&k, v) {
                     Ok(_t) => {}
                     Err(_e) => {
-                        // TODO do something
-                        println!("Silently failing to insert user.");
+                        let r = error_message(m.clone(), "Failed to create new user.".to_owned());
+                        self.out.send(r)?;
                     }
                 }
-
-                // let overlap_name = users.iter().any(|u| u.name == user.name);
-                // if !overlap_name {
-                // } else {
-                //     // TODO do something
-                //     println!("Silently failing to create user since name is already taken.");
-                // }
 
                 Ok(())
             }
             "/rooms" => {
                 match m.event.as_str() {
                     "create" => {
-                        let k = format!("room/{}", m.body["name"].as_str().unwrap());
+                        let n = m.body["name"].as_str().unwrap();
+                        let k = format!("room/{}", n);
                         match self.db.get(&k).unwrap() {
                             Some(_r) => {
-                                println!("{} already exists", k);
+                                let r = error_message(m.clone(), format!("Room {} already exists", n.clone()));
+                                self.out.send(r)?;
                                 return Ok(())
-                            }, // TODO inform client that room already exists
+                            },
                             _ => {
                                 let user_k = format!("user/{}", self.id.to_hyphenated());
                                 if let Some(user_ivec) = self.db.get(&user_k).unwrap() {
@@ -372,18 +367,19 @@ impl ws::Handler for Server {
                                         "winning_path": [],
                                         "winner": "",
                                     });
+                                    let m_clone = m.clone();
                                     let room: Room = serde_json::from_value(m.body).unwrap();
                                     let v = bincode::serialize(&room).unwrap();
                                     match self.db.insert(&k, v) {
                                         Ok(_t) => {},
                                         Err(_e) => {
-                                            // TODO do something
-                                            println!("Silently failing to insert room.");
+                                            let r = error_message(m_clone, format!("Failed to create {}", k));
+                                            self.out.send(r)?;
                                         }
                                     }
                                 } else {
-                                    // TODO do something
-                                    println!("Silently preventing user without a user name from creating a room.");
+                                    let r = error_message(m.clone(), "User without username cannot create a room".to_owned());
+                                    self.out.send(r)?;
                                 }
                             }
                         }
@@ -403,22 +399,22 @@ impl ws::Handler for Server {
                                         match self.db.insert(&k, v) {
                                             Ok(_t) => {},
                                             Err(_e) => {
-                                                // TODO do something
-                                                println!("Silently failing to update room.");
+                                                let r = error_message(m.clone(), format!("Failed to insert room {} into database.", k));
+                                                self.out.send(r)?;
                                             }
                                         }
                                     } else {
-                                        // TODO do something
-                                        println!("Silently preventing user from joining full room.");
+                                        let r = error_message(m.clone(), format!("Preventing {} from joining full room {}.", user_k, room.name));
+                                        self.out.send(r)?;
                                     }
                                 } else {
-                                    // TODO do something
-                                    println!("Silently preventing user without a user name from joining a room.");
+                                    let r = error_message(m.clone(), format!("Preventing user without username from joining {}.", k));
+                                    self.out.send(r)?;
                                 }
                             },
                             _ => {
-                                // TODO inform client that room does not exists
-                                println!("Silently failing to update room because it does not exist.");
+                                let r = error_message(m.clone(), format!("Cannot join {} since it does not exist.", k));
+                                self.out.send(r)?;
                             }
                         }
                     },
@@ -432,14 +428,14 @@ impl ws::Handler for Server {
                                 match self.db.insert(&k, v) {
                                     Ok(_t) => {},
                                     Err(_e) => {
-                                        // TODO do something
-                                        println!("Silently failing to update room.");
+                                        let r = error_message(m.clone(), format!("Failed to leave {} because db could not be updated.", k));
+                                        self.out.send(r)?;
                                     }
                                 }
                             },
                             _ => {
-                                // TODO inform client that room does not exists
-                                println!("Silently failing to leave room because it does not exist.");
+                                let r = error_message(m.clone(), format!("Failed to leave {} because it does not exist.", k));
+                                self.out.send(r)?;
                             }
                         }
                     },
@@ -463,22 +459,22 @@ impl ws::Handler for Server {
                                         match self.db.insert(&k, v) {
                                             Ok(_t) => {},
                                             Err(_e) => {
-                                                // TODO do something
-                                                println!("Silently failing to update room.game with new location.");
+                                                let r = error_message(m.clone(), format!("Failed to update game in room {} because of an error inserting into the db.", room.name));
+                                                self.out.send(r)?;
                                             }
                                         }
                                     } else {
-                                        // TODO do something
-                                        println!("Silently failing because location is already taken.");
+                                        let r = error_message(m.clone(), format!("Failed to update game in room {} because location {:?} is already taken.", room.name, location));
+                                        self.out.send(r)?;
                                     }
                                 } else {
-                                    // TODO do something
-                                    println!("Silently failing because same player cannot go twice in a row.");
+                                    let r = error_message(m.clone(), format!("Failed to update game in {} because it is the other player's turn.", k));
+                                    self.out.send(r)?;
                                 }
                             },
                             _ => {
-                                // TODO do something
-                                println!("Silently failing to update room because it does not exist.");
+                                let r = error_message(m.clone(), format!("Failed to update game in {} because it does not exist.", k));
+                                self.out.send(r)?;
                             }
                         }
                     },
