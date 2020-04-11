@@ -13,7 +13,6 @@ use uuid::Uuid;
 // use ws::util::Token;
 
 // TODO
-// - push errors to client
 // - identify winner
 // - delete user
 // - there will definitely be some bugs related to users leaving rooms. Maybe they shouldn't be removed? Or the game should auto reset?
@@ -323,24 +322,39 @@ impl ws::Handler for Server {
                     },
                     _ => {},
                 };
-                let user: User = serde_json::from_value(m.body.clone()).unwrap();
-                let users: Vec<User> = all_users(self.db.clone());
-                let overlap_id_exists: bool = users.iter().any(|u| u.id == user.id);
-                if overlap_id_exists {
-                    // Recover and/or update user name (NOTE this is easily hackable, someone can hijack a current users "account")
-                    // Update self.id
-                    self.id = Uuid::parse_str(&user.id).unwrap(); // TODO probably important to handle malformed uuid
-                }
+                match m.event.as_str() {
+                    "create" => {
+                        let user: User = serde_json::from_value(m.body.clone()).unwrap();
+                        let users: Vec<User> = all_users(self.db.clone());
+                        let overlap_id_exists: bool = users.iter().any(|u| u.id == user.id);
+                        if overlap_id_exists {
+                            // Recover and/or update user name (NOTE this is easily hackable, someone can hijack a current users "account")
+                            // Update self.id
+                            self.id = Uuid::parse_str(&user.id).unwrap(); // TODO probably important to handle malformed uuid
+                        }
 
-                // Upsert user record
-                let k = format!("user/{}", self.id.to_hyphenated());
-                let v = bincode::serialize(&user).unwrap();
-                match self.db.insert(&k, v) {
-                    Ok(_t) => {}
-                    Err(_e) => {
-                        let r = error_message(m.clone(), "Failed to create new user.".to_owned());
-                        self.out.send(r)?;
-                    }
+                        // Upsert user record
+                        let k = format!("user/{}", self.id.to_hyphenated());
+                        let v = bincode::serialize(&user).unwrap();
+                        match self.db.insert(&k, v) {
+                            Ok(_t) => {}
+                            Err(_e) => {
+                                let r = error_message(m.clone(), "Failed to create new user.".to_owned());
+                                self.out.send(r)?;
+                            }
+                        }
+                    },
+                    "delete" => {
+                        let k = format!("user/{}", self.id.to_hyphenated());
+                        match self.db.remove(&k) {
+                            Ok(_t) => {}
+                            Err(_e) => {
+                                let r = error_message(m.clone(), format!("Failed to delete {}.", k));
+                                self.out.send(r)?;
+                            }
+                        }
+                    },
+                    _ => {},
                 }
 
                 Ok(())
@@ -385,6 +399,7 @@ impl ws::Handler for Server {
                         }
                     },
                     "join" => {
+
                         let k = format!("room/{}", m.body["name"].as_str().unwrap());
                         match self.db.get(&k).unwrap() {
                             Some(r) => {
