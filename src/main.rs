@@ -654,6 +654,8 @@ impl ws::Handler for Server {
 // impl ws::Handler for DefaultHandler {}
 
 fn main() {
+    println!("Launching hex-server.");
+
     // let db = Arc::new(sled::open("game_db").expect("Sled must start ok."));
     let db = Arc::new(
         sled::Config::new()
@@ -701,6 +703,7 @@ fn main() {
         }
     });
 
+    println!("Starting server.");
     ws::listen("0.0.0.0:3000", |out| {
         Server {
             id: Uuid::new_v4(),
