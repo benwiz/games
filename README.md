@@ -20,3 +20,7 @@ Deploy.
 ``` text
 Push to master. Heroku will deploy to wss://nashhex.herokuapp.com.
 ```
+
+## To Do
+
+- If I ever wanted to learn testing with rust, this is an excellent candidate.
