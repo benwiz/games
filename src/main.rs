@@ -655,6 +655,7 @@ impl ws::Handler for Server {
 // impl ws::Handler for DefaultHandler {}
 
 fn main() {
+    println!("TESTING AAAAAA");
     println!("Launching hex-server.");
 
     // let db = Arc::new(sled::open("game_db").expect("Sled must start ok."));
