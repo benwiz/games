@@ -6,9 +6,9 @@
                       :asset-path        "/js/compiled"
                       :build-options     {:manifest-name "manifest.json"}
                       :module-hash-names true
-                      :modules           {:main {:entries [crinkle-template.core]}}
-                      :devtools          {:before-load crinkle-template.core/stop
-                                          :after-load  crinkle-template.core/start
+                      :modules           {:main {:entries [taboo.core]}}
+                      :devtools          {:before-load taboo.core/stop
+                                          :after-load  taboo.core/start
                                           :http-root   "docs"
                                           :http-port   8700
                                           :preloads    [devtools.preload]}}}}

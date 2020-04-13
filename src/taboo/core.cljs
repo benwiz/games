@@ -1,9 +1,9 @@
-(ns crinkle-template.core
+(ns taboo.core
   (:require
    ["react-dom" :refer [render]]
    ["react" :as react]
    [crinkle.component :refer [CE]]
-   [crinkle-template.view :as view]))
+   [taboo.view :as view]))
 
 (enable-console-print!)
 
