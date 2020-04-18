@@ -10,6 +10,9 @@ yarn watch
 ``` shell
 yarn clean
 ```
+
+NOTE!! This is easy to forget:
+
 Visit `http://localhost:8700/dev.html` for development.
 
 ## Deploy
@@ -26,5 +29,6 @@ Run `C-c C-x j s` which will start a shadow cljs repl based on the `.dir-local.e
 
 ## To Do
 
+- **figure out how to not need dev.html**
 - Release script should clean all main.XXX.js files that are not the current one
 - Return to using versioned js files. maybe.
