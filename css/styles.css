@@ -76,6 +76,11 @@ u {
     height: 80vw;
 }
 
+#game-seed > input,
+#num-players > input {
+    width: 100px;
+}
+
 #game {
     margin-top: 20px;
     margin-bottom: 60px;

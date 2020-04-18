@@ -42,7 +42,7 @@ const OPTIONS = [{location: "Beach", roles: ["Beach Waitress", "Kite Surfer", "L
                  {location: "Local parkdog", roles: ["Jogger", "Police", "Child", "Parent", "Gardener", "Exerciser", "Vendor"]},
                  {location: "Ski Resort", roles: ["Skier", "Ski Lift Operator", "Ski Run Groomer", "Shuttle Bus Driver", "Ski Shop Manager", "Ski Patrol", "Ski Instructor"]},
                  {location: "The Last Supper", roles: ["Jesus", "Da Vinci", "Mel Brooks", "Judas", "John the Baptist", "Matthew the Apostle", "Mark the Apostle", "Simon the Apostle"]},
-                 {location: "Movie theater", roles: ["Concessionaire", "Usher", "Movie Goer", "Ticket Taker", "Cleaning Crew", "Projectionist"]},
+                 // {location: "Movie Theater", roles: ["Concessionaire", "Usher", "Movie Goer", "Ticket Taker", "Cleaning Crew", "Projectionist"]}, // TODO 2 more
                  {location: "Post-Office", roles: ["Mail Man", "Customer", "Mail Clerk", "Mail Sorter", "Security", "Notary", "Janitor"]},
                  {location: "Clue Board Game", roles: ["Player", "Player", "Miss Scarlet", "Mr. Green", "Colonel Mustard", "Prof. Plum", "Mrs. peacock", "Mrs. White"]},
                  {location: "Golden Gate Bridge", roles: ["Jumper", "Painter", "Driver", "Biker", "Runner", "MaintenanceWorker", "Tourist"]},
