@@ -17,3 +17,5 @@ Push to master
 
 - "Easy mode" where there is a predefined subset of locations
 - "Hard mode" where locations are grouped into sets of 12 really similar locations (e.g. "stores" includes boutique, sports store, restaurant, fast food, etc.)
+- Next game button (maybe)
+- 
