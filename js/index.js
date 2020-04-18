@@ -26,7 +26,7 @@ const OPTIONS = [{location: "Beach", roles: ["Beach Waitress", "Kite Surfer", "L
                  {location: "Pirate Ship", roles: ["Cook", "Slave", "Cannoneer", "Tied Up Prisoner", "Cabin Boy", "Brave Captain", "Sailor"]},
                  {location: "Cathedral", roles: ["Priest", "Beggar", "Sinner", "Tourist", "Sponsor", "Chorister", "Parishioner"]},
                  // {location: "Crusader Army", roles: ["Monk", "Imprision Saracen (Roman-era Arab/Muslim)", "Servant", "Bishop", "Squire", "Archer", "Knight"]},
-                 {location: "Cemetary", roles: ["Priest", "Grave Robber", "Poet", "Mourner", "Gatekeeper", "Dead Person", "Relative", "Flower Seller", "Grave Digger", "Goth Girl/Boy"]},
+                 {location: "Cemetery", roles: ["Priest", "Grave Robber", "Poet", "Mourner", "Gatekeeper", "Dead Person", "Relative", "Flower Seller", "Grave Digger", "Goth Girl/Boy"]},
                  {location: "Polar Station", roles: ["Medic", "Expedition Leader", "Biologist", "Radioman", "Hydrologist", "Meteorologist", "Geologist"]},
                  {location: "Space Station", roles: ["Engineer", "Alien", "Pilot", "Commander", "Scientist", "Doctor", "Space Tourist"]},
                  // {location: "World War II Squadron", roles: ["Resistance Fighter", "Radioman", "Scout", "Medic", "Cook", "Imprisoned Nazi", "Soldier"]},
@@ -39,6 +39,14 @@ const OPTIONS = [{location: "Beach", roles: ["Beach Waitress", "Kite Surfer", "L
                  {location: "Gas Station", roles: ["Car Enthusiast", "Service Attendant", "Shopkeeper", "Customer", "Car Washer", "Cashier", "Climate Change Activist", "Manager"]},
                  // {location: "Harbor Docks", roles: ["Loader", "Salty Old Pirate", "Captain", "Sailor", "Fisherman", "Exporter", "Cargo Overseer", "Cargo Inspector", "Smuggler", "Old Man"]},
                  // {location: "Sightseeing Bus", roles: ["Old Man", "Lone Tourist", "Driver", "Annoying Child", "Tourist", "Tour Guide", "Photographer", "Lost Person"]},
+                 {location: "Local parkdog", roles: ["Jogger", "Police", "Child", "Parent", "Gardener", "Exerciser", "Vendor"]},
+                 {location: "Ski Resort", roles: ["Skier", "Ski Lift Operator", "Ski Run Groomer", "Shuttle Bus Driver", "Ski Shop Manager", "Ski Patrol", "Ski Instructor"]},
+                 {location: "The Last Supper", roles: ["Jesus", "Da Vinci", "Mel Brooks", "Judas", "John the Baptist", "Matthew the Apostle", "Mark the Apostle", "Simon the Apostle"]},
+                 {location: "Movie theater", roles: ["Concessionaire", "Usher", "Movie Goer", "Ticket Taker", "Cleaning Crew", "Projectionist"]},
+                 {location: "Post-Office", roles: ["Mail Man", "Customer", "Mail Clerk", "Mail Sorter", "Security", "Notary", "Janitor"]},
+                 {location: "Clue Board Game", roles: ["Player", "Player", "Miss Scarlet", "Mr. Green", "Colonel Mustard", "Prof. Plum", "Mrs. peacock", "Mrs. White"]},
+                 {location: "Golden Gate Bridge", roles: ["Jumper", "Painter", "Driver", "Biker", "Runner", "MaintenanceWorker", "Tourist"]},
+                 {location: "Brewery", roles: ["Brewmaster", "Tour Guide", "Customer", "Bar Back", "Bar Tender", "Manager", "Food Server"]},
                  // TODO school
                 ];
 
