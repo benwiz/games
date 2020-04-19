@@ -36,12 +36,12 @@
                                          (setHistory {:t       (dec t)
                                                       :history history}))}
                             "<<")
-                  #_(d/button {:disabled (or (< t (count history)) (= (count history) (dec word-count)))
-                               :onClick  (fn [_e]
-                                           (setHistory {:t       (inc t)
-                                                        :history (conj history "skip")}))}
-                              "skip")
-                  (d/button {:disabled (= (count history) (dec word-count))
+                  (d/button {:disabled (or (< t (count history)) (= (count history) (dec word-count))) ;; disable skip for reviewing history and last card
+                             :onClick  (fn [_e]
+                                         (setHistory {:t       (inc t)
+                                                      :history (conj history "skip")}))}
+                            "skip")
+                  (d/button {:disabled (= (count history) (dec word-count)) ;; disable next button for last card
                              :onClick  (fn [_e]
                                          (setHistory {:t       (inc t)
                                                       :history (if (= t (count history))
