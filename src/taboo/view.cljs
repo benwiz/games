@@ -1,11 +1,18 @@
 (ns taboo.view
   (:require
+   ["@material-ui/core/styles/makeStyles" :default makeStyles]
    ["react" :as react]
-   [crinkle.dom :as d]
+   [cljs-bean.core :refer [->clj]]
    [crinkle.component :refer [CE RE]]
+   [crinkle.dom :as d]
    [taboo.words :as w]))
 
 (def word-count (dec (count w/words))) ;; Minus 1 because the "Done" hack
+
+(def styles (makeStyles (fn [theme]
+                          (let [theme (->clj theme)]
+                            #js {:next-button #js {:height "80px"
+                                                   :margin ((:spacing theme) 0.5)}}))))
 
 (defn card
   [{:keys [target taboo]}]
@@ -17,17 +24,29 @@
                       taboo))
          (d/hr nil)))
 
+(defn next-button
+  [{:keys [classes event t history setHistory]}]
+  (d/button {:className (:next-button classes)
+             :onClick (fn [_e]
+                        (setHistory {:t       (inc t)
+                                     :history (conj history event)}))}
+            (str (name event) " >>")))
+
 (defn app
   []
-  (let [;; Track place (t) in deck and history of what happened
+  (let [classes (->clj (styles))
+
+        ;; Track place (t) in deck and history of what happened
         [{:keys [t history]} setHistory] (react/useState {:t 0 :history []})
 
         ;; Get current word
         wordset (nth w/words t)
         target  (first wordset)
-        taboo   (rest wordset)]
+        taboo   (rest wordset)
+
+        reviewing? (< t (count history))]
     (d/div nil
-           (CE card {:target (str target " #" t "/" (inc (count history)))
+           (CE card {:target (str target " #" t "///" (inc (count history)))
                      :taboo  taboo})
            (d/div {:style #js {:display        "flex"
                                :justifyContent "space-between"}}
@@ -36,17 +55,28 @@
                                          (setHistory {:t       (dec t)
                                                       :history history}))}
                             "<<")
-                  (d/button {:disabled (or (< t (count history)) (= (count history) (dec word-count))) ;; disable skip for reviewing history and last card
-                             :onClick  (fn [_e]
-                                         (setHistory {:t       (inc t)
-                                                      :history (conj history "skip")}))}
-                            "skip")
-                  (d/button {:disabled (= (count history) (dec word-count)) ;; disable next button for last card
-                             :onClick  (fn [_e]
-                                         (setHistory {:t       (inc t)
-                                                      :history (if (= t (count history))
-                                                                 (conj history "correct")
-                                                                 history)}))}
-                            (if (= t (count history))
-                              "correct >>"
-                              ">>"))))))
+                  (when reviewing?
+                    (d/button {:disabled (= t (count history))
+                               :onClick  (fn [_e]
+                                           (setHistory {:t       (inc t)
+                                                        :history history}))}
+                              ">>"))
+                  (when-not reviewing?
+                    (d/div {:style #js {:display       "flex"
+                                        :flexDirection "column"}}
+                           (CE next-button {:classes    classes
+                                            :event      :correct
+                                            :t          t
+                                            :history    history
+                                            :setHistory setHistory})
+                           (CE next-button {:classes    classes
+                                            :event      :skip
+                                            :t          t
+                                            :history    history
+                                            :setHistory setHistory})
+                           (CE next-button {:classes    classes
+                                            :event      :wrong
+                                            :disabled   (< t (count history))
+                                            :t          t
+                                            :history    history
+                                            :setHistory setHistory})))))))
