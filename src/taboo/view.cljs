@@ -5,6 +5,8 @@
    [crinkle.component :refer [CE RE]]
    [taboo.words :as w]))
 
+(def word-count (dec (count w/words))) ;; Minus 1 because the "Done" hack
+
 (defn card
   [{:keys [target taboo]}]
   (d/div {}
@@ -25,7 +27,7 @@
         target  (first wordset)
         taboo   (rest wordset)]
     (d/div nil
-           (CE card {:target target
+           (CE card {:target (str target " #" t "/" (inc (count history)))
                      :taboo  taboo})
            (d/div {:style #js {:display        "flex"
                                :justifyContent "space-between"}}
@@ -34,18 +36,17 @@
                                          (setHistory {:t       (dec t)
                                                       :history history}))}
                             "<<")
-                  #_(d/button {:disabled (or (not= t -1) (= (count history) (dec (count w/words))))
-                             :onClick (fn [_e]
-                                        (if (= t -1)
-                                          ;; Update history with current wordset
-                                          (setHistory {:t       t
-                                                       :history (cons wordset history)})
-                                          ;; Decrement t to go forward in history
-                                          (setHistory {:t       (dec t)
-                                                       :history history})))}
-                            "skip")
-                  (d/button {:disabled (= (count history) (dec (count w/words)))
+                  #_(d/button {:disabled (or (< t (count history)) (= (count history) (dec word-count)))
+                               :onClick  (fn [_e]
+                                           (setHistory {:t       (inc t)
+                                                        :history (conj history "skip")}))}
+                              "skip")
+                  (d/button {:disabled (= (count history) (dec word-count))
                              :onClick  (fn [_e]
                                          (setHistory {:t       (inc t)
-                                                      :history (conj history "success")}))}
-                            ">>")))))
+                                                      :history (if (= t (count history))
+                                                                 (conj history "correct")
+                                                                 history)}))}
+                            (if (= t (count history))
+                              "correct >>"
+                              ">>"))))))
