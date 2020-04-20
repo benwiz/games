@@ -7,3 +7,6 @@ filename="${filename#\"}" # strip last quote
 echo "new filename is: $filename"
 sed -i "s/main\..*\.js/$filename/" docs/index.html # for mac inset `.bak` after the `-i`
 cat docs/index.html
+git add "docs/js/compiled/$filename"
+git add "docs/index.html"
+git commit -m "release $filename"

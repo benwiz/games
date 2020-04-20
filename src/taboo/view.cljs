@@ -25,25 +25,29 @@
                           (let [theme (->clj theme)
                                 card-width 200]
                             #js {:app            #js {:fontFamily "Roboto"}
-                                 :card           #js {:textAlign "center"
-                                                      :margin    "60px auto"
-                                                      :width     (str card-width "px")
-                                                      :height    (str (* card-width 1.5) "px")
+                                 :card           #js {:textAlign       "center"
+                                                      :marginLeft      "auto"
+                                                      :marginRight     "auto"
+                                                      :marginTop       (str (* card-width 0.33) "px")
+                                                      :marginBottom    (str (* card-width 0.33 0.5) "px")
+                                                      :width           (str card-width "px")
+                                                      :height          (str (* card-width 1.5) "px")
                                                       :backgroundColor "#8e2dfc"} ;; 27c4a8
                                  :card-header    #js {:color "white"}
                                  :card-content   #js {:backgroundColor "white"
-                                                      :paddingLeft 0
-                                                      :paddingRight 0
-                                                      :marginLeft ((:spacing theme) 1.0)
-                                                      :marginRight ((:spacing theme) 1.0)
+                                                      :paddingLeft     0
+                                                      :paddingRight    0
+                                                      :marginLeft      ((:spacing theme) 1.0)
+                                                      :marginRight     ((:spacing theme) 1.0)
                                                       ;; Would be better to have dynamic bottom border rather than hardcoded height
                                                       ;; :marginBottom ((:spacing theme) 1.0)
-                                                      :height (- card-width 12)}
-                                 :taboo          #js {:marginTop ((:spacing theme) 2.0)
-                                                      #_#_:marginBottom ((:spacing theme) 2.0)}
-                                 :next-button    #js {:height "80px"
-                                                      :margin ((:spacing theme) 0.5)}
-                                 :history-button #js {:height "264px"}}))))
+                                                      :height          (- card-width 12)}
+                                 :taboo          #js {:marginTop    ((:spacing theme) 2.0)
+                                                      :marginBottom ((:spacing theme) 2.0)}
+                                 :next-button    #js {:height "60px"
+                                                      :margin ((:spacing theme) 1.0)}
+                                 :history-button #js {#_#_:height "264px"
+                                                      :margin ((:spacing theme) 1.0)}}))))
 
 (defn card
   [{:keys [classes target taboo]}]
