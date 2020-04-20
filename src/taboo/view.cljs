@@ -1,6 +1,9 @@
 (ns taboo.view
   (:require
    ["@material-ui/core/Button" :default Button]
+   ["@material-ui/core/Card" :default Card]
+   ["@material-ui/core/CardHeader" :default CardHeader]
+   ["@material-ui/core/CardContent" :default CardContent]
    ["@material-ui/core/styles/makeStyles" :default makeStyles]
    ["@material-ui/icons/Check" :default CheckIcon]
    ["@material-ui/icons/Redo" :default RedoIcon]
@@ -8,33 +11,51 @@
    ["@material-ui/icons/FastForward" :default FastForwardIcon]
    ["@material-ui/icons/FastRewind" :default FastRewindIcon]
    ["react" :as react]
+   [clojure.string :as str]
    [cljs-bean.core :refer [->clj]]
    [crinkle.component :refer [CE RE]]
    [crinkle.dom :as d]
    [taboo.words :as w]))
 
+;; Card visual reference https://www.bestchoicereviews.org/wp-content/uploads/2014/12/taboo-card-and-board-games.jpg
+
 (def word-count (dec (count w/words))) ;; minus 1 because the "done" hack
 
 (def styles (makeStyles (fn [theme]
-                          (let [theme (->clj theme)]
-                            #js {:app            #js {:fontFamily "Roboto sans-serif"} ;; TODO use this https://cssinjs.org/jss-syntax/?v=v10.1.1#font-face and remove from html files
-                                 :card           #js {:textAlign "center"}
-                                 :taboo          #js {:margin ((:spacing theme) 0.75)}
+                          (let [theme (->clj theme)
+                                card-width 200]
+                            #js {:app            #js {:fontFamily "Roboto"}
+                                 :card           #js {:textAlign "center"
+                                                      :margin    "60px auto"
+                                                      :width     (str card-width "px")
+                                                      :height    (str (* card-width 1.5) "px")
+                                                      :backgroundColor "#8e2dfc"} ;; 27c4a8
+                                 :card-header    #js {:color "white"}
+                                 :card-content   #js {:backgroundColor "white"
+                                                      :paddingLeft 0
+                                                      :paddingRight 0
+                                                      :marginLeft ((:spacing theme) 1.0)
+                                                      :marginRight ((:spacing theme) 1.0)
+                                                      ;; Would be better to have dynamic bottom border rather than hardcoded height
+                                                      ;; :marginBottom ((:spacing theme) 1.0)
+                                                      :height (- card-width 12)}
+                                 :taboo          #js {:marginTop ((:spacing theme) 2.0)
+                                                      #_#_:marginBottom ((:spacing theme) 2.0)}
                                  :next-button    #js {:height "80px"
                                                       :margin ((:spacing theme) 0.5)}
                                  :history-button #js {:height "264px"}}))))
 
 (defn card
   [{:keys [classes target taboo]}]
-  (d/div {:className (:card classes)}
-         (d/h4 nil target)
-         (d/div nil
-                (into []
-                      (map #(d/div {:key %
-                                    :className (:taboo classes)}
-                                   %))
-                      taboo))
-         (d/hr {:style #js {:margin "30px"}})))
+  (RE Card {:className (:card classes)}
+      (RE CardHeader {:className (:card-header classes)
+                      :title     (str/upper-case target)})
+      (RE CardContent {:className (:card-content classes)}
+          (into []
+                (map #(d/div {:key       %
+                              :className (:taboo classes)}
+                             (str/upper-case %)))
+                taboo))))
 
 (defn history-button
   [{:keys [classes direction t history setHistory]}]
