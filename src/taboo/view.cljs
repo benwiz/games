@@ -1,36 +1,75 @@
 (ns taboo.view
   (:require
+   ["@material-ui/core/Button" :default Button]
    ["@material-ui/core/styles/makeStyles" :default makeStyles]
+   ["@material-ui/icons/Check" :default CheckIcon]
+   ["@material-ui/icons/Redo" :default RedoIcon]
+   ["@material-ui/icons/Clear" :default ClearIcon]
+   ["@material-ui/icons/FastForward" :default FastForwardIcon]
+   ["@material-ui/icons/FastRewind" :default FastRewindIcon]
    ["react" :as react]
    [cljs-bean.core :refer [->clj]]
    [crinkle.component :refer [CE RE]]
    [crinkle.dom :as d]
    [taboo.words :as w]))
 
-(def word-count (dec (count w/words))) ;; Minus 1 because the "Done" hack
+(def word-count (dec (count w/words))) ;; minus 1 because the "done" hack
 
 (def styles (makeStyles (fn [theme]
                           (let [theme (->clj theme)]
-                            #js {:next-button #js {:height "80px"
-                                                   :margin ((:spacing theme) 0.5)}}))))
+                            #js {:app            #js {}
+                                 :card           #js {:textAlign "center"}
+                                 :taboo          #js {:margin ((:spacing theme) 0.75)}
+                                 :next-button    #js {:height "80px"
+                                                      :margin ((:spacing theme) 0.5)}
+                                 :history-button #js {:height "264px"}}))))
 
 (defn card
-  [{:keys [target taboo]}]
-  (d/div {}
+  [{:keys [classes target taboo]}]
+  (d/div {:className (:card classes)}
          (d/h4 nil target)
          (d/div nil
                 (into []
-                      (map #(d/div {:key %} %))
+                      (map #(d/div {:key %
+                                    :className (:taboo classes)}
+                                   %))
                       taboo))
-         (d/hr nil)))
+         (d/hr {:style #js {:margin "30px"}})))
+
+(defn history-button
+  [{:keys [classes direction t history setHistory]}]
+  (assert (#{:backward :forward} direction) "direction must be either backward or forward")
+  (RE Button {:className (:history-button classes)
+              :variant  "outlined"
+              :disabled (case direction
+                          :backward (<= t 0)
+                          :forward  false)
+              :onClick  (fn [_e]
+                          (setHistory {:t       (case direction
+                                                  :backward (dec t)
+                                                  :forward  (inc t))
+                                       :history history}))}
+      (case direction
+        :backward (RE FastRewindIcon nil)
+        :forward  (RE FastForwardIcon nil))))
 
 (defn next-button
   [{:keys [classes event t history setHistory]}]
-  (d/button {:className (:next-button classes)
-             :onClick (fn [_e]
-                        (setHistory {:t       (inc t)
-                                     :history (conj history event)}))}
-            (str (name event) " >>")))
+  (RE Button {:className (:next-button classes)
+              :variant   (case event
+                           :correct "contained"
+                           "outlined")
+              :color     (case event
+                           :correct "primary"
+                           :skip    "default"
+                           :wrong   "secondary")
+              :onClick   (fn [_e]
+                           (setHistory {:t       (inc t)
+                                        :history (conj history event)}))}
+      (case event
+        :correct (RE CheckIcon nil)
+        :skip (RE RedoIcon nil)
+        :wrong (RE ClearIcon nil))))
 
 (defn app
   []
@@ -45,22 +84,23 @@
         taboo   (rest wordset)
 
         reviewing? (< t (count history))]
-    (d/div nil
-           (CE card {:target (str target " #" t "///" (inc (count history)))
-                     :taboo  taboo})
+    (d/div {:className (:app classes)}
+           (CE card {:classes classes
+                     :target  target
+                     :taboo   taboo})
            (d/div {:style #js {:display        "flex"
                                :justifyContent "space-between"}}
-                  (d/button {:disabled (<= t 0)
-                             :onClick  (fn [_e]
-                                         (setHistory {:t       (dec t)
-                                                      :history history}))}
-                            "<<")
+                  (CE history-button {:direction  :backward
+                                      :classes    classes
+                                      :t          t
+                                      :history    history
+                                      :setHistory setHistory})
                   (when reviewing?
-                    (d/button {:disabled (= t (count history))
-                               :onClick  (fn [_e]
-                                           (setHistory {:t       (inc t)
-                                                        :history history}))}
-                              ">>"))
+                    (CE history-button {:direction  :forward
+                                        :classes    classes
+                                        :t          t
+                                        :history    history
+                                        :setHistory setHistory}))
                   (when-not reviewing?
                     (d/div {:style #js {:display       "flex"
                                         :flexDirection "column"}}
