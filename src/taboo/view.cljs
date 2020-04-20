@@ -68,8 +68,8 @@
                                         :history (conj history event)}))}
       (case event
         :correct (RE CheckIcon nil)
-        :skip (RE RedoIcon nil)
-        :wrong (RE ClearIcon nil))))
+        :skip    (RE RedoIcon nil)
+        :wrong   (RE ClearIcon nil))))
 
 (defn app
   []
