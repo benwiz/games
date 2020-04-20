@@ -17,7 +17,7 @@
 
 (def styles (makeStyles (fn [theme]
                           (let [theme (->clj theme)]
-                            #js {:app            #js {}
+                            #js {:app            #js {:fontFamily "Roboto sans-serif"} ;; TODO use this https://cssinjs.org/jss-syntax/?v=v10.1.1#font-face and remove from html files
                                  :card           #js {:textAlign "center"}
                                  :taboo          #js {:margin ((:spacing theme) 0.75)}
                                  :next-button    #js {:height "80px"
@@ -115,7 +115,7 @@
                                             :history    history
                                             :setHistory setHistory})
                            (CE next-button {:classes    classes
-                                            :event      :wrong
+p                                            :event      :wrong
                                             :disabled   (< t (count history))
                                             :t          t
                                             :history    history
