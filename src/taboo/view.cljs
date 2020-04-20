@@ -115,7 +115,7 @@
                                             :history    history
                                             :setHistory setHistory})
                            (CE next-button {:classes    classes
-p                                            :event      :wrong
+                                            :event      :wrong
                                             :disabled   (< t (count history))
                                             :t          t
                                             :history    history
