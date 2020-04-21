@@ -20,7 +20,7 @@
 ;; TODO ready screen
 ;; TODO timer
 ;; TODO finish screen
-;; TODO toggle colors
+;; TODO toggle colorsl
 
 ;; Card visual reference https://www.bestchoicereviews.org/wp-content/uploads/2014/12/taboo-card-and-board-games.jpg
 
@@ -31,7 +31,7 @@
                                 card-width 200
                                 next-button-height 60
                                 next-button-margin ((:spacing theme) 1.0) ]
-                            #js {:app            #js {:fontFamily "'Comic Neueu', cursive"}
+                            #js {:app            #js {#_#_:fontFamily "'Comic Neueu', cursive"}
                                  :card           #js {:textAlign       "center"
                                                       :marginLeft      "auto"
                                                       :marginRight     "auto"
