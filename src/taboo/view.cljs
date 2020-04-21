@@ -91,6 +91,24 @@
                              (str/upper-case %)))
                 taboo))))
 
+(defn swipe-card
+  [{:keys [classes target taboo swipe]}]
+  (RE TinderCard {:key              target
+                  :className        (:tinder-card classes)
+                  :preventSwipe     #js ["up" "down"]
+                  :onSwipe          swipe
+                  :onCardLeftScreen (fn []
+                                      (prn "card left screen"))}
+      (CE card {:classes classes
+                :target  target
+                :taboo   taboo})))
+
+(defn deck
+  [{:keys [classes _target _taboo _swipe] :as args}]
+  (let [[cards setCard] (react/useState [(CE swipe-card args) (CE swipe-card args)])]
+    (d/div {:className (:deck classes)}
+           cards)))
+
 (defn history-button
   [{:keys [classes direction t history setHistory]}]
   (assert (#{:backward :forward} direction) "direction must be either backward or forward")
@@ -140,25 +158,11 @@
 
         reviewing? (< t (count history))]
     (d/div {:className (:app classes)}
-           (d/div {:className (:deck classes)}
-                  (RE TinderCard {:className (:tinder-card classes)
-                                  :preventSwipe     #js ["up" "down"]
-                                  :onSwipe          (fn [direction]
-                                                      (prn (str "swiped " direction)))
-                                  :onCardLeftScreen (fn []
-                                                      (prn "card left screen"))}
-                      (CE card {:classes classes
-                                :target  target
-                                :taboo   taboo}))
-                  (RE TinderCard {:className (:tinder-card classes)
-                                  :preventSwipe     #js ["up" "down"]
-                                  :onSwipe          (fn [direction]
-                                                      (prn (str "swiped " direction)))
-                                  :onCardLeftScreen (fn []
-                                                      (prn "card left screen"))}
-                      (CE card {:classes classes
-                                :target  target
-                                :taboo   taboo})))
+           (CE deck {:classes classes
+                     :target  target
+                     :taboo   taboo
+                     :swipe   (fn [direction]
+                                (prn (str "Swiped: " direction)))})
            #_(d/div {:style #js {:display        "flex"
                                :justifyContent "space-between"}}
                   (CE history-button {:direction  :backward
