@@ -18,8 +18,6 @@
    [crinkle.dom :as d]
    [taboo.words :as w]))
 
-(prn TinderCard)
-
 ;; TODO ready screen
 ;; TODO timer
 ;; TODO finish screen
@@ -35,7 +33,7 @@
                                 card-height (* 1.5 card-width)
                                 next-button-height 60
                                 next-button-margin ((:spacing theme) 1.0) ]
-                            #js {:app            #js {#_#_:fontFamily "'Comic Neueu', cursive"}
+                            #js {:app            #js {:fontFamily "'Comic Neueu', cursive"}
                                  :deck           #js {}
                                  :tinder-card    #js {:position "absolute"
                                                       :top      0
