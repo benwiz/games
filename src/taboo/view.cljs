@@ -52,7 +52,9 @@
                                                       :padding ((:spacing theme) 2.0)}
                                  :card-content   #js {:backgroundColor "white"
                                                       :padding         ((:spacing theme) 2.0)
-                                                      :margin          ((:spacing theme) 1.0)
+                                                      :marginLeft      ((:spacing theme) 1.0)
+                                                      :marginRight     ((:spacing theme) 1.0)
+                                                      :marginBottom    ((:spacing theme) 1.0)
                                                       :height          (- card-height
                                                                           ;; minus header and header padding
                                                                           (* 0.1 card-height)
@@ -60,7 +62,7 @@
                                                                           ;; minus content padding
                                                                           (* 2 ((:spacing theme) 2.0))
                                                                           ;; minus content margin
-                                                                          (* 2 ((:spacing theme) 1.0))
+                                                                          ((:spacing theme) 1.0)
                                                                           ;; Actual border
                                                                           ((:spacing theme) 1.0))
                                                       :display         "flex"
