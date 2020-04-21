@@ -31,27 +31,44 @@
 
 (def styles (makeStyles (fn [theme]
                           (let [theme (->clj theme)
-                                card-width 200
+                                card-width 311
+                                card-height (* 1.5 card-width)
                                 next-button-height 60
                                 next-button-margin ((:spacing theme) 1.0) ]
                             #js {:app            #js {#_#_:fontFamily "'Comic Neueu', cursive"}
-                                 :card           #js {:textAlign       "center"
+                                 :deck           #js {}
+                                 :tinder-card    #js {:position "absolute"
+                                                      :top      0
+                                                      :bottom   0
+                                                      :left     0
+                                                      :right    0}
+                                 :card           #js {:backgroundColor "#8e2dfc" ;; 27c4a8
+                                                      :textAlign       "center"
                                                       :marginLeft      "auto"
                                                       :marginRight     "auto"
-                                                      :marginTop       (str (* card-width 0.33) "px")
-                                                      :marginBottom    (str (* card-width 0.33 0.5) "px")
-                                                      :width           (str card-width "px")
-                                                      :height          (str (* card-width 1.5) "px")
-                                                      :backgroundColor "#8e2dfc"} ;; 27c4a8
-                                 :card-header    #js {:color "white"}
+                                                      :marginTop       ((:spacing theme) 4.0)
+                                                      :width           card-width
+                                                      :height          card-height}
+                                 :card-header    #js {:color "white"
+                                                      :height (* 0.1 card-height)
+                                                      :padding ((:spacing theme) 2.0)}
                                  :card-content   #js {:backgroundColor "white"
-                                                      :paddingLeft     0
-                                                      :paddingRight    0
-                                                      :marginLeft      ((:spacing theme) 1.0)
-                                                      :marginRight     ((:spacing theme) 1.0)
-                                                      ;; Would be better to have dynamic bottom border rather than hardcoded height
-                                                      ;; :marginBottom ((:spacing theme) 1.0)
-                                                      :height          (- card-width 12)}
+                                                      :padding         ((:spacing theme) 2.0)
+                                                      :margin          ((:spacing theme) 1.0)
+                                                      :height          (- card-height
+                                                                          ;; minus header and header padding
+                                                                          (* 0.1 card-height)
+                                                                          (* 2 ((:spacing theme) 2.0))
+                                                                          ;; minus content padding
+                                                                          (* 2 ((:spacing theme) 2.0))
+                                                                          ;; minus content margin
+                                                                          (* 2 ((:spacing theme) 1.0))
+                                                                          ;; Actual border
+                                                                          ((:spacing theme) 1.0))
+                                                      :display         "flex"
+                                                      :flexDirection   "column"
+                                                      :justifyContent  "space-evenly"}
+
                                  :taboo          #js {:marginTop    ((:spacing theme) 1.5)
                                                       :marginBottom ((:spacing theme) 1.5)}
                                  :next-button    #js {:height (str next-button-height "px")
@@ -123,15 +140,25 @@
 
         reviewing? (< t (count history))]
     (d/div {:className (:app classes)}
-           (d/div nil "AAA")
-           (RE TinderCard {:preventSwipe     #js ["up" "down"]
-                           :onSwipe          (fn [direction]
-                                               (prn (str "swiped " direction)))
-                           :onCardLeftScreen (fn []
-                                               (prn "card left screen"))}
-               (CE card {:classes classes
-                         :target  target
-                         :taboo   taboo}))
+           (d/div {:className (:deck classes)}
+                  (RE TinderCard {:className (:tinder-card classes)
+                                  :preventSwipe     #js ["up" "down"]
+                                  :onSwipe          (fn [direction]
+                                                      (prn (str "swiped " direction)))
+                                  :onCardLeftScreen (fn []
+                                                      (prn "card left screen"))}
+                      (CE card {:classes classes
+                                :target  target
+                                :taboo   taboo}))
+                  (RE TinderCard {:className (:tinder-card classes)
+                                  :preventSwipe     #js ["up" "down"]
+                                  :onSwipe          (fn [direction]
+                                                      (prn (str "swiped " direction)))
+                                  :onCardLeftScreen (fn []
+                                                      (prn "card left screen"))}
+                      (CE card {:classes classes
+                                :target  target
+                                :taboo   taboo})))
            #_(d/div {:style #js {:display        "flex"
                                :justifyContent "space-between"}}
                   (CE history-button {:direction  :backward
