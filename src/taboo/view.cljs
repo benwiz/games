@@ -23,8 +23,10 @@
 
 (def styles (makeStyles (fn [theme]
                           (let [theme (->clj theme)
-                                card-width 200]
-                            #js {:app            #js {:fontFamily "Roboto"}
+                                card-width 200
+                                next-button-height 60
+                                next-button-margin ((:spacing theme) 1.0) ]
+                            #js {:app            #js {:fontFamily "'Comic Neueu', cursive"}
                                  :card           #js {:textAlign       "center"
                                                       :marginLeft      "auto"
                                                       :marginRight     "auto"
@@ -42,18 +44,21 @@
                                                       ;; Would be better to have dynamic bottom border rather than hardcoded height
                                                       ;; :marginBottom ((:spacing theme) 1.0)
                                                       :height          (- card-width 12)}
-                                 :taboo          #js {:marginTop    ((:spacing theme) 2.0)
-                                                      :marginBottom ((:spacing theme) 2.0)}
-                                 :next-button    #js {:height "60px"
-                                                      :margin ((:spacing theme) 1.0)}
-                                 :history-button #js {#_#_:height "264px"
+                                 :taboo          #js {:marginTop    ((:spacing theme) 1.5)
+                                                      :marginBottom ((:spacing theme) 1.5)}
+                                 :next-button    #js {:height (str next-button-height "px")
+                                                      :margin next-button-margin}
+                                 :history-button #js {:height (str (+ (* next-button-height 3) (* next-button-margin 4)) "px")
                                                       :margin ((:spacing theme) 1.0)}}))))
 
 (defn card
   [{:keys [classes target taboo]}]
   (RE Card {:className (:card classes)}
       (RE CardHeader {:className (:card-header classes)
-                      :title     (str/upper-case target)})
+                      :title     (str/upper-case target)
+                      ;; If I want to use same font as other text.
+                      ;; Alternatively, and better, is to pass in titleTypographyProps
+                      #_#_:disableTypography true})
       (RE CardContent {:className (:card-content classes)}
           (into []
                 (map #(d/div {:key       %
