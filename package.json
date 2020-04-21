@@ -12,6 +12,7 @@
     "@material-ui/styles": "^4.9.10",
     "create-react-class": "^15.6.2",
     "dom-helpers": "^5.1.4",
+    "p-sleep": "^1.1.0",
     "react": "^16.8.6",
     "react-dom": "^16.8.6",
     "react-wired-elements": "^0.1.4",

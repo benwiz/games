@@ -10,6 +10,7 @@
    ["@material-ui/icons/Clear" :default ClearIcon]
    ["@material-ui/icons/FastForward" :default FastForwardIcon]
    ["@material-ui/icons/FastRewind" :default FastRewindIcon]
+   ["./react-tinder-card" :refer [TinderCard]]
    ["react" :as react]
    [clojure.string :as str]
    [cljs-bean.core :refer [->clj]]
@@ -17,10 +18,12 @@
    [crinkle.dom :as d]
    [taboo.words :as w]))
 
+(prn TinderCard)
+
 ;; TODO ready screen
 ;; TODO timer
 ;; TODO finish screen
-;; TODO toggle colorsl
+;; TODO toggle colors
 
 ;; Card visual reference https://www.bestchoicereviews.org/wp-content/uploads/2014/12/taboo-card-and-board-games.jpg
 
@@ -120,10 +123,16 @@
 
         reviewing? (< t (count history))]
     (d/div {:className (:app classes)}
-           (CE card {:classes classes
-                     :target  target
-                     :taboo   taboo})
-           (d/div {:style #js {:display        "flex"
+           (d/div nil "AAA")
+           (RE TinderCard {:preventSwipe     #js ["up" "down"]
+                           :onSwipe          (fn [direction]
+                                               (prn (str "swiped " direction)))
+                           :onCardLeftScreen (fn []
+                                               (prn "card left screen"))}
+               (CE card {:classes classes
+                         :target  target
+                         :taboo   taboo}))
+           #_(d/div {:style #js {:display        "flex"
                                :justifyContent "space-between"}}
                   (CE history-button {:direction  :backward
                                       :classes    classes
