@@ -17,6 +17,11 @@
    [crinkle.dom :as d]
    [taboo.words :as w]))
 
+;; TODO ready screen
+;; TODO timer
+;; TODO finish screen
+;; TODO toggle colors
+
 ;; Card visual reference https://www.bestchoicereviews.org/wp-content/uploads/2014/12/taboo-card-and-board-games.jpg
 
 (def word-count (dec (count w/words))) ;; minus 1 because the "done" hack

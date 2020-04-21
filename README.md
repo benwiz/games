@@ -31,5 +31,4 @@ Run `C-c C-x j s` which will start a shadow cljs repl based on the `.dir-local.e
 
 - Release script should clean all main.XXX.js files that are not the current one
 - figure out how to not need dev.html
-- Return to using versioned js files. maybe.
-- Switch to wired-elements but could not get to import
+- tried to use wired-elements but had a horrible time trying to get it to import
