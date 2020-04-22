@@ -9,6 +9,7 @@
                       :modules           {:main {:entries [taboo.core]}}
                       :devtools          {:before-load taboo.core/stop
                                           :after-load  taboo.core/start
+                                          :repl-pprint true
                                           :http-root   "docs"
                                           :http-port   8700
                                           :preloads    [devtools.preload]}}}}

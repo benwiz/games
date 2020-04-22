@@ -175,7 +175,7 @@ const TinderCard = ({ flickOnSwipe = true, children, onSwipe, onCardLeftScreen, 
       if (mouseIsClicked) {
         const newLocation = dragableTouchmove(mouseCoordinatesFromEvent(ev), element, offset, lastLocation)
         speed = calcSpeed(lastLocation, newLocation)
-        lastLocation = newLocationplre
+        lastLocation = newLocation
       }
     })
 

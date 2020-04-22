@@ -18,56 +18,66 @@
    [crinkle.dom :as d]
    [taboo.words :as w]))
 
+;; TODO toggle colors randomly
+;; TODO history explorer
+;; TODO rotate cards to it looks like a stack
+;; TODO visually prepare next card when swiping top card
 ;; TODO ready screen
 ;; TODO timer
 ;; TODO finish screen
-;; TODO toggle colors
+;; TODO toggle colors based on team
 
 ;; Card visual reference https://www.bestchoicereviews.org/wp-content/uploads/2014/12/taboo-card-and-board-games.jpg
 
-(def word-count (dec (count w/words))) ;; minus 1 because the "done" hack
+(def dev-words
+  [["A" "a" "a" "a" "a"]
+   ["B" "b" "b" "b" "b"]
+   ["C" "c" "c" "c" "c"]
+   ["D" "d" "d" "d" "d"]
+   ["E" "e" "e" "e" "e"]])
 
 (def styles (makeStyles (fn [theme]
-                          (let [theme (->clj theme)
-                                card-width 311
-                                card-height (* 1.5 card-width)
+                          (let [theme              (->clj theme)
+                                card-width         311
+                                card-height        (* 1.5 card-width)
                                 next-button-height 60
                                 next-button-margin ((:spacing theme) 1.0) ]
-                            #js {:app            #js {:fontFamily "'Comic Neueu', cursive"}
-                                 :deck           #js {}
-                                 :tinder-card    #js {:position "absolute"
-                                                      :top      0
-                                                      :bottom   0
-                                                      :left     0
-                                                      :right    0}
-                                 :card           #js {:backgroundColor "#8e2dfc" ;; 27c4a8
-                                                      :textAlign       "center"
-                                                      :marginLeft      "auto"
-                                                      :marginRight     "auto"
-                                                      :marginTop       ((:spacing theme) 4.0)
-                                                      :width           card-width
-                                                      :height          card-height}
-                                 :card-header    #js {:color "white"
-                                                      :height (* 0.1 card-height)
-                                                      :padding ((:spacing theme) 2.0)}
-                                 :card-content   #js {:backgroundColor "white"
-                                                      :padding         ((:spacing theme) 2.0)
-                                                      :marginLeft      ((:spacing theme) 1.0)
-                                                      :marginRight     ((:spacing theme) 1.0)
-                                                      :marginBottom    ((:spacing theme) 1.0)
-                                                      :height          (- card-height
-                                                                          ;; minus header and header padding
-                                                                          (* 0.1 card-height)
-                                                                          (* 2 ((:spacing theme) 2.0))
-                                                                          ;; minus content padding
-                                                                          (* 2 ((:spacing theme) 2.0))
-                                                                          ;; minus content margin
-                                                                          ((:spacing theme) 1.0)
-                                                                          ;; Actual border
-                                                                          ((:spacing theme) 1.0))
-                                                      :display         "flex"
-                                                      :flexDirection   "column"
-                                                      :justifyContent  "space-evenly"}
+                            #js {:app          #js {:fontFamily "'Walter Turncoat', cursive"}
+                                 :deck         #js {}
+                                 :tinder-card  #js {:position "absolute"
+                                                    :top      0
+                                                    :bottom   0
+                                                    :left     0
+                                                    :right    0}
+                                 :card         #js {:textAlign       "center"
+                                                    :backgroundColor "#8e2dfc"
+                                                    ;; :backgroundColor "#27c4a8"
+                                                    :marginLeft      "auto"
+                                                    :marginRight     "auto"
+                                                    :marginTop       ((:spacing theme) 4.0)
+                                                    :width           card-width
+                                                    :height          card-height}
+                                 :card-header  #js {:color   "white"
+                                                    :height  (* 0.1 card-height)
+                                                    :padding ((:spacing theme) 2.0)}
+                                 :card-content #js {:backgroundColor "white"
+                                                    :padding         ((:spacing theme) 2.0)
+                                                    :marginLeft      ((:spacing theme) 1.0)
+                                                    :marginRight     ((:spacing theme) 1.0)
+                                                     :marginBottom    ((:spacing theme) 1.0)
+                                                    :height          (- card-height
+                                                                        ;; minus header and header padding
+                                                                        (* 0.1 card-height)
+                                                                        (* 2 ((:spacing theme) 2.0))
+                                                                        ;; minus content padding
+                                                                        (* 2 ((:spacing theme) 2.0))
+                                                                        ;; minus content margin
+                                                                        ((:spacing theme) 1.0)
+                                                                        ;; Actual border
+                                                                        ((:spacing theme) 1.0))
+                                                    :display         "flex"
+                                                    :flexDirection   "column"
+                                                    :justifyContent  "space-evenly"}
 
                                  :taboo          #js {:marginTop    ((:spacing theme) 1.5)
                                                       :marginBottom ((:spacing theme) 1.5)}
@@ -76,52 +86,19 @@
                                  :history-button #js {:height (str (+ (* next-button-height 3) (* next-button-margin 4)) "px")
                                                       :margin ((:spacing theme) 1.0)}}))))
 
-(defn card
-  [{:keys [classes target taboo]}]
-  (RE Card {:className (:card classes)}
-      (RE CardHeader {:className (:card-header classes)
-                      :title     (str/upper-case target)
-                      ;; If I want to use same font as other text.
-                      ;; Alternatively, and better, is to pass in titleTypographyProps
-                      #_#_:disableTypography true})
-      (RE CardContent {:className (:card-content classes)}
-          (into []
-                (map #(d/div {:key       %
-                              :className (:taboo classes)}
-                             (str/upper-case %)))
-                taboo))))
-
-(defn swipe-card
-  [{:keys [classes target taboo swipe]}]
-  (RE TinderCard {:key              target
-                  :className        (:tinder-card classes)
-                  :preventSwipe     #js ["up" "down"]
-                  :onSwipe          swipe
-                  :onCardLeftScreen (fn []
-                                      (prn "card left screen"))}
-      (CE card {:classes classes
-                :target  target
-                :taboo   taboo})))
-
-(defn deck
-  [{:keys [classes _target _taboo _swipe] :as args}]
-  (let [[cards setCard] (react/useState [(CE swipe-card args) (CE swipe-card args)])]
-    (d/div {:className (:deck classes)}
-           cards)))
-
 (defn history-button
   [{:keys [classes direction t history setHistory]}]
   (assert (#{:backward :forward} direction) "direction must be either backward or forward")
   (RE Button {:className (:history-button classes)
-              :variant  "outlined"
-              :disabled (case direction
-                          :backward (<= t 0)
-                          :forward  false)
-              :onClick  (fn [_e]
-                          (setHistory {:t       (case direction
-                                                  :backward (dec t)
-                                                  :forward  (inc t))
-                                       :history history}))}
+              :variant   "outlined"
+              :disabled  (case direction
+                           :backward (<= t 0)
+                           :forward  false)
+              :onClick   (fn [_e]
+                           (setHistory {:t       (case direction
+                                                   :backward (dec t)
+                                                   :forward  (inc t))
+                                        :history history}))}
       (case direction
         :backward (RE FastRewindIcon nil)
         :forward  (RE FastForwardIcon nil))))
@@ -144,54 +121,63 @@
         :skip    (RE RedoIcon nil)
         :wrong   (RE ClearIcon nil))))
 
+(defn card
+  [{:keys [classes target taboo]}]
+  (RE Card {:className (:card classes)}
+      (RE CardHeader {:className             (:card-header classes)
+                      :title                 (str/upper-case target)
+                      ;; If I want to use same font as other text.
+                      ;; Alternatively, and better, is to pass in titleTypographyProps
+                      #_#_:disableTypography true})
+      (RE CardContent {:className (:card-content classes)}
+          (into []
+                (map #(d/div {:key       %
+                              :className (:taboo classes)}
+                             (str/upper-case %)))
+                taboo))))
+
+(defn swipe-card
+  [{:keys [classes target taboo setT]}]
+  (RE TinderCard {:key              target
+                  :className        (:tinder-card classes)
+                  :preventSwipe     #js ["up" "down"]
+                  :onSwipe          identity ;; (fn [direction] (prn "dir" direction))
+                  :onCardLeftScreen (fn []
+                                      (prn "left screen")
+                                      (setT inc))}
+      (CE card {:classes classes
+                :target  target
+                :taboo   taboo})))
+
+(defn deck
+  [{:keys [classes wordsets setT]}]
+  (d/div {:className (:deck classes)}
+         (into []
+               (map (fn [[target & taboo]]
+                      (CE swipe-card {:classes classes
+                                      :target  target
+                                      :taboo   taboo
+                                      :setT    setT}
+                          :key target)))
+               wordsets)))
+
+(defn game
+  [{:keys [classes]}]
+  (let [[t setT]               (react/useState 0)
+        excess                 5
+        [wordsets setWordsets] (react/useState (reverse (take excess w/words)))]
+    ;; (prn (into [] (map first) wordsets))
+    (react/useEffect (fn []
+                       (setWordsets (reverse (take (+ t excess) w/words)))
+                       js/undefined)
+                     #js[t])
+    (d/div {:className (:game classes)}
+           (CE deck {:classes  classes
+                     :wordsets wordsets
+                     :setT     setT}))))
+
 (defn app
   []
-  (let [classes (->clj (styles))
-
-        ;; Track place (t) in deck and history of what happened
-        [{:keys [t history]} setHistory] (react/useState {:t 0 :history []})
-
-        ;; Get current word
-        wordset (nth w/words t)
-        target  (first wordset)
-        taboo   (rest wordset)
-
-        reviewing? (< t (count history))]
-    (d/div {:className (:app classes)}
-           (CE deck {:classes classes
-                     :target  target
-                     :taboo   taboo
-                     :swipe   (fn [direction]
-                                (prn (str "Swiped: " direction)))})
-           #_(d/div {:style #js {:display        "flex"
-                               :justifyContent "space-between"}}
-                  (CE history-button {:direction  :backward
-                                      :classes    classes
-                                      :t          t
-                                      :history    history
-                                      :setHistory setHistory})
-                  (when reviewing?
-                    (CE history-button {:direction  :forward
-                                        :classes    classes
-                                        :t          t
-                                        :history    history
-                                        :setHistory setHistory}))
-                  (when-not reviewing?
-                    (d/div {:style #js {:display       "flex"
-                                        :flexDirection "column"}}
-                           (CE next-button {:classes    classes
-                                            :event      :correct
-                                            :t          t
-                                            :history    history
-                                            :setHistory setHistory})
-                           (CE next-button {:classes    classes
-                                            :event      :skip
-                                            :t          t
-                                            :history    history
-                                            :setHistory setHistory})
-                           (CE next-button {:classes    classes
-                                            :event      :wrong
-                                            :disabled   (< t (count history))
-                                            :t          t
-                                            :history    history
-                                            :setHistory setHistory})))))))
+  (let [classes (->clj (styles))]
+    (d/div nil
+           (CE game {:classes classes}))))
