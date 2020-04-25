@@ -19,13 +19,13 @@
    [taboo.words :as w]))
 
 ;; TODO toggle colors randomly
-;; TODO history explorer
 ;; TODO rotate cards to it looks like a stack
 ;; TODO visually prepare next card when swiping top card
 ;; TODO ready screen
 ;; TODO timer
-;; TODO finish screen
+;; TODO finish screen (should show all wordsets during this turn, netagtes need for history explorer)
 ;; TODO toggle colors based on team
+;; TODO history explorer (probably don't need)
 
 ;; Card visual reference https://www.bestchoicereviews.org/wp-content/uploads/2014/12/taboo-card-and-board-games.jpg
 
@@ -49,14 +49,12 @@
                                                     :bottom   0
                                                     :left     0
                                                     :right    0}
-                                 :card         #js {:textAlign       "center"
-                                                    :backgroundColor "#8e2dfc"
-                                                    ;; :backgroundColor "#27c4a8"
-                                                    :marginLeft      "auto"
-                                                    :marginRight     "auto"
-                                                    :marginTop       ((:spacing theme) 4.0)
-                                                    :width           card-width
-                                                    :height          card-height}
+                                 :card         #js {:textAlign   "center"
+                                                    :marginLeft  "auto"
+                                                    :marginRight "auto"
+                                                    :marginTop   ((:spacing theme) 4.0)
+                                                    :width       card-width
+                                                    :height      card-height}
                                  :card-header  #js {:color   "white"
                                                     :height  (* 0.1 card-height)
                                                     :padding ((:spacing theme) 2.0)}
@@ -64,7 +62,7 @@
                                                     :padding         ((:spacing theme) 2.0)
                                                     :marginLeft      ((:spacing theme) 1.0)
                                                     :marginRight     ((:spacing theme) 1.0)
-                                                     :marginBottom    ((:spacing theme) 1.0)
+                                                    :marginBottom    ((:spacing theme) 1.0)
                                                     :height          (- card-height
                                                                         ;; minus header and header padding
                                                                         (* 0.1 card-height)
@@ -81,10 +79,21 @@
 
                                  :taboo          #js {:marginTop    ((:spacing theme) 1.5)
                                                       :marginBottom ((:spacing theme) 1.5)}
+                                 :purple         #js {:backgroundColor "#8e2dfc"}
+                                 :green          #js {:backgroundColor "#27c4a8"}
                                  :next-button    #js {:height (str next-button-height "px")
                                                       :margin next-button-margin}
                                  :history-button #js {:height (str (+ (* next-button-height 3) (* next-button-margin 4)) "px")
                                                       :margin ((:spacing theme) 1.0)}}))))
+
+(defn classname
+  [classes classnames]
+  (let [classnames (if (vector? classnames)
+                     classnames
+                     (vector classnames))]
+    (str/join " " (into []
+                        (map #(get classes %))
+                        classnames))))
 
 (defn history-button
   [{:keys [classes direction t history setHistory]}]
@@ -123,7 +132,9 @@
 
 (defn card
   [{:keys [classes target taboo]}]
-  (RE Card {:className (:card classes)}
+  (RE Card {:className (classname classes [:card (if (even? (count target))
+                                                   :purple
+                                                   :green)])}
       (RE CardHeader {:className             (:card-header classes)
                       :title                 (str/upper-case target)
                       ;; If I want to use same font as other text.
