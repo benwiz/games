@@ -18,7 +18,6 @@
    [crinkle.dom :as d]
    [taboo.words :as w]))
 
-;; TODO toggle colors randomly
 ;; TODO rotate cards to it looks like a stack
 ;; TODO visually prepare next card when swiping top card
 ;; TODO ready screen
@@ -176,16 +175,32 @@
   [{:keys [classes]}]
   (let [[t setT]               (react/useState 0)
         excess                 5
-        [wordsets setWordsets] (react/useState (reverse (take excess w/words)))]
-    ;; (prn (into [] (map first) wordsets))
+        [wordsets setWordsets] (react/useState (reverse (take excess w/words)))
+        [timer setTimer]       (react/useState 65)]
+
+    ;; t triggers wordsets update
     (react/useEffect (fn []
                        (setWordsets (reverse (take (+ t excess) w/words)))
                        js/undefined)
                      #js[t])
+
+    ;; countdown timer
+    (react/useEffect (fn []
+                       (let [interval (js/setInterval
+                                        (fn []
+                                          (setTimer dec))
+                                        1000)]
+                         (fn []
+                           (js/clearInterval interval))))
+                     #js[])
+
     (d/div {:className (:game classes)}
            (CE deck {:classes  classes
                      :wordsets wordsets
-                     :setT     setT}))))
+                     :setT     setT})
+           (let [minutes (int (/ timer 60))
+                 seconds (mod timer 60)]
+             (d/span nil (str minutes ":" seconds))))))
 
 (defn app
   []
