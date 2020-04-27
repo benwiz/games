@@ -155,28 +155,31 @@
                              (str/upper-case %)))
                 taboo))))
 
+(defn start-card
+  [{:keys [classes]}]
+  (RE Card {:className (classname classes [:blue])}))
+
 (defn swipe-card
-  [{:keys [classes target taboo setT]}]
-  (RE TinderCard {:key              target
-                  :className        (:tinder-card classes)
+  [{:keys [classes setT child-card]}]
+  (RE TinderCard {:className        (:tinder-card classes)
                   :preventSwipe     #js ["up" "down"]
                   :onSwipe          identity ;; (fn [direction] (prn "dir" direction))
                   :onCardLeftScreen (fn []
                                       (prn "left screen")
                                       (setT inc))}
-      (CE card {:classes classes
-                :target  target
-                :taboo   taboo})))
+      child-card))
 
 (defn deck
   [{:keys [classes wordsets setT]}]
   (d/div {:className (:deck classes)}
          (into []
                (map (fn [[target & taboo]]
+                      ;; TODO pass in child card
                       (CE swipe-card {:classes classes
-                                      :target  target
-                                      :taboo   taboo
-                                      :setT    setT}
+                                      :setT    setT
+                                      :child-card (CE card {:classes classes
+                                                            :target  target
+                                                            :taboo   taboo})}
                           :key target)))
                wordsets)))
 
