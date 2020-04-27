@@ -20,13 +20,12 @@
    [goog.string.format]
    [taboo.words :as w]))
 
+;; TODO ready screen
+;; TODO finish screen (should show all wordsets during this turn, netagtes need for history explorer)
 ;; TODO rotate cards to it looks like a stack
 ;; TODO visually prepare next card when swiping top card
-;; TODO ready screen
-;; TODO timer
-;; TODO finish screen (should show all wordsets during this turn, netagtes need for history explorer)
 ;; TODO toggle colors based on team
-;; TODO history explorer (probably don't need)
+;; TODO history explorer, only if necessary, probably isn't. If I decide it's not, write a note.
 
 ;; Card visual reference https://www.bestchoicereviews.org/wp-content/uploads/2014/12/taboo-card-and-board-games.jpg
 
@@ -43,8 +42,8 @@
                                 card-height        (* 1.5 card-width)
                                 next-button-height 60
                                 next-button-margin ((:spacing theme) 1.0)]
-                            #js {:app          #js {:fontFamily "'Walter Turncoat', cursive"
-                                                    :dispaly "flex"
+                            #js {:app          #js {:fontFamily    "'Walter Turncoat', cursive"
+                                                    :dispaly       "flex"
                                                     :flexDirection "column"}
                                  :deck         #js {:marginTop ((:spacing theme) 4.0)
                                                     :width     card-width
@@ -86,9 +85,13 @@
                                                       :marginBottom ((:spacing theme) 1.5)}
                                  :purple         #js {:backgroundColor "#8e2dfc"}
                                  :green          #js {:backgroundColor "#27c4a8"}
+                                 :blue           #js {:backgroundColor "dodgerblue"}
+                                 :front          #js {:zIndex -1}
                                  :clock          #js {:textAlign "center"
                                                       :margin ((:spacing theme) 4.0)}
                                  :clock-span     #js {:fontSize 24} ;; TODO look into using (:typography theme)
+                                 :invisible      #js {:visibility "hidden"}
+                                 :display-none   #js {:display "none"}
                                  :next-button    #js {:height (str next-button-height "px")
                                                       :margin next-button-margin}
                                  :history-button #js {:height (str (+ (* next-button-height 3) (* next-button-margin 4)) "px")
@@ -140,9 +143,11 @@
 
 (defn card
   [{:keys [classes target taboo]}]
-  (RE Card {:className (classname classes [:card (if (even? (count target))
-                                                   :purple
-                                                   :green)])}
+  (RE Card {:className (classname classes [:card (if (= target "Ready?")
+                                                   :blue
+                                                   (if (even? (count target))
+                                                     :purple
+                                                     :green))])}
       (RE CardHeader {:className             (:card-header classes)
                       :title                 (str/upper-case target)
                       ;; If I want to use same font as other text.
@@ -160,34 +165,32 @@
   (RE Card {:className (classname classes [:blue])}))
 
 (defn swipe-card
-  [{:keys [classes setT child-card]}]
-  (RE TinderCard {:className        (:tinder-card classes)
+  [{:keys [classname child-card on-card-left-screen]}]
+  (RE TinderCard {:className        classname
                   :preventSwipe     #js ["up" "down"]
-                  :onSwipe          identity ;; (fn [direction] (prn "dir" direction))
-                  :onCardLeftScreen (fn []
-                                      (prn "left screen")
-                                      (setT inc))}
+                  :onSwipe          identity ;; function required
+                  :onCardLeftScreen on-card-left-screen}
       child-card))
 
 (defn deck
-  [{:keys [classes wordsets setT]}]
-  (d/div {:className (:deck classes)}
+  [{:keys [classes extra-classes wordsets setT]}]
+  (d/div {:className (str (:deck classes) " " extra-classes)}
          (into []
                (map (fn [[target & taboo]]
-                      ;; TODO pass in child card
-                      (CE swipe-card {:classes classes
-                                      :setT    setT
-                                      :child-card (CE card {:classes classes
-                                                            :target  target
-                                                            :taboo   taboo})}
+                      (CE swipe-card {:classname           (classname classes [:tinder-card])
+                                      :on-card-left-screen (fn []
+                                                             (setT inc))
+                                      :child-card          (CE card {:classes classes
+                                                                     :target  target
+                                                                     :taboo   taboo})}
                           :key target)))
                wordsets)))
 
 (defn clock
-  [{:keys [classes timer]}]
+  [{:keys [classes extra-classes timer]}]
   (let [minutes (int (/ timer 60))
         seconds (mod timer 60)]
-    (d/div {:className (:clock classes)}
+    (d/div {:className (str (:clock classes) " " extra-classes)}
            (d/span {:className (:clock-span classes)}
                    (str minutes ":" (gstr/format "%02d" seconds))))))
 
@@ -196,12 +199,16 @@
   (let [[t setT]               (react/useState 0)
         excess                 5
         [wordsets setWordsets] (react/useState (reverse (take excess w/words)))
-        [timer setTimer]       (react/useState 3)]
+        [timer setTimer]       (react/useState 0)
+        game-seconds           5]
+    ;; (prn (into [] (map first) wordsets))
+    ;; (prn "t:" t)
+    ;; (prn "timer:" timer)
 
     ;; t triggers wordsets update
     (react/useEffect (fn []
                        (setWordsets (reverse (take (+ t excess) w/words)))
-                       js/undefined)
+                       (constantly nil))
                      #js[t])
 
     ;; countdown timer
@@ -209,19 +216,32 @@
                        (let [interval (js/setInterval
                                         (fn []
                                           (setTimer (fn [x]
-                                                      (when (> x 0)
-                                                        (dec x)))))
+                                                      (if (> x 0)
+                                                        (dec x)
+                                                        0))))
                                         1000)]
                          (fn []
                            (js/clearInterval interval))))
                      #js[])
 
     (d/div {:className (:game classes)}
-           (CE deck {:classes  classes
-                     :wordsets wordsets
-                     :setT     setT})
-           (CE clock {:classes classes
-                      :timer   timer}))))
+           ;; Using a when outside of swipe-card causes it to entirely re-render since the
+           ;; old one would be off screen if it still existed. If I rewrite the js swiping lib
+           ;; I can fix that.
+           (when (zero? timer)
+             (CE swipe-card {:classname           (classname classes [:tinder-card :front])
+                             :on-card-left-screen (fn []
+                                                    (setTimer game-seconds))
+                             :child-card          (CE card {:classes classes
+                                                            :target  "Ready?"
+                                                            :taboo   ["Swipe to begin"]})}))
+           (CE deck {:classes       classes
+                     :extra-classes (when (zero? timer) (:display-none classes))
+                     :wordsets      wordsets
+                     :setT          setT})
+           (CE clock {:classes       classes
+                      :extra-classes (when (zero? timer) (:invisible classes))
+                      :timer         timer}))))
 
 (defn app
   []
