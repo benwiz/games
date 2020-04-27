@@ -1,21 +1,23 @@
 (ns taboo.view
   (:require
+   ["./react-tinder-card" :refer [TinderCard]]
    ["@material-ui/core/Button" :default Button]
    ["@material-ui/core/Card" :default Card]
-   ["@material-ui/core/CardHeader" :default CardHeader]
    ["@material-ui/core/CardContent" :default CardContent]
+   ["@material-ui/core/CardHeader" :default CardHeader]
    ["@material-ui/core/styles/makeStyles" :default makeStyles]
    ["@material-ui/icons/Check" :default CheckIcon]
-   ["@material-ui/icons/Redo" :default RedoIcon]
    ["@material-ui/icons/Clear" :default ClearIcon]
    ["@material-ui/icons/FastForward" :default FastForwardIcon]
    ["@material-ui/icons/FastRewind" :default FastRewindIcon]
-   ["./react-tinder-card" :refer [TinderCard]]
+   ["@material-ui/icons/Redo" :default RedoIcon]
    ["react" :as react]
-   [clojure.string :as str]
    [cljs-bean.core :refer [->clj]]
+   [clojure.string :as str]
    [crinkle.component :refer [CE RE]]
    [crinkle.dom :as d]
+   [goog.string :as gstr]
+   [goog.string.format]
    [taboo.words :as w]))
 
 ;; TODO rotate cards to it looks like a stack
@@ -40,9 +42,13 @@
                                 card-width         311
                                 card-height        (* 1.5 card-width)
                                 next-button-height 60
-                                next-button-margin ((:spacing theme) 1.0) ]
-                            #js {:app          #js {:fontFamily "'Walter Turncoat', cursive"}
-                                 :deck         #js {}
+                                next-button-margin ((:spacing theme) 1.0)]
+                            #js {:app          #js {:fontFamily "'Walter Turncoat', cursive"
+                                                    :dispaly "flex"
+                                                    :flexDirection "column"}
+                                 :deck         #js {:marginTop ((:spacing theme) 4.0)
+                                                    :width     card-width
+                                                    :height    card-height}
                                  :tinder-card  #js {:position "absolute"
                                                     :top      0
                                                     :bottom   0
@@ -80,6 +86,9 @@
                                                       :marginBottom ((:spacing theme) 1.5)}
                                  :purple         #js {:backgroundColor "#8e2dfc"}
                                  :green          #js {:backgroundColor "#27c4a8"}
+                                 :clock          #js {:textAlign "center"
+                                                      :margin ((:spacing theme) 4.0)}
+                                 :clock-span     #js {:fontSize 24} ;; TODO look into using (:typography theme)
                                  :next-button    #js {:height (str next-button-height "px")
                                                       :margin next-button-margin}
                                  :history-button #js {:height (str (+ (* next-button-height 3) (* next-button-margin 4)) "px")
@@ -171,12 +180,20 @@
                           :key target)))
                wordsets)))
 
+(defn clock
+  [{:keys [classes timer]}]
+  (let [minutes (int (/ timer 60))
+        seconds (mod timer 60)]
+    (d/div {:className (:clock classes)}
+           (d/span {:className (:clock-span classes)}
+                   (str minutes ":" (gstr/format "%02d" seconds))))))
+
 (defn game
   [{:keys [classes]}]
   (let [[t setT]               (react/useState 0)
         excess                 5
         [wordsets setWordsets] (react/useState (reverse (take excess w/words)))
-        [timer setTimer]       (react/useState 65)]
+        [timer setTimer]       (react/useState 3)]
 
     ;; t triggers wordsets update
     (react/useEffect (fn []
@@ -188,7 +205,9 @@
     (react/useEffect (fn []
                        (let [interval (js/setInterval
                                         (fn []
-                                          (setTimer dec))
+                                          (setTimer (fn [x]
+                                                      (when (> x 0)
+                                                        (dec x)))))
                                         1000)]
                          (fn []
                            (js/clearInterval interval))))
@@ -198,9 +217,8 @@
            (CE deck {:classes  classes
                      :wordsets wordsets
                      :setT     setT})
-           (let [minutes (int (/ timer 60))
-                 seconds (mod timer 60)]
-             (d/span nil (str minutes ":" seconds))))))
+           (CE clock {:classes classes
+                      :timer   timer}))))
 
 (defn app
   []
