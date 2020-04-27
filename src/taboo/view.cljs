@@ -200,7 +200,7 @@
         excess                 5
         [wordsets setWordsets] (react/useState (reverse (take excess w/words)))
         [timer setTimer]       (react/useState 0)
-        game-seconds           5]
+        game-seconds           15]
     ;; (prn (into [] (map first) wordsets))
     ;; (prn "t:" t)
     ;; (prn "timer:" timer)
