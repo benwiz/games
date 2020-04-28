@@ -20,8 +20,8 @@
    [goog.string.format]
    [taboo.words :as w]))
 
-;; TODO ready screen
-;; TODO finish screen (should show all wordsets during this turn, netagtes need for history explorer)
+;; TODO finish screen (should show all wordsets during this turn, netagtes need for history explorer) make full screen with button to discard
+;; TODO cards should be relative to screen size not hardcoded pixels
 ;; TODO rotate cards to it looks like a stack
 ;; TODO visually prepare next card when swiping top card
 ;; TODO toggle colors based on team
@@ -91,6 +91,9 @@
                        :clock          #js {:textAlign "center"
                                             :margin    ((:spacing theme) 4.0)}
                        :clock-span     #js {:fontSize 24} ;; TODO look into using (:typography theme)
+                       :review         #js {:backgroundColor "lightcyan"
+                                            :width "100%"
+                                            :height "100%"}
                        :invisible      #js {:visibility "hidden"}
                        :display-none   #js {:display "none"}
                        :next-button    #js {:height (str next-button-height "px")
@@ -107,7 +110,7 @@
                         (map #(get classes %))
                         classnames))))
 
-(defn history-button
+#_(defn history-button
   [{:keys [classes direction t history setHistory]}]
   (assert (#{:backward :forward} direction) "direction must be either backward or forward")
   (RE Button {:className (:history-button classes)
@@ -124,7 +127,7 @@
         :backward (RE FastRewindIcon nil)
         :forward  (RE FastForwardIcon nil))))
 
-(defn next-button
+#_(defn next-button
   [{:keys [classes event t history setHistory]}]
   (RE Button {:className (:next-button classes)
               :variant   (case event
@@ -141,6 +144,20 @@
         :correct (RE CheckIcon nil)
         :skip    (RE RedoIcon nil)
         :wrong   (RE ClearIcon nil))))
+
+(defn review
+  [{:keys [classes wordsets setReviewing]}]
+  (d/div {:className (:review classes)}
+         (into []
+               (comp
+                 (map (fn [[target & taboo]]
+                        (d/div nil (str target ": " (str/join ", " taboo))))))
+               wordsets)
+         (RE Button {:className ""
+                     :variant   "contained"
+                     :onClick   (fn [_e]
+                                  (setReviewing false))}
+             "Continue")))
 
 (defn card
   [{:keys [classes target taboo]}]
@@ -197,14 +214,17 @@
 
 (defn game
   [{:keys [classes]}]
-  (let [[t setT]               (react/useState 0)
-        excess                 2
+  (let [game-seconds           4
+        excess                 5
+        [t setT]               (react/useState 0)
         [wordsets setWordsets] (react/useState (reverse (take excess w/words)))
         [timer setTimer]       (react/useState 0)
-        game-seconds           61]
+        [turn setTurn]         (react/useState [0 0])
+        [reviewing? setReviewing] (react/useState false)]
     ;; (prn (into [] (map first) wordsets))
     ;; (prn "t:" t)
     ;; (prn "timer:" timer)
+    (prn "turn:" turn)
 
     ;; t triggers wordsets update
     (react/useEffect (fn []
@@ -212,10 +232,15 @@
                        (constantly nil))
                      #js[t])
 
+    ;; skip leftover card when round is over
     (react/useEffect (fn []
                        (when (zero? timer)
+                         ;; this is so janky, should not be setting multiple states like this
                          (setWordsets drop-last)
-                         (setT inc))
+                         (setT inc)
+                         (setTurn (fn [[start end]]
+                                    [end t]))
+                         (setReviewing true))
                        (constantly nil))
                      #js[timer])
 
@@ -243,6 +268,10 @@
                              :child-card          (CE card {:classes classes
                                                             :target  "Ready?"
                                                             :taboo   ["Swipe to begin"]})}))
+           (when (and (zero? timer) reviewing? (pos? (second turn)))
+             (CE review {:classes      classes
+                         :wordsets     (subvec w/words (inc (first turn)) (inc (second turn)))
+                         :setReviewing setReviewing}))
            (CE deck {:classes       classes
                      :extra-classes (when (zero? timer) (:display-none classes))
                      :wordsets      wordsets
