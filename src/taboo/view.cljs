@@ -214,7 +214,7 @@
 
 (defn game
   [{:keys [classes]}]
-  (let [game-seconds           4
+  (let [game-seconds           61
         excess                 5
         [t setT]               (react/useState 0)
         [wordsets setWordsets] (react/useState (reverse (take excess w/words)))
@@ -224,7 +224,7 @@
     ;; (prn (into [] (map first) wordsets))
     ;; (prn "t:" t)
     ;; (prn "timer:" timer)
-    (prn "turn:" turn)
+    ;; (prn "turn:" turn)
 
     ;; t triggers wordsets update
     (react/useEffect (fn []
