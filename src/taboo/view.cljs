@@ -36,66 +36,67 @@
    ["D" "d" "d" "d" "d"]
    ["E" "e" "e" "e" "e"]])
 
-(def styles (makeStyles (fn [theme]
-                          (let [theme              (->clj theme)
-                                card-width         311
-                                card-height        (* 1.5 card-width)
-                                next-button-height 60
-                                next-button-margin ((:spacing theme) 1.0)]
-                            #js {:app          #js {:fontFamily    "'Walter Turncoat', cursive"
-                                                    :dispaly       "flex"
-                                                    :flexDirection "column"}
-                                 :deck         #js {:marginTop ((:spacing theme) 4.0)
-                                                    :width     card-width
-                                                    :height    card-height}
-                                 :tinder-card  #js {:position "absolute"
-                                                    :top      0
-                                                    :bottom   0
-                                                    :left     0
-                                                    :right    0}
-                                 :card         #js {:textAlign   "center"
-                                                    :marginLeft  "auto"
-                                                    :marginRight "auto"
-                                                    :marginTop   ((:spacing theme) 4.0)
-                                                    :width       card-width
-                                                    :height      card-height}
-                                 :card-header  #js {:color   "white"
-                                                    :height  (* 0.1 card-height)
-                                                    :padding ((:spacing theme) 2.0)}
-                                 :card-content #js {:backgroundColor "white"
-                                                    :padding         ((:spacing theme) 2.0)
-                                                    :marginLeft      ((:spacing theme) 1.0)
-                                                    :marginRight     ((:spacing theme) 1.0)
-                                                    :marginBottom    ((:spacing theme) 1.0)
-                                                    :height          (- card-height
-                                                                        ;; minus header and header padding
-                                                                        (* 0.1 card-height)
-                                                                        (* 2 ((:spacing theme) 2.0))
-                                                                        ;; minus content padding
-                                                                        (* 2 ((:spacing theme) 2.0))
-                                                                        ;; minus content margin
-                                                                        ((:spacing theme) 1.0)
-                                                                        ;; Actual border
-                                                                        ((:spacing theme) 1.0))
-                                                    :display         "flex"
-                                                    :flexDirection   "column"
-                                                    :justifyContent  "space-evenly"}
+(def styles
+  (makeStyles (fn [theme]
+                (let [theme              (->clj theme)
+                      card-width         311
+                      card-height        (* 1.5 card-width)
+                      next-button-height 60
+                      next-button-margin ((:spacing theme) 1.0)]
+                  #js {:app          #js {:fontFamily    "'Walter Turncoat', cursive"
+                                          :dispaly       "flex"
+                                          :flexDirection "column"}
+                       :deck         #js {:marginTop ((:spacing theme) 4.0)
+                                          :width     card-width
+                                          :height    card-height}
+                       :tinder-card  #js {:position "absolute"
+                                          :top      0
+                                          :bottom   0
+                                          :left     0
+                                          :right    0}
+                       :card         #js {:textAlign   "center"
+                                          :marginLeft  "auto"
+                                          :marginRight "auto"
+                                          :marginTop   ((:spacing theme) 4.0)
+                                          :width       card-width
+                                          :height      card-height}
+                       :card-header  #js {:color   "white"
+                                          :height  (* 0.1 card-height)
+                                          :padding ((:spacing theme) 2.0)}
+                       :card-content #js {:backgroundColor "white"
+                                          :padding         ((:spacing theme) 2.0)
+                                          :marginLeft      ((:spacing theme) 1.0)
+                                          :marginRight     ((:spacing theme) 1.0)
+                                          :marginBottom    ((:spacing theme) 1.0)
+                                          :height          (- card-height
+                                                              ;; minus header and header padding
+                                                              (* 0.1 card-height)
+                                                              (* 2 ((:spacing theme) 2.0))
+                                                              ;; minus content padding
+                                                              (* 2 ((:spacing theme) 2.0))
+                                                              ;; minus content margin
+                                                              ((:spacing theme) 1.0)
+                                                              ;; Actual border
+                                                              ((:spacing theme) 1.0))
+                                          :display         "flex"
+                                          :flexDirection   "column"
+                                          :justifyContent  "space-evenly"}
 
-                                 :taboo          #js {:marginTop    ((:spacing theme) 1.5)
-                                                      :marginBottom ((:spacing theme) 1.5)}
-                                 :purple         #js {:backgroundColor "#8e2dfc"}
-                                 :green          #js {:backgroundColor "#27c4a8"}
-                                 :blue           #js {:backgroundColor "dodgerblue"}
-                                 :front          #js {:zIndex -1}
-                                 :clock          #js {:textAlign "center"
-                                                      :margin ((:spacing theme) 4.0)}
-                                 :clock-span     #js {:fontSize 24} ;; TODO look into using (:typography theme)
-                                 :invisible      #js {:visibility "hidden"}
-                                 :display-none   #js {:display "none"}
-                                 :next-button    #js {:height (str next-button-height "px")
-                                                      :margin next-button-margin}
-                                 :history-button #js {:height (str (+ (* next-button-height 3) (* next-button-margin 4)) "px")
-                                                      :margin ((:spacing theme) 1.0)}}))))
+                       :taboo          #js {:marginTop    ((:spacing theme) 1.5)
+                                            :marginBottom ((:spacing theme) 1.5)}
+                       :purple         #js {:backgroundColor "#8e2dfc"}
+                       :green          #js {:backgroundColor "#27c4a8"}
+                       :blue           #js {:backgroundColor "dodgerblue"}
+                       :front          #js {:zIndex -1}
+                       :clock          #js {:textAlign "center"
+                                            :margin    ((:spacing theme) 4.0)}
+                       :clock-span     #js {:fontSize 24} ;; TODO look into using (:typography theme)
+                       :invisible      #js {:visibility "hidden"}
+                       :display-none   #js {:display "none"}
+                       :next-button    #js {:height (str next-button-height "px")
+                                            :margin next-button-margin}
+                       :history-button #js {:height (str (+ (* next-button-height 3) (* next-button-margin 4)) "px")
+                                            :margin ((:spacing theme) 1.0)}}))))
 
 (defn classname
   [classes classnames]
