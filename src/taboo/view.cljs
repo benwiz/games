@@ -198,19 +198,26 @@
 (defn game
   [{:keys [classes]}]
   (let [[t setT]               (react/useState 0)
-        excess                 5
+        excess                 2
         [wordsets setWordsets] (react/useState (reverse (take excess w/words)))
         [timer setTimer]       (react/useState 0)
-        game-seconds           15]
+        game-seconds           61]
     ;; (prn (into [] (map first) wordsets))
     ;; (prn "t:" t)
     ;; (prn "timer:" timer)
 
     ;; t triggers wordsets update
     (react/useEffect (fn []
-                       (setWordsets (reverse (take (+ t excess) w/words)))
+                       (setWordsets (reverse (subvec w/words t (+ t excess))))
                        (constantly nil))
                      #js[t])
+
+    (react/useEffect (fn []
+                       (when (zero? timer)
+                         (setWordsets drop-last)
+                         (setT inc))
+                       (constantly nil))
+                     #js[timer])
 
     ;; countdown timer
     (react/useEffect (fn []
