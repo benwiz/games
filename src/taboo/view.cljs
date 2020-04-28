@@ -110,41 +110,6 @@
                         (map #(get classes %))
                         classnames))))
 
-#_(defn history-button
-  [{:keys [classes direction t history setHistory]}]
-  (assert (#{:backward :forward} direction) "direction must be either backward or forward")
-  (RE Button {:className (:history-button classes)
-              :variant   "outlined"
-              :disabled  (case direction
-                           :backward (<= t 0)
-                           :forward  false)
-              :onClick   (fn [_e]
-                           (setHistory {:t       (case direction
-                                                   :backward (dec t)
-                                                   :forward  (inc t))
-                                        :history history}))}
-      (case direction
-        :backward (RE FastRewindIcon nil)
-        :forward  (RE FastForwardIcon nil))))
-
-#_(defn next-button
-  [{:keys [classes event t history setHistory]}]
-  (RE Button {:className (:next-button classes)
-              :variant   (case event
-                           :correct "contained"
-                           "outlined")
-              :color     (case event
-                           :correct "primary"
-                           :skip    "default"
-                           :wrong   "secondary")
-              :onClick   (fn [_e]
-                           (setHistory {:t       (inc t)
-                                        :history (conj history event)}))}
-      (case event
-        :correct (RE CheckIcon nil)
-        :skip    (RE RedoIcon nil)
-        :wrong   (RE ClearIcon nil))))
-
 (defn review
   [{:keys [classes wordsets setReviewing]}]
   (d/div {:className (:review classes)}
@@ -235,7 +200,6 @@
     ;; skip leftover card when round is over
     (react/useEffect (fn []
                        (when (zero? timer)
-                         ;; this is so janky, should not be setting multiple states like this
                          (setWordsets drop-last)
                          (setT inc)
                          (setTurn (fn [[start end]]
