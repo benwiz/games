@@ -20,7 +20,6 @@
    [goog.string.format]
    [taboo.words :as w]))
 
-;; TODO review screen (should show all wordsets during this turn, netagtes need for history explorer) make full screen with button to discard
 ;; TODO can I do a floating, arrow down to show to scroll on the review panel?
 ;; TODO rotate cards to it looks like a stack
 ;; TODO after rotating cards, visually prepare next card when swiping top card so it is vertical and easy to read
@@ -95,7 +94,7 @@
                                             :margin next-button-margin}
                        :history-button #js {:height (str (+ (* next-button-height 3) (* next-button-margin 4)) "px")
                                             :margin ((:spacing theme) 1.0)}
-                       :review         #js {:backgroundColor "#F0FFFF" ;; Maybe make this a gradient?
+                       :review         #js {:background      "linear-gradient(0deg, #e3ffe7 0%, #d9e7ff 100%)"
                                             :position        "absolute"
                                             :top             0
                                             :right           0
