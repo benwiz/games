@@ -40,7 +40,7 @@
                       card-height        (* 1.5 card-width)
                       next-button-height 60
                       next-button-margin ((:spacing theme) 1.0)]
-                  #js {:app          #js {:fontFamily    "'Walter Turncoat'" ;; , cursive
+                  #js {:app          #js {:fontFamily    "'Walter Turncoat', 'Roboto', sans-serif" ;; , cursive (phone was making cursive weird but may have been bad import)
                                           :dispaly       "flex"
                                           :flexDirection "column"}
                        :deck         #js {:marginTop ((:spacing theme) 4.0)
@@ -85,7 +85,7 @@
                        :green          #js {:backgroundColor "#27c4a8"}
                        :blue           #js {:backgroundColor "dodgerblue"}
                        :front          #js {:zIndex -1}
-                       :clock          #js {:fontFamily "'Roboto', sans-serif"
+                       :clock          #js {:fontFamily "'Roboto Mono', monospace"
                                             :textAlign  "center"
                                             :margin     ((:spacing theme) 4.0)}
                        :clock-span     #js {:fontSize 24} ;; TODO look into using (:typography theme)
