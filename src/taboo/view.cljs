@@ -21,6 +21,7 @@
    [taboo.words :as w]))
 
 ;; TODO review screen (should show all wordsets during this turn, netagtes need for history explorer) make full screen with button to discard
+;; TODO can I do a floating, arrow down to show to scroll on the review panel?
 ;; TODO rotate cards to it looks like a stack
 ;; TODO after rotating cards, visually prepare next card when swiping top card so it is vertical and easy to read
 
@@ -94,14 +95,18 @@
                                             :margin next-button-margin}
                        :history-button #js {:height (str (+ (* next-button-height 3) (* next-button-margin 4)) "px")
                                             :margin ((:spacing theme) 1.0)}
-                       :review         #js {:backgroundColor "lightcyan"
-                                            :position "absolute"
+                       :review         #js {:backgroundColor "#F0FFFF" ;; Maybe make this a gradient?
+                                            :position        "absolute"
                                             :top             0
-                                            :right 0
-                                            :left 0}
-                       :review-item    #js {:margin ((:spacing theme) 6.0)}
+                                            :right           0
+                                            :left            0
+                                            :display         "flex"
+                                            :flexDirection   "column"
+                                            :padding         ((:spacing theme) 2.0)}
+                       :review-item    #js {:margin ((:spacing theme) 2.0)}
                        :review-target  #js {:fontWeight "bold"}
-                       :review-taboo   #js {:margin ((:spacing theme) 2.0)}}))))
+                       :review-taboo   #js {:margin ((:spacing theme) 2.0)}
+                       :review-button  #js {:margin ((:spacing theme) 2.0)}}))))
 
 (defn classname
   [classes classnames]
@@ -124,8 +129,9 @@
                                      (map #(d/div {:className (:review-taboo classes)} %))
                                      taboo)))))
                wordsets)
-         (RE Button {:className ""
+         (RE Button {:className (:review-button classes)
                      :variant   "contained"
+                     :color     "primary"
                      :onClick   (fn [_e]
                                   (setReviewing false))}
              "Continue")))
@@ -185,7 +191,7 @@
 
 (defn game
   [{:keys [classes]}]
-  (let [game-seconds           6
+  (let [game-seconds           4
         excess                 5
         [t setT]               (react/useState 0)
         [wordsets setWordsets] (react/useState (reverse (take excess w/words)))
