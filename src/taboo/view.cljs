@@ -85,8 +85,9 @@
                        :green          #js {:backgroundColor "#27c4a8"}
                        :blue           #js {:backgroundColor "dodgerblue"}
                        :front          #js {:zIndex -1}
-                       :clock          #js {:textAlign "center"
-                                            :margin    ((:spacing theme) 4.0)}
+                       :clock          #js {:fontFamily "'Roboto', sans-serif"
+                                            :textAlign  "center"
+                                            :margin     ((:spacing theme) 4.0)}
                        :clock-span     #js {:fontSize 24} ;; TODO look into using (:typography theme)
                        :invisible      #js {:visibility "hidden"}
                        :display-none   #js {:display "none"}
@@ -94,16 +95,18 @@
                                             :margin next-button-margin}
                        :history-button #js {:height (str (+ (* next-button-height 3) (* next-button-margin 4)) "px")
                                             :margin ((:spacing theme) 1.0)}
-                       :review         #js {:background      "linear-gradient(0deg, #e3ffe7 0%, #d9e7ff 100%)"
-                                            :position        "absolute"
-                                            :top             0
-                                            :right           0
-                                            :left            0
-                                            :display         "flex"
-                                            :flexDirection   "column"
-                                            :padding         ((:spacing theme) 2.0)}
-                       :review-item    #js {:margin ((:spacing theme) 2.0)}
-                       :review-target  #js {:fontWeight "bold"}
+                       :review         #js {:background    "linear-gradient(0deg, #e3ffe7 0%, #d9e7ff 100%)"
+                                            :position      "absolute"
+                                            :top           0
+                                            :right         0
+                                            :left          0
+                                            :display       "flex"
+                                            :flexDirection "column"
+                                            :padding       ((:spacing theme) 2.0)}
+                       :review-item    #js {:fontFamily "'Roboto', sans-serif"
+                                            :margin     ((:spacing theme) 2.0)}
+                       :review-target  #js {:fontSize   "larger"
+                                            :fontWeight "bold"}
                        :review-taboo   #js {:margin ((:spacing theme) 2.0)}
                        :review-button  #js {:margin ((:spacing theme) 2.0)}}))))
 
@@ -190,12 +193,12 @@
 
 (defn game
   [{:keys [classes]}]
-  (let [game-seconds           4
-        excess                 5
-        [t setT]               (react/useState 0)
-        [wordsets setWordsets] (react/useState (reverse (take excess w/words)))
-        [timer setTimer]       (react/useState 0)
-        [turn setTurn]         (react/useState [0 0])
+  (let [game-seconds              4
+        excess                    5
+        [t setT]                  (react/useState 0)
+        [wordsets setWordsets]    (react/useState (reverse (take excess w/words)))
+        [timer setTimer]          (react/useState 0)
+        [turn setTurn]            (react/useState [0 0])
         [reviewing? setReviewing] (react/useState false)]
     ;; (prn (into [] (map first) wordsets))
     ;; (prn "t:" t)
@@ -258,5 +261,5 @@
 (defn app
   []
   (let [classes (->clj (styles))]
-    (d/div nil
+    (d/div {:className (:app classes)}
            (CE game {:classes classes}))))
