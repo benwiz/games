@@ -20,12 +20,10 @@
    [goog.string.format]
    [taboo.words :as w]))
 
-;; TODO finish screen (should show all wordsets during this turn, netagtes need for history explorer) make full screen with button to discard
 ;; TODO cards should be relative to screen size not hardcoded pixels
+;; TODO review screen (should show all wordsets during this turn, netagtes need for history explorer) make full screen with button to discard
 ;; TODO rotate cards to it looks like a stack
-;; TODO visually prepare next card when swiping top card
-;; TODO toggle colors based on team
-;; TODO history explorer, only if necessary, probably isn't. If I decide it's not, write a note.
+;; TODO after rotating cards, visually prepare next card when swiping top card so it is vertical and easy to read
 
 ;; Card visual reference https://www.bestchoicereviews.org/wp-content/uploads/2014/12/taboo-card-and-board-games.jpg
 
