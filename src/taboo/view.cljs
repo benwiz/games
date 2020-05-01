@@ -40,7 +40,7 @@
                       card-height        (* 1.5 card-width)
                       next-button-height 60
                       next-button-margin ((:spacing theme) 1.0)]
-                  #js {:app          #js {:fontFamily    "'Walter Turncoat', cursive"
+                  #js {:app          #js {:fontFamily    "'Walter Turncoat'" ;; , cursive
                                           :dispaly       "flex"
                                           :flexDirection "column"}
                        :deck         #js {:marginTop ((:spacing theme) 4.0)
