@@ -20,7 +20,6 @@
    [goog.string.format]
    [taboo.words :as w]))
 
-;; TODO cards should be relative to screen size not hardcoded pixels
 ;; TODO review screen (should show all wordsets during this turn, netagtes need for history explorer) make full screen with button to discard
 ;; TODO rotate cards to it looks like a stack
 ;; TODO after rotating cards, visually prepare next card when swiping top card so it is vertical and easy to read
@@ -89,15 +88,20 @@
                        :clock          #js {:textAlign "center"
                                             :margin    ((:spacing theme) 4.0)}
                        :clock-span     #js {:fontSize 24} ;; TODO look into using (:typography theme)
-                       :review         #js {:backgroundColor "lightcyan"
-                                            :width "100%"
-                                            :height "100%"}
                        :invisible      #js {:visibility "hidden"}
                        :display-none   #js {:display "none"}
                        :next-button    #js {:height (str next-button-height "px")
                                             :margin next-button-margin}
                        :history-button #js {:height (str (+ (* next-button-height 3) (* next-button-margin 4)) "px")
-                                            :margin ((:spacing theme) 1.0)}}))))
+                                            :margin ((:spacing theme) 1.0)}
+                       :review         #js {:backgroundColor "lightcyan"
+                                            :position "absolute"
+                                            :top             0
+                                            :right 0
+                                            :left 0}
+                       :review-item    #js {:margin ((:spacing theme) 6.0)}
+                       :review-target  #js {:fontWeight "bold"}
+                       :review-taboo   #js {:margin ((:spacing theme) 2.0)}}))))
 
 (defn classname
   [classes classnames]
@@ -114,7 +118,11 @@
          (into []
                (comp
                  (map (fn [[target & taboo]]
-                        (d/div nil (str target ": " (str/join ", " taboo))))))
+                        (d/div {:className (:review-item classes)}
+                               (d/div {:className (:review-target classes)} target)
+                               (into []
+                                     (map #(d/div {:className (:review-taboo classes)} %))
+                                     taboo)))))
                wordsets)
          (RE Button {:className ""
                      :variant   "contained"
@@ -177,7 +185,7 @@
 
 (defn game
   [{:keys [classes]}]
-  (let [game-seconds           61
+  (let [game-seconds           6
         excess                 5
         [t setT]               (react/useState 0)
         [wordsets setWordsets] (react/useState (reverse (take excess w/words)))
