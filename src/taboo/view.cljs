@@ -37,7 +37,7 @@
 (def styles
   (makeStyles (fn [theme]
                 (let [theme              (->clj theme)
-                      card-width         311
+                      card-width         260
                       card-height        (* 1.5 card-width)
                       next-button-height 60
                       next-button-margin ((:spacing theme) 1.0)]
