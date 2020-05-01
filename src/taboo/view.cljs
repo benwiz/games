@@ -193,7 +193,15 @@
 
 (defn game
   [{:keys [classes]}]
-  (let [game-seconds              61
+  ;; const urlParams = new URLSearchParams(window.location.search);
+  ;; const myParam = urlParams.get('myParam');
+  (prn "t=" )
+
+  (let [game-seconds              (as-> (-> (js/URLSearchParams. js/window.location.search) (.get "t") js/parseInt)
+                                      custom-game-length
+                                    (if (js/isNaN custom-game-length)
+                                      61
+                                      custom-game-length))
         excess                    5
         [t setT]                  (react/useState 0)
         [wordsets setWordsets]    (react/useState (reverse (take excess w/words)))
