@@ -125,10 +125,13 @@
          (into []
                (comp
                  (map (fn [[target & taboo]]
-                        (d/div {:className (:review-item classes)}
+                        (d/div {:className (:review-item classes)
+                                :key       target}
                                (d/div {:className (:review-target classes)} target)
                                (into []
-                                     (map #(d/div {:className (:review-taboo classes)} %))
+                                     (map #(d/div {:className (:review-taboo classes)
+                                                   :key       (str target "/" %)}
+                                                  %))
                                      taboo)))))
                wordsets)
          (RE Button {:className (:review-button classes)
@@ -193,10 +196,6 @@
 
 (defn game
   [{:keys [classes]}]
-  ;; const urlParams = new URLSearchParams(window.location.search);
-  ;; const myParam = urlParams.get('myParam');
-  (prn "t=" )
-
   (let [game-seconds              (as-> (-> (js/URLSearchParams. js/window.location.search) (.get "t") js/parseInt)
                                       custom-game-length
                                     (if (js/isNaN custom-game-length)
