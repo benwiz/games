@@ -60,7 +60,7 @@
                        :card-header  #js {:color   "white"
                                           :height  (* 0.1 card-height)
                                           :padding ((:spacing theme) 2.0)}
-                       :card-content #js {:backgroundColor "white"
+                       :card-content #js {:backgroundColor "seashell"
                                           :padding         ((:spacing theme) 2.0)
                                           :marginLeft      ((:spacing theme) 1.0)
                                           :marginRight     ((:spacing theme) 1.0)
