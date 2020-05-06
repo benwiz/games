@@ -1,0 +1,72 @@
+<!doctype html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+
+    <title>Spyfall</title>
+    <meta name="description" content="Spyfall game">
+    <meta name="author" content="Ben Wiz">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/all.css" integrity="sha384-UHRtZLI+pbxtHCWp1t77Bi1L4ZtiqrqD80Kn4Z8NTSRyMA2Fd33n5dQ8lWUE00s/" crossorigin="anonymous"> <!-- so unnecessary -->
+    <link href="https://fonts.googleapis.com/css2?family=Source+Code+Pro&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/styles.css">
+  </head>
+
+  <body>
+    <h1>Spyfall</h1>
+    <p id="back-button" class="button">< back</p>
+
+    <div id="game-seed">
+      <h4>Game ID (any number)</h4>
+      <input type="number" id="seed" name="seed" min="0" pattern="\d*" autocomplete="off">
+    </div>
+
+    <div id="num-players">
+      <h4>Number of Players (max 8)</h4>
+      <input type="number" id="player-count" name="seed" min="1" max="8" pattern="\d*" autocomplete="off">
+    </div>
+
+    <div id="color-picker">
+      <h4>First, pick your color</h4>
+      <div class="color-grid">
+        <div class="color-item a hidden"></div>
+        <div class="color-item b hidden"></div>
+        <div class="color-item c hidden"></div>
+        <div class="color-item d hidden"></div>
+        <div class="color-item e hidden"></div>
+        <div class="color-item f hidden"></div>
+        <div class="color-item g hidden"></div>
+        <div class="color-item h hidden"></div>
+      </div>
+    </div>
+
+    <div id="confirm-colors" class="hidden">
+      <h4>Second, show everyone your color. Confirm everyone has a different color.</h4>
+      <h5><u>Click here to continue</u></h5>
+      <div class="color-item-confirm"></div>
+    </div>
+
+    <div id="game" class="hidden">
+      <div id="player-color"></div>
+      <p><u>Location and Role</u> <span id="hide-show-button" class="button">(hide)</span></p>
+      <div id="location-and-role">
+        <p><span><b>Location:</b> </span><span id="location-label"></span></p>
+        <p><span><b>Role:</b> </span><span id="role-label"></span></p>
+      </div>
+      <div id="locations-list"></div>
+    </div>
+
+    <div id="error"></div>
+
+    <div id="links">
+      <div>
+        <a href="https://benwiz.io/"><i class="fas fa-home"></i></a>
+        <a href="https://github.com/benwiz/spyfall/"><i class="fab fa-github"></i></a>
+      </div>
+    </div>
+
+    <script src="js/index.js"></script>
+  </body>
+</html>
