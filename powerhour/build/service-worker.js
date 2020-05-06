@@ -14,7 +14,7 @@
 importScripts("https://storage.googleapis.com/workbox-cdn/releases/3.6.3/workbox-sw.js");
 
 importScripts(
-  "/powerhour/precache-manifest.d5beb47209185027d8d9d7c7b38d5197.js"
+  "/games/powerhour/build/precache-manifest.c62f604fffd1ba9ef096ef7cdab792ec.js"
 );
 
 workbox.clientsClaim();
@@ -28,7 +28,7 @@ self.__precacheManifest = [].concat(self.__precacheManifest || []);
 workbox.precaching.suppressWarnings();
 workbox.precaching.precacheAndRoute(self.__precacheManifest, {});
 
-workbox.routing.registerNavigationRoute("/powerhour/index.html", {
+workbox.routing.registerNavigationRoute("/games/powerhour/build/index.html", {
   
   blacklist: [/^\/_/,/\/[^/]+\.[^/]+$/],
 });

@@ -1,13 +1,13 @@
 {
-  "main.css": "/powerhour/static/css/main.a879bcae.chunk.css",
-  "main.js": "/powerhour/static/js/main.b6ca1583.chunk.js",
-  "main.js.map": "/powerhour/static/js/main.b6ca1583.chunk.js.map",
-  "runtime~main.js": "/powerhour/static/js/runtime~main.e722ba36.js",
-  "runtime~main.js.map": "/powerhour/static/js/runtime~main.e722ba36.js.map",
-  "static/js/2.5146c976.chunk.js": "/powerhour/static/js/2.5146c976.chunk.js",
-  "static/js/2.5146c976.chunk.js.map": "/powerhour/static/js/2.5146c976.chunk.js.map",
-  "index.html": "/powerhour/index.html",
-  "precache-manifest.d5beb47209185027d8d9d7c7b38d5197.js": "/powerhour/precache-manifest.d5beb47209185027d8d9d7c7b38d5197.js",
-  "service-worker.js": "/powerhour/service-worker.js",
-  "static/css/main.a879bcae.chunk.css.map": "/powerhour/static/css/main.a879bcae.chunk.css.map"
+  "main.css": "/games/powerhour/build/static/css/main.a879bcae.chunk.css",
+  "main.js": "/games/powerhour/build/static/js/main.ed4b9e0e.chunk.js",
+  "main.js.map": "/games/powerhour/build/static/js/main.ed4b9e0e.chunk.js.map",
+  "runtime~main.js": "/games/powerhour/build/static/js/runtime~main.17197fba.js",
+  "runtime~main.js.map": "/games/powerhour/build/static/js/runtime~main.17197fba.js.map",
+  "static/js/2.5146c976.chunk.js": "/games/powerhour/build/static/js/2.5146c976.chunk.js",
+  "static/js/2.5146c976.chunk.js.map": "/games/powerhour/build/static/js/2.5146c976.chunk.js.map",
+  "index.html": "/games/powerhour/build/index.html",
+  "precache-manifest.c62f604fffd1ba9ef096ef7cdab792ec.js": "/games/powerhour/build/precache-manifest.c62f604fffd1ba9ef096ef7cdab792ec.js",
+  "service-worker.js": "/games/powerhour/build/service-worker.js",
+  "static/css/main.a879bcae.chunk.css.map": "/games/powerhour/build/static/css/main.a879bcae.chunk.css.map"
 }
