@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Games | benwiz</title>
+
+    <script src="https://unpkg.com/@benwiz/boba.js@latest/dist/bundle.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss/dist/tailwind.min.css" rel="stylesheet">
+  </head>
+  <body>
+
+    <script>
+      const options = Boba.getDefaultOptions();
+      console.log(options);
+
+      var color1 = { r: 250, g: 150, b: 0, a: 0.2 };
+      options.vertexColors = [color1];
+      options.edgeColors = [color1];
+
+      var color2 = { r: 250, g: 150, b: 0, a: 0.05 };
+      options.shapeColors = [color2];
+      options.drawShapes = false;
+
+      options.vertexMaxSpeed = 1.0;
+      options.vertexMinSpeed = 0.2;
+
+      Boba.start(options);
+    </script>
+
+    <!-- NOTE would be better to use anchor tags but i couldn't get the buttons to be same width without button button tags -->
+
+    <div class="m-auto mt-4 flex flex-col items-center w-64 max-w-xs">
+      <div class="text-center px-4 py-2 m-2">
+        <span class="text-2xl">
+          Games
+        </span>
+      </div>
+      <div class="text-center px-4 py-2 m-2 w-full">
+        <button class="w-full shadow bg-blue-500 hover:bg-blue-400 text-white font-bold py-2 px-4 border-b-4 border-blue-700 hover:border-blue-500 rounded"
+                onclick="location.href='./spyfall/'">
+          Spyfall
+        </button>
+      </div>
+      <div class="text-center px-4 py-2 m-2 w-full">
+        <button class="w-full shadow bg-blue-500 hover:bg-blue-400 text-white font-bold py-2 px-4 border-b-4 border-blue-700 hover:border-blue-500 rounded"
+                onclick="location.href='./taboo/'">
+          Taboo
+        </button>
+      </div>
+      <div class="text-center px-4 py-2 m-2 w-full">
+        <button class="w-full shadow bg-blue-500 hover:bg-blue-400 text-white font-bold py-2 px-4 border-b-4 border-blue-700 hover:border-blue-500 rounded"
+                onclick="location.href='./codenames-trio/'">
+          Codenames Trio
+        </a>
+      </div>
+      <div class="text-center px-4 py-2 m-2 w-full">
+        <button class="w-full shadow bg-blue-500 hover:bg-blue-400 text-white font-bold py-2 px-4 border-b-4 border-blue-700 hover:border-blue-500 rounded"
+                onclick="location.href='./powerhour/'">
+          Power Hour
+        </a>
+      </div>
+    </div>
+
+
+  </body>
+</html>
