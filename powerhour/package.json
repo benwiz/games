@@ -33,5 +33,6 @@
   "homepage": "https://benwiz.io/games/powerhour",
   "devDependencies": {
     "gh-pages": "^2.0.1"
+
   }
 }
