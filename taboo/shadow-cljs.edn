@@ -1,0 +1,15 @@
+{:source-paths ["src"]
+ :deps         {:aliases [:cljs]}
+ :nrepl        {:port 9000}
+ :builds       {:app {:target            :browser
+                      :output-dir        "docs/js/compiled" ;; docs dir because that's the easiest way to deploy to github pages
+                      :asset-path        "/js/compiled"
+                      :build-options     {:manifest-name "manifest.json"}
+                      :module-hash-names true
+                      :modules           {:main {:entries [taboo.core]}}
+                      :devtools          {:before-load taboo.core/stop
+                                          :after-load  taboo.core/start
+                                          :repl-pprint true
+                                          :http-root   "docs"
+                                          :http-port   8700
+                                          :preloads    [devtools.preload]}}}}
