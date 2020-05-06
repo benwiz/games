@@ -1,0 +1,43 @@
+<!doctype html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+
+    <title>Codenames Trio</title>
+    <meta name="description" content="Three player cooperative Codenames">
+    <meta name="author" content="Ben Wiz">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Oxanium&display=swap">
+    <link rel="stylesheet" href="css/styles.css">
+  </head>
+
+  <body>
+    <h1>Codenames Trio</h1>
+
+    <h4 id="player-input-label">1. Pick your player</h4>
+    <div class="toggle-buttons">
+      <input type="radio" id="1" name="player" value="1" autocomplete="off">
+      <label for="1">One</label>
+      <input type="radio" id="2" name="player" value="2" autocomplete="off">
+      <label for="2">Two</label>
+      <input type="radio" id="3" name="player" value="3" autocomplete="off">
+      <label for="3">Three</label>
+    </div>
+
+    <h4 id="seed-input-label" class="hidden">2. Pick board size and a game id (any number)</h4>
+    <div id="board-size" class="toggle-buttons hidden">
+      <input type="radio" id="5x5" name="board-size" value="5x5" autocomplete="off" checked>
+      <label for="5x5">5x5</label>
+      <input type="radio" id="6x6" name="board-size" value="6x6" autocomplete="off">
+      <label for="6x6">6x6</label>
+    </div>
+    <input class="hidden" type="number" id="seed" name="seed" min="0" pattern="\d*" autocomplete="off"><br><br>
+
+    <h4 id="board-label" class="hidden">3. Play the game</h4>
+    <div class="wrapper five-by-five hidden"></div>
+
+    <script src="js/index.js"></script>
+  </body>
+</html>
