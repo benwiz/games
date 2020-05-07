@@ -322,10 +322,10 @@ class Footer extends React.Component {
   render = () => {
     return (
       <div className="footer">
-        <IconButton onClick={() => { window.location.href='https://benwiz.io/'; }}>
+        <IconButton onClick={() => window.location.href='https://benwiz.io/'}>
           <Icon>home</Icon>
         </IconButton>
-        <IconButton onClick={() => { window.location.href='https://github.com/benwiz/games/'; }}>
+        <IconButton onClick={() => window.location.href='https://github.com/benwiz/games/'}>
           <SvgIcon viewBox={'0 0 16 16'}>
             <path
               // fill-rule="evenodd"
