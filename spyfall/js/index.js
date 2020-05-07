@@ -45,8 +45,7 @@ const OPTIONS = [{location: "Beach", roles: ["Beach Waitress", "Kite Surfer", "L
                  // {location: "Movie Theater", roles: ["Concessionaire", "Usher", "Movie Goer", "Ticket Taker", "Cleaning Crew", "Projectionist"]}, // TODO 2 more
                  {location: "Post-Office", roles: ["Mail Man", "Customer", "Mail Clerk", "Mail Sorter", "Security", "Notary", "Janitor"]},
                  {location: "Clue Board Game", roles: ["Player", "Player", "Miss Scarlet", "Mr. Green", "Colonel Mustard", "Prof. Plum", "Mrs. peacock", "Mrs. White"]},
-                 // commented bc too long
-                 // {location: "Golden Gate Bridge", roles: ["Jumper", "Painter", "Driver", "Biker", "Runner", "Maintenance Worker", "Tourist"]},
+                 {location: "Golden Gate Brg.", roles: ["Jumper", "Painter", "Driver", "Biker", "Runner", "Maintenance Worker", "Tourist"]},
                  {location: "Brewery", roles: ["Brewmaster", "Tour Guide", "Customer", "Bar Back", "Bar Tender", "Manager", "Food Server"]},
                  // TODO school
                 ];
@@ -119,19 +118,32 @@ const selectLocationAndRole = () => {
 };
 
 const populateLocationsList = (options) => {
+    // TODO turn #locations-list into a flexbox col of flexbox rows with items in row being space apart
     const locationsList = document.querySelector('#locations-list');
     const locations = options.map(option => option.location).sort();
-    const height = 20;
-    locations.forEach((loc, i) => {
-        const location = document.createElement('span');
-        location.style.cssFloat = i % 2 === 0 ? 'left' : 'right';
-        location.style.textAlign = i % 2 === 0 ? 'left' : 'right';
-        location.style.height = height + 'px'; // This is a little janky
-        location.classList.add('location-item');
-        location.innerHTML = loc;
-        locationsList.appendChild(location);
-    });
-    locationsList.style.height = height / 2 * locations.length + 'px'; // this is janky pt. 2, this is the reason for janky pt. 1
+    // const height = 20;
+    for (let i = 0; i < locations.length; i += 2) {
+        const locationsWrapper = document.createElement('div');
+        locationsWrapper.style.display = 'flex';
+        locationsWrapper.style.justifyContent = 'space-between';
+
+        const loc1 = locations[i];
+        const loc2 = locations[i+1];
+        const location1 = document.createElement('span');
+        location1.classList.add('location-item');
+        location1.innerHTML = loc1;
+        locationsWrapper.appendChild(location1);
+
+        const location2 = document.createElement('span');
+        // location2.style.backgroundColor = 'red';
+        location2.style.textAlign = 'right';
+        location2.classList.add('location-item');
+        location2.innerHTML = loc2;
+        locationsWrapper.appendChild(location2);
+
+        locationsList.appendChild(locationsWrapper);
+    };
+    // locationsList.style.height = height / 2 * locations.length + 'px'; // this is janky pt. 2, this is the reason for janky pt. 1
 };
 
 const numPlayers = document.querySelector('#num-players');

@@ -95,6 +95,11 @@ u {
     margin: 20px 0px 50px 0px;
 }
 
+#locations-list {
+    display: flex;
+    flex-direction: column;
+}
+
 .location-item {
     /* margin: 15px 0px 15px 5px; */
     cursor: pointer;
