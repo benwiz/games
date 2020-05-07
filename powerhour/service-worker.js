@@ -14,7 +14,7 @@
 importScripts("https://storage.googleapis.com/workbox-cdn/releases/3.6.3/workbox-sw.js");
 
 importScripts(
-  "/games/powerhour/precache-manifest.cd4214085177ee31df7f5763270f51bd.js"
+  "/games/powerhour/precache-manifest.fad06a1c93ce42c0bdea8ac019ab0f30.js"
 );
 
 workbox.clientsClaim();
