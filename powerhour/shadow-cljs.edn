@@ -1,0 +1,15 @@
+{:source-paths ["src"]
+ :deps         {:aliases [:cljs]}
+ :nrepl        {:port 9000}
+ :builds       {:app {:target            :browser
+                      :output-dir        "js/compiled" ;; yes, in root, it's ugly but github pages gives me a good route
+                      :asset-path        "/js/compiled"
+                      :build-options     {:manifest-name "manifest.json"}
+                      :module-hash-names true
+                      :modules           {:main {:entries [powerhour.core]}}
+                      :devtools          {:before-load powerhour.core/stop
+                                          :after-load  powerhour.core/start
+                                          :repl-pprint true
+                                          :http-root   "./"
+                                          :http-port   8700
+                                          :preloads    [devtools.preload]}}}}
