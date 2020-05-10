@@ -27,7 +27,7 @@ const OPTIONS = [{location: "Beach", roles: ["Beach Waitress", "Kite Surfer", "L
                  {location: "Cathedral", roles: ["Priest", "Beggar", "Sinner", "Tourist", "Sponsor", "Chorister", "Parishioner"]},
                  // {location: "Crusader Army", roles: ["Monk", "Imprision Saracen (Roman-era Arab/Muslim)", "Servant", "Bishop", "Squire", "Archer", "Knight"]},
                  {location: "Cemetery", roles: ["Priest", "Grave Robber", "Poet", "Mourner", "Gatekeeper", "Dead Person", "Relative", "Flower Seller", "Grave Digger", "Goth Girl/Boy"]},
-                 {location: "Polar Station", roles: ["Medic", "Expedition Leader", "Biologist", "Radioman", "Hydrologist", "Meteorologist", "Geologist"]},
+                 // {location: "Polar Station", roles: ["Medic", "Expedition Leader", "Biologist", "Radioman", "Hydrologist", "Meteorologist", "Geologist"]},
                  {location: "Space Station", roles: ["Engineer", "Alien", "Pilot", "Commander", "Scientist", "Doctor", "Space Tourist"]},
                  // {location: "World War II Squadron", roles: ["Resistance Fighter", "Radioman", "Scout", "Medic", "Cook", "Imprisoned Nazi", "Soldier"]},
                  {location: "Retirement Home", roles: ["Relative", "Cribbage Player", "Old Person", "Nurse", "Janitor", "Cook", "Blind Soul", "Psychologist"]},
