@@ -1,19 +1,18 @@
 (ns powerhour.view
-  (:require
-   ["@material-ui/core/Button" :default Button]
-   ["react" :as react]
-   ;; [goog.string :as gstr]
-   ;; [goog.string.format]
-   ;; ["@material-ui/core/Card" :default Card]
-   ;; ["@material-ui/core/CardContent" :default CardContent]
-   ;; ["@material-ui/core/CardHeader" :default CardHeader]
-   ["@material-ui/core/styles/makeStyles" :default makeStyles]
-   [cljs-bean.core :refer [->clj]]
-   [clojure.string :as str]
-   [clojure.edn :as edn]
-   [crinkle.component :refer [CE RE]]
-   [crinkle.dom :as d]
-   [powerhour.localstorage :as localstorage]))
+  (:require ["@material-ui/core/Button" :default Button]
+            ["react" :as react]
+            ;; [goog.string :as gstr]
+            ;; [goog.string.format]
+            ;; ["@material-ui/core/Card" :default Card]
+            ;; ["@material-ui/core/CardContent" :default CardContent]
+            ;; ["@material-ui/core/CardHeader" :default CardHeader]
+            ["@material-ui/core/styles/makeStyles" :default makeStyles]
+            [cljs-bean.core :refer [->clj]]
+            [cljs.core.async :refer [alt!]]
+            [clojure.string :as str]
+            [crinkle.component :refer [CE RE]]
+            [crinkle.dom :as d]
+            [powerhour.spotify :as spotify]))
 
 (def styles
   (makeStyles (fn [theme]
@@ -32,30 +31,9 @@
                         (map #(get classes %))
                         classnames))))
 
-(defn spotify-auth
-  [client-id]
-  ;; TODO should store timestamp with token and check if it needs to be refreshed (probably remove the localstorage and recursively call this fn)
-  ;; TODO (maybe) use toast notifications to alert what is happening
-  (let [access-token (or (-> (localstorage/get-item "spotify-access-token")
-                                  edn/read-string
-                                  :token)
-                              (-> (subs js/window.location.hash 1)
-                                  js/URLSearchParams.
-                                  (.get "access_token")))]
-    (if access-token
-      (do
-        (localstorage/set-item! "spotify-access-token" {:token access-token})
-        access-token)
-      (let [scopes            (js/encodeURIComponent "user-read-playback-state user-modify-playback-state")
-            redirect-uri      (.. js/window -location -href)
-            spotify-login-uri (str "https://accounts.spotify.com/authorize?response_type=token&client_id=" client-id "&scope=" scopes "&redirect_uri=" redirect-uri)]
-        ;; Redirect, so doesn't matter what is returned
-        (set! js/window.location spotify-login-uri)))))
-
 (defn app
   []
-  (let [spotify-token (spotify-auth "ff53948d58f1491baa6169d34bc4179a")
+  (let [spotify-token (spotify/token "ff53948d58f1491baa6169d34bc4179a")
         classes       (->clj (styles))]
-    (prn "spotify-token" spotify-token)
     (d/div {:className (:app classes)}
            (d/div nil spotify-token))))
