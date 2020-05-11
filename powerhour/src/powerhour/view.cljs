@@ -36,7 +36,7 @@
   [client-id]
   ;; TODO should store timestamp with token and check if it needs to be refreshed (probably remove the localstorage and recursively call this fn)
   ;; TODO (maybe) use toast notifications to alert what is happening
-  (let [access-token      (or (-> (localstorage/get-item "spotify-access-token")
+  (let [access-token (or (-> (localstorage/get-item "spotify-access-token")
                                   edn/read-string
                                   :token)
                               (-> (subs js/window.location.hash 1)
@@ -47,7 +47,7 @@
         (localstorage/set-item! "spotify-access-token" {:token access-token})
         access-token)
       (let [scopes            (js/encodeURIComponent "user-read-playback-state user-modify-playback-state")
-          redirect-uri      (.. js/window -location -href)
+            redirect-uri      (.. js/window -location -href)
             spotify-login-uri (str "https://accounts.spotify.com/authorize?response_type=token&client_id=" client-id "&scope=" scopes "&redirect_uri=" redirect-uri)]
         ;; Redirect, so doesn't matter what is returned
         (set! js/window.location spotify-login-uri)))))
