@@ -1,6 +1,7 @@
 (ns powerhour.view
   (:require ["@material-ui/core/Button" :default Button]
             ["react" :as react]
+            ["react-iframe" :default Iframe]
             ;; [goog.string :as gstr]
             ;; [goog.string.format]
             ;; ["@material-ui/core/Card" :default Card]
@@ -15,6 +16,7 @@
             [powerhour.spotify :as spotify]))
 
 ;; NOTE I should have all the external hooks I need to create the app.
+;; NOTE if spotify web player button does not work well, I can use Spotify Web Playback SDK.
 
 ;; TODO login button if not logged in
 ;; TODO expiration on spotify-token
@@ -45,7 +47,14 @@
 
 (defn app
   []
-  (let [spotify-token (spotify/token "ff53948d58f1491baa6169d34bc4179a")
+  (let [;; Log into spotify so that full songs can be played through iFrame and get access token for api use.
+        spotify-token (spotify/token "ff53948d58f1491baa6169d34bc4179a")
         classes       (->clj (styles))]
     (d/div {:className (:app classes)}
-           (d/div nil spotify-token))))
+           (RE Iframe {:src               "https://open.spotify.com/embed/playlist/02FALZS2dSPI33T644ENNb"
+                       :width             "300"
+                       :height            "80"
+                       :frameborder       "0"
+                       :allowtransparency "true"
+                       :allow             "encrypted-media"}))))
+
