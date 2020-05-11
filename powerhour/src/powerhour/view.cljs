@@ -14,6 +14,18 @@
             [crinkle.dom :as d]
             [powerhour.spotify :as spotify]))
 
+;; NOTE I should have all the external hooks I need to create the app.
+
+;; TODO login button if not logged in
+;; TODO expiration on spotify-token
+;; TODO select a device, with an info icon button with js/alert for "I don't see my device"
+;; TODO select a playlist -> load songs into queue, with an info icon button explaining what is happening
+;; TODO shot interval seletor
+;; TODO game length selector
+;; TODO play button
+;; TODO album cover and track name
+;; TODO very very simple audio reactive quil background, with checkbox to turn it on, default off
+
 (def styles
   (makeStyles (fn [theme]
                 (let [theme (->clj theme)]
