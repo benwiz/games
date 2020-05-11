@@ -10,6 +10,7 @@
    ["@material-ui/core/styles/makeStyles" :default makeStyles]
    [cljs-bean.core :refer [->clj]]
    [clojure.string :as str]
+   [clojure.edn :as edn]
    [crinkle.component :refer [CE RE]]
    [crinkle.dom :as d]
    [powerhour.localstorage :as localstorage]))
@@ -33,12 +34,17 @@
 
 (defn spotify-auth
   [client-id]
-  (let [access-token      (or (localstorage/get-item "spotify-access-token")
-                              (-> (js/URLSearchParams. (subs js/window.location.hash 1))
+  ;; TODO should store timestamp with token and check if it needs to be refreshed (probably remove the localstorage and recursively call this fn)
+  ;; TODO (maybe) use toast notifications to alert what is happening
+  (let [access-token      (or (-> (localstorage/get-item "spotify-access-token")
+                                  edn/read-string
+                                  :token)
+                              (-> (subs js/window.location.hash 1)
+                                  js/URLSearchParams.
                                   (.get "access_token")))]
     (if access-token
       (do
-        (localstorage/set-item! "spotify-access-token" access-token)
+        (localstorage/set-item! "spotify-access-token" {:token access-token})
         access-token)
       (let [scopes            (js/encodeURIComponent "user-read-playback-state user-modify-playback-state")
           redirect-uri      (.. js/window -location -href)
