@@ -21,9 +21,8 @@
 
 ;; NOTE neither spotify play butter nor spotify web playback api work on mobile
 
-;; TODO select a device, with an info icon button with js/alert for "I don't see my device"
 ;; TODO select a playlist -> load songs into queue, with an info icon button explaining what is happening
-;; TODO shot intervla seletor
+;; TODO shot interval seletor
 ;; TODO game length selector
 ;; TODO play button
 ;; TODO album cover and track name
@@ -62,12 +61,13 @@
                                        (let [ds (or (some-> response :body :devices)
                                                     [])]
                                          (setDevices ds)
-                                         (setDevice (first (into []
-                                                                 (comp
-                                                                   (remove :is_restricted)
-                                                                   (filter :is_active)
-                                                                   (map :id))
-                                                                 ds)))))))]
+                                         (when (not-empty device)
+                                           (setDevice (first (into []
+                                                                   (comp
+                                                                     (remove :is_restricted)
+                                                                     (filter :is_active)
+                                                                     (map :id))
+                                                                   ds))))))))]
           (get-and-update-devices)
           (js/setInterval get-and-update-devices 10000))
         (fn []))
@@ -80,6 +80,7 @@
                (RE Select {:labelId  "device-select-label"
                            :value    device
                            :onChange (fn [e]
+                                       ;; TODO should also call Transfer Playback API (not essential)
                                        (setDevice (.. e -target -value)))}
                    (into []
                          (comp
@@ -95,12 +96,63 @@
                                         (js/alert "This app is just a remote for Spotify. Open the Spotify app on this device or another device then select it from the list."))}
                (RE HelpOutlineIcon {:fontSize "inherit"})))))
 
+(defn playlists
+  [{:keys [classes spotify-token device playlist setPlaylist]}]
+  (let [[playlists setPlaylists] (react/useState [])]
+
+    ;; Use effect on load to read list of playists one time
+    (react/useEffect
+      (fn []
+        (letfn [(get-and-update-playlists
+                  []
+                  (spotify/playlists spotify-token
+                                     (fn [response]
+                                       (let [ps (or (some-> response :body :items)
+                                                    [])]
+                                         (setPlaylists ps)
+                                         (when-not playlist
+                                           (setPlaylist (first (into []
+                                                                     (comp
+                                                                       (map :id))
+                                                                     ps))))))))]
+          (get-and-update-playlists)
+          ;; (js/setInterval get-and-update-playlists 10000)
+          )
+        (fn []))
+      #js [])
+
+    (d/div nil
+           ;; TODO better signal that this is optional
+           (RE FormControl {:className   (:buttonFormControl classes)
+                            #_#_:variant "outlined"}
+               (RE InputLabel {:id "playlist-select-label"} "Playlist")
+               (RE Select {:labelId  "playlist-select-label"
+                           :value    playlist
+                           :onChange (fn [e]
+                                       (let [playlist-id (.. e -target -value)]
+                                         (prn "TODO call start/resume on spotify api")
+                                         (spotify/play! spotify-token identity [(str "spotify:playlist:" playlist-id)] device)
+                                         (setPlaylist playlist-id)))}
+                   (into []
+                         (comp
+                           (map (fn [{:keys [id name]}]
+                                  (RE MenuItem {:key   id
+                                                :value id}
+                                      (d/span nil name)))))
+                         playlists)))
+           (RE IconButton {:className "select-help-button"
+                           :size      "small"
+                           :onClick   (fn []
+                                        (js/alert "This app is just a remote for Spotify. Selecting a playlist will start playing that playlist. This is optional."))}
+               (RE HelpOutlineIcon {:fontSize "inherit"})))))
+
 (defn app
   []
   (let [;; Log into spotify so that full songs can be played through iFrame and get access token for api use.
         classes            (->clj (styles))
         spotify-token      (spotify/token "ff53948d58f1491baa6169d34bc4179a")
-        [device setDevice] (react/useState "")]
+        [device setDevice] (react/useState "")
+        [playlist setPlaylist] (react/useState "")]
     (d/div {:className (:app classes)}
            #_(RE Iframe {:src               "https://open.spotify.com/embed/playlist/02FALZS2dSPI33T644ENNb"
                          :width             "300"
@@ -111,4 +163,9 @@
            (CE devices {:classes       classes
                         :spotify-token spotify-token
                         :device        device
-                        :setDevice     setDevice}))))
+                        :setDevice     setDevice})
+           (CE playlists {:classes       classes
+                          :spotify-token spotify-token
+                          :device        device
+                          :playlist      playlist
+                          :setPlaylist   setPlaylist}))))

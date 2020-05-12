@@ -1,15 +1,23 @@
 (ns powerhour.spotify
-  (:require-macros [cljs.core.async.macros :refer [go]])
+  (:require-macros [cljs.core.async.macros :refer [go]]
+                   [clojure.string :as str])
   (:require [cljs-http.client :as http]
             [cljs.core.async :refer [<!]]
             [clojure.edn :as edn]
+            [clojure.string :as str]
             [crinkle.dom :as d]
             [powerhour.localstorage :as localstorage]))
 
 ;; TODO I think there is a way for me to tell spotify to only give me desired parts of response tree
 (defn redirect
   [client-id]
-  (let [scopes            (js/encodeURIComponent "user-read-playback-state user-modify-playback-state streaming user-read-email user-read-private")
+  (let [scopes            (js/encodeURIComponent (str/join " " ["user-read-playback-state"
+                                                                "user-modify-playback-state"
+                                                                "streaming"
+                                                                "user-read-email"
+                                                                "user-read-private"
+                                                                "playlist-read-private"
+                                                                "playlist-read-collaborative"]))
         redirect-uri      (.. js/window -location -href)
         spotify-login-uri (str "https://accounts.spotify.com/authorize?response_type=token&client_id=" client-id "&scope=" scopes "&redirect_uri=" redirect-uri)]
     ;; Redirect, so doesn't matter what is returned
@@ -58,11 +66,12 @@
         (handler response))))
 
 (defn api-put
-  [url token handler & [query-params]]
+  [url token handler & [query-params json-params]]
   (go (let [response (<! (http/put url
                                    (cond-> {:with-credentials? false
                                             :oauth-token       token}
-                                     (some? query-params) (assoc :query-params query-params))))]
+                                     (some? query-params) (assoc :query-params query-params)
+                                     (some? json-params)  (assoc :json-params json-params))))]
         (handler response))))
 
 (defn api-post
@@ -107,3 +116,10 @@
   (api-put "https://api.spotify.com/v1/me/player/seek" token handler
            (cond-> {"position_ms" 10000}
              (some? device-id) (assoc "device_id" device-id))))
+
+(defn play!
+  [token handler uris & [device-id]]
+  (api-put "https://api.spotify.com/v1/me/player/play" token handler
+           (cond-> {}
+             (some? device-id) (assoc "device_id" device-id))
+           {"uris" uris}))
