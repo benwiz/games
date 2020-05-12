@@ -1,9 +1,13 @@
 (ns powerhour.view
   (:require ["@material-ui/core/Button" :default Button]
+            ["@material-ui/core/FormControl" :default FormControl]
+            ["@material-ui/core/IconButton" :default IconButton]
+            ["@material-ui/core/InputLabel" :default InputLabel]
+            ["@material-ui/core/MenuItem" :default MenuItem]
+            ["@material-ui/core/Select" :default Select]
+            ["@material-ui/icons/HelpOutline" :default HelpOutlineIcon]
             ["react" :as react]
-            ["react-iframe" :default Iframe]
-            ;; [goog.string :as gstr]
-            ;; [goog.string.format]
+            ;; ["react-iframe" :default Iframe]
             ;; ["@material-ui/core/Card" :default Card]
             ;; ["@material-ui/core/CardContent" :default CardContent]
             ;; ["@material-ui/core/CardHeader" :default CardHeader]
@@ -15,26 +19,25 @@
             [crinkle.dom :as d]
             [powerhour.spotify :as spotify]))
 
-;; NOTE I should have all the external hooks I need to create the app.
-;; NOTE if spotify web player button does not work well, I can use Spotify Web Playback SDK.
+;; NOTE neither spotify play butter nor spotify web playback api work on mobile
 
-;; TODO login button if not logged in
-;; TODO expiration on spotify-token
 ;; TODO select a device, with an info icon button with js/alert for "I don't see my device"
 ;; TODO select a playlist -> load songs into queue, with an info icon button explaining what is happening
-;; TODO shot interval seletor
+;; TODO shot intervla seletor
 ;; TODO game length selector
 ;; TODO play button
 ;; TODO album cover and track name
 ;; TODO very very simple audio reactive quil background, with checkbox to turn it on, default off
+;; TODO login button if not logged in
+;; TODO refresh access token when appropriate
 
 (def styles
   (makeStyles (fn [theme]
                 (let [theme (->clj theme)]
-                  #js {:app #js {:fontFamily    "'Roboto', sans-serif"
-                                 :dispaly       "flex"
-                                 :flexDirection "column"}
-                       }))))
+                  #js {:app               #js {:fontFamily    "'Roboto', sans-serif"
+                                               :dispaly       "flex"
+                                               :flexDirection "column"}
+                       :buttonFormControl #js {:width 180}}))))
 
 (defn classname
   [classes classnames]
@@ -45,16 +48,67 @@
                         (map #(get classes %))
                         classnames))))
 
+(defn devices
+  [{:keys [classes spotify-token device setDevice]}]
+  (let [[devices setDevices] (react/useState [])]
+
+    ;; Use effect on load to read list of devices one time, check again every 10s
+    (react/useEffect
+      (fn []
+        (letfn [(get-and-update-devices
+                  []
+                  (spotify/devices spotify-token
+                                     (fn [response]
+                                       (let [ds (or (some-> response :body :devices)
+                                                    [])]
+                                         (setDevices ds)
+                                         (setDevice (first (into []
+                                                                 (comp
+                                                                   (remove :is_restricted)
+                                                                   (filter :is_active)
+                                                                   (map :id))
+                                                                 ds)))))))]
+          (get-and-update-devices)
+          (js/setInterval get-and-update-devices 10000))
+        (fn []))
+      #js [])
+
+    (d/div nil
+           (RE FormControl {:className   (:buttonFormControl classes)
+                            #_#_:variant "outlined"}
+               (RE InputLabel {:id "device-select-label"} "Playback Device")
+               (RE Select {:labelId  "device-select-label"
+                           :value    device
+                           :onChange (fn [e]
+                                       (setDevice (.. e -target -value)))}
+                   (into []
+                         (comp
+                           (remove :is_restricted)
+                           (map (fn [{:keys [id name]}]
+                                  (RE MenuItem {:key   id
+                                                :value id}
+                                      (d/span nil name)))))
+                         devices)))
+           (RE IconButton {:className "select-help-button"
+                           :size      "small"
+                           :onClick   (fn []
+                                        (js/alert "This app is just a remote for Spotify. Open the Spotify app on this device or another device then select it from the list."))}
+               (RE HelpOutlineIcon {:fontSize "inherit"})))))
+
 (defn app
   []
   (let [;; Log into spotify so that full songs can be played through iFrame and get access token for api use.
-        spotify-token (spotify/token "ff53948d58f1491baa6169d34bc4179a")
-        classes       (->clj (styles))]
+        classes            (->clj (styles))
+        spotify-token      (spotify/token "ff53948d58f1491baa6169d34bc4179a")
+        [device setDevice] (react/useState "")]
     (d/div {:className (:app classes)}
-           (RE Iframe {:src               "https://open.spotify.com/embed/playlist/02FALZS2dSPI33T644ENNb"
-                       :width             "300"
-                       :height            "80"
-                       :frameborder       "0"
-                       :allowtransparency "true"
-                       :allow             "encrypted-media"}))))
-
+           #_(RE Iframe {:src               "https://open.spotify.com/embed/playlist/02FALZS2dSPI33T644ENNb"
+                         :width             "300"
+                         :height            "80"
+                         :frameborder       "0"
+                         :allowtransparency "true"
+                         :allow             "encrypted-media"})
+           (CE devices {:classes       classes
+                        :spotify-token spotify-token
+                        :device        device
+                        :setDevice     setDevice}))))

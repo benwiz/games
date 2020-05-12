@@ -16,6 +16,7 @@
     (set! js/window.location spotify-login-uri)))
 
 (defn token
+  "Get access token. I am currently never refreshing this token, I should."
   [client-id]
   (let [stored-access-token (-> (localstorage/get-item "spotify-access-token")
                                 edn/read-string)
@@ -24,15 +25,11 @@
                                 (.get "access_token"))
         now                 (/ (.now js/Date) 1000)
         ttl                 3600]
-    (case [stored-access-token url-access-token]
-      ;; When no access token -> redirect
-      [nil nil]
-      (redirect client-id)
-
+    (cond
       ;; Access token in localstorage -> branch
-      [stored-access-token _]
+      (some? stored-access-token)
       (let [{:keys [token expiration]} stored-access-token]
-        (if (< expiration now) ;; TODO may want to do this prematurely
+        (if (< expiration now)
           ;; First check url for access token, if not exists then redirect
           (if url-access-token
             (do
@@ -42,12 +39,15 @@
             (redirect client-id))
           token))
 
-      ;; Access token from url -> store in localstorage
-      [nil url-access-token]
+      ;; Access token from url (but only after checking for local storage) -> store in localstorage
+      (some? url-access-token)
       (do
         (localstorage/set-item! "spotify-access-token" {:token      url-access-token
                                                         :expiration (+ now ttl)})
-        url-access-token))))
+        url-access-token)
+
+      ;; Otherwise, we have no token -> redirect
+      :else (redirect client-id))))
 
 (defn api-get
   [url token handler & [query-params]]
