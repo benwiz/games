@@ -82,6 +82,10 @@
                                       (some? query-params) (assoc :query-params query-params))))]
         (handler response))))
 
+(defn player
+  [token handler]
+  (api-get "https://api.spotify.com/v1/me/player" token handler))
+
 (defn playlist
   [token playlist-id handler]
   (api-get (str "https://api.spotify.com/v1/playlists/" playlist-id "/tracks") token handler))
@@ -122,11 +126,16 @@
              (some? device-id) (assoc "device_id" device-id))))
 
 (defn play!
-  [token handler uris & [device-id]]
+  [token handler & [device-id]]
   (api-put "https://api.spotify.com/v1/me/player/play" token handler
            (cond-> {}
-             (some? device-id) (assoc "device_id" device-id))
-           {"uris" uris}))
+             (some? device-id) (assoc "device_id" device-id))))
+
+(defn pause!
+  [token handler & [device-id]]
+  (api-put "https://api.spotify.com/v1/me/player/pause" token handler
+           (cond-> {}
+             (some? device-id) (assoc "device_id" device-id))))
 
 (defn transfer!
   [token device-id handler]

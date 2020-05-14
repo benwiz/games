@@ -1,11 +1,14 @@
 (ns powerhour.view
   (:require ["@material-ui/core/Button" :default Button]
             ["@material-ui/core/FormControl" :default FormControl]
+            ["@material-ui/core/Fab" :default Fab]
             ["@material-ui/core/IconButton" :default IconButton]
             ["@material-ui/core/InputLabel" :default InputLabel]
             ["@material-ui/core/MenuItem" :default MenuItem]
             ["@material-ui/core/Select" :default Select]
             ["@material-ui/icons/HelpOutline" :default HelpOutlineIcon]
+            ["@material-ui/icons/PlayArrow" :default PlayArrowIcon]
+            ["@material-ui/icons/Pause" :default PauseIcon]
             ["react" :as react]
             ;; ["react-iframe" :default Iframe]
             ;; ["@material-ui/core/Card" :default Card]
@@ -21,8 +24,11 @@
 
 ;; NOTE neither spotify play butter nor spotify web playback api work on mobile
 
-;; TODO play button
 ;; TODO album cover and track name
+;; TODO play/pause button
+;; TOOD timer component
+;; TODO trigger next on minute mark
+;; TODO trigger ding on monite mark
 ;; TODO very very simple audio reactive quil background, with checkbox to turn it on, default off
 ;; TODO login button if not logged in
 ;; TODO refresh access token when appropriate
@@ -96,7 +102,7 @@
                                        (let [ds (or (some-> response :body :devices)
                                                     [])]
                                          (setDevices ds)
-                                         (when (not-empty device)
+                                         (when (empty? device)
                                            (setDevice (first (into []
                                                                    (comp
                                                                      (remove :is_restricted)
@@ -187,23 +193,50 @@
                                         (js/alert "This app is just a remote for Spotify. Selecting a playlist will replace your queue with the first 60 songs of the playlist. This is optional."))}
                (RE HelpOutlineIcon {:fontSize "inherit"})))))
 
+(defn play-pause
+  [{:keys [classes spotify-token device playing setPlaying]}]
+  (d/div nil
+         (RE Fab {:onClick (fn [_]
+                             (prn "playing" playing)
+                             (if playing
+                               (spotify/pause! spotify-token
+                                               (fn [_response] (setPlaying false))
+                                               device)
+                               (spotify/play! spotify-token
+                                              (fn [_response] (setPlaying true))
+                                              device)))}
+             (if playing
+               (RE PauseIcon)
+               (RE PlayArrowIcon)))))
+
 (defn app
   []
   (let [;; Log into spotify so that full songs can be played through iFrame and get access token for api use.
-        classes            (->clj (styles))
-        spotify-token      (spotify/token "ff53948d58f1491baa6169d34bc4179a")
-        [device setDevice] (react/useState "")
+        classes                (->clj (styles))
+        spotify-token          (spotify/token "ff53948d58f1491baa6169d34bc4179a")
         [interval setInterval] (react/useState 60)
-        [length setLength] (react/useState 60)]
+        [length setLength]     (react/useState 60)
+        [device setDevice]     (react/useState "")
+        [playing setPlaying]   (react/useState false)]
+
+    ;; On load, playing state (device state is set inside component)
+    (react/useEffect
+      (fn []
+        (spotify/player spotify-token
+                        (fn [response]
+                          (setPlaying (-> response :body :is_playing))))
+        (fn []))
+      #js [])
+
     (d/div {:className (:app classes)}
-           #_(RE Iframe {:src       (int minutesminutes        "Length://open.spotify.com/embed/playlist/02FALZS2dSPI33T644ENNb")
-                         :minutesminuteswidth             "300"
-                         :height            "80"
-                         :frameborder       "0"
-                         :allowtransparency "true"
-                         :allow             "encrypted-media"})
-           (CE shot-interval {:classes classes
-                              :interval interval
+           #_(RE Iframe {:src                 (int minutesminutes        "Length://open.spotify.com/embed/playlist/02FALZS2dSPI33T644ENNb")
+                         :minutesminuteswidth "300"
+                         :height              "80"
+                         :frameborder         "0"
+                         :allowtransparency   "true"
+                         :allow               "encrypted-media"})
+           (CE shot-interval {:classes     classes
+                              :interval    interval
                               :setInterval setInterval})
            (CE game-length {:classes   classes
                             :length    length
@@ -215,4 +248,10 @@
            (when (not-empty device)
              (CE playlists {:classes       classes
                             :spotify-token spotify-token
-                            :device        device})))))
+                            :device        device}))
+           (when (not-empty device)
+             (CE play-pause {:classes       classes
+                             :spotify-token spotify-token
+                             :device        device
+                             :playing       playing
+                             :setPlaying    setPlaying})))))
