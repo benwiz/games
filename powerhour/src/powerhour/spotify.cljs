@@ -127,3 +127,10 @@
            (cond-> {}
              (some? device-id) (assoc "device_id" device-id))
            {"uris" uris}))
+
+(defn transfer!
+  [token device-id handler]
+  (api-put "https://api.spotify.com/v1/me/player" token handler
+           nil
+           {"device_ids" [device-id]
+            "play"       true}))

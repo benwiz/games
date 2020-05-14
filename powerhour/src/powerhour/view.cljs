@@ -79,8 +79,9 @@
                (RE Select {:labelId  "device-select-label"
                            :value    device
                            :onChange (fn [e]
-                                       ;; TODO should also call Transfer Playback API (not essential)
-                                       (setDevice (.. e -target -value)))}
+                                       (let [device-id (.. e -target -value)]
+                                         (spotify/transfer! spotify-token device-id identity)
+                                         (setDevice device-id)))}
                    (into []
                          (comp
                            (remove :is_restricted)
