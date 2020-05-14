@@ -96,8 +96,9 @@
                (RE HelpOutlineIcon {:fontSize "inherit"})))))
 
 (defn playlists
-  [{:keys [classes spotify-token device playlist setPlaylist]}]
-  (let [[playlists setPlaylists] (react/useState [])]
+  [{:keys [classes spotify-token device]}]
+  (let [[playlists setPlaylists] (react/useState [])
+        [playlist setPlaylist]   (react/useState "")]
 
     ;; Use effect on load to read list of playists one time
     (react/useEffect
@@ -108,19 +109,14 @@
                                      (fn [response]
                                        (let [ps (or (some-> response :body :items)
                                                     [])]
-                                         (setPlaylists ps)
-                                         (when-not playlist
-                                           (setPlaylist (first (into []
-                                                                     (comp
-                                                                       (map :id))
-                                                                     ps))))))))]
+                                         (setPlaylists ps)))))]
           (get-and-update-playlists))
         (fn []))
       #js [])
 
     ;; TODO use a split button https://material-ui.com/components/button-group/#split-button
     ;; then it can be very obvious that you are taking the action of "queueing" a playlist
-    ;; I can have some default "power hour" playlists
+    ;; I can have some default "power hour" playlists. Also, can do away with playlist state.
     (d/div nil
            (RE FormControl {:className   (:buttonFormControl classes)
                             #_#_:variant "outlined"}
@@ -159,8 +155,7 @@
   (let [;; Log into spotify so that full songs can be played through iFrame and get access token for api use.
         classes            (->clj (styles))
         spotify-token      (spotify/token "ff53948d58f1491baa6169d34bc4179a")
-        [device setDevice] (react/useState "")
-        [playlist setPlaylist] (react/useState "")]
+        [device setDevice] (react/useState "")]
     (d/div {:className (:app classes)}
            #_(RE Iframe {:src               "https://open.spotify.com/embed/playlist/02FALZS2dSPI33T644ENNb"
                          :width             "300"
@@ -172,8 +167,7 @@
                         :spotify-token spotify-token
                         :device        device
                         :setDevice     setDevice})
-           (CE playlists {:classes       classes
-                          :spotify-token spotify-token
-                          :device        device
-                          :playlist      playlist
-                          :setPlaylist   setPlaylist}))))
+           (when (not-empty device)
+             (CE playlists {:classes       classes
+                            :spotify-token spotify-token
+                            :device        device})))))
