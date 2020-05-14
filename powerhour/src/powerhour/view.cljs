@@ -196,7 +196,7 @@
            (RE IconButton {:className "select-help-button"
                            :size      "small"
                            :onClick   (fn []
-                                        (js/alert "This app is just a remote for Spotify. Selecting a playlist will replace your queue with the first 60 songs of the playlist. This is optional."))}
+                                        (js/alert "Selecting a playlist will append (not replace) the songs from this playlist to your queue. This is optional."))}
                (RE HelpOutlineIcon {:fontSize "inherit"})))))
 
 (defn now-playing
