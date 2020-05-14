@@ -21,8 +21,6 @@
 
 ;; NOTE neither spotify play butter nor spotify web playback api work on mobile
 
-;; TODO shot interval seletor
-;; TODO game length selector
 ;; TODO play button
 ;; TODO album cover and track name
 ;; TODO very very simple audio reactive quil background, with checkbox to turn it on, default off
@@ -48,23 +46,41 @@
 
 (defn shot-interval
   [{:keys [classes interval setInterval]}]
-  (RE FormControl {:className   (:buttonFormControl classes)
-                   #_#_:variant "outlined"}
-      (RE InputLabel {:id "interval-select-label"} "Interval")
-      (RE Select {:labelId  "interval-select-label"
-                  :value    (str interval)
-                  :onChange (fn [e]
-                              (setInterval (.. e -target -value)))}
-          (into []
-                (map (fn [seconds]
-                       (RE MenuItem {:key   (str seconds)
-                                     :value (str seconds)}
-                           (d/span nil
-                                   (as-> (/ seconds 60) minutes
-                                     (if (< minutes 2)
-                                       (str seconds " seconds")
-                                       (str minutes " minutes")))))))
-                [15 30 60 90 120 180]))))
+  (d/div nil
+         (RE FormControl {:className   (:buttonFormControl classes)
+                          #_#_:variant "outlined"}
+             (RE InputLabel {:id "interval-select-label"} "Interval")
+             (RE Select {:labelId  "interval-select-label"
+                         :value    (str interval)
+                         :onChange (fn [e]
+                                     (setInterval (js/parseInt (.. e -target -value))))}
+                 (into []
+                       (map (fn [seconds]
+                              (RE MenuItem {:key   (str seconds)
+                                            :value (str seconds)}
+                                  (d/span nil
+                                          (as-> (/ seconds 60) minutes
+                                            (if (< minutes 2)
+                                              (str seconds " seconds")
+                                              (str minutes " minutes")))))))
+                       [15 30 60 90 120 180])))))
+
+(defn game-length
+  [{:keys [classes length setLength]}]
+  (d/div nil
+         (RE FormControl {:className   (:buttonFormControl classes)
+                          #_#_:variant "outlined"}
+             (RE InputLabel {:id "length-select-label"} "Length")
+             (RE Select {:labelId  "length-select-label"
+                         :value    (str length)
+                         :onChange (fn [e]
+                                     (setLength (js/parseInt (.. e -target -value))))}
+                 (into []
+                       (map (fn [minutes]
+                              (RE MenuItem {:key   (str minutes)
+                                            :value (str minutes)}
+                                  (d/span nil (str minutes " minutes")))))
+                       [20 30 60 90 100])))))
 
 (defn devices
   [{:keys [classes spotify-token device setDevice]}]
@@ -177,10 +193,11 @@
         classes            (->clj (styles))
         spotify-token      (spotify/token "ff53948d58f1491baa6169d34bc4179a")
         [device setDevice] (react/useState "")
-        [interval setInterval] (react/useState 60)]
+        [interval setInterval] (react/useState 60)
+        [length setLength] (react/useState 60)]
     (d/div {:className (:app classes)}
-           #_(RE Iframe {:src               "https://open.spotify.com/embed/playlist/02FALZS2dSPI33T644ENNb"
-                         :width             "300"
+           #_(RE Iframe {:src       (int minutesminutes        "Length://open.spotify.com/embed/playlist/02FALZS2dSPI33T644ENNb")
+                         :minutesminuteswidth             "300"
                          :height            "80"
                          :frameborder       "0"
                          :allowtransparency "true"
@@ -188,6 +205,9 @@
            (CE shot-interval {:classes classes
                               :interval interval
                               :setInterval setInterval})
+           (CE game-length {:classes   classes
+                            :length    length
+                            :setLength setLength})
            (CE devices {:classes       classes
                         :spotify-token spotify-token
                         :device        device
