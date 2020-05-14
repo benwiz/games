@@ -35,10 +35,15 @@
 (def styles
   (makeStyles (fn [theme]
                 (let [theme (->clj theme)]
-                  #js {:app               #js {:fontFamily    "'Roboto', sans-serif"
-                                               :dispaly       "flex"
-                                               :flexDirection "column"}
-                       :buttonFormControl #js {:width 200}}))))
+                  #js {:app    #js {:fontFamily    "'Roboto', sans-serif"
+                                    :display       "flex"
+                                    :flexDirection "column"
+                                    :margin        "0 auto"
+                                    :width         300}
+                       :item   #js {:margin ((:spacing theme) 3.0)}
+                       :button #js {:textAlign "left"
+                                    :width     200}
+                       :fab    #js {:margin "0 auto"}}))))
 
 (defn classname
   [classes classnames]
@@ -51,8 +56,8 @@
 
 (defn shot-interval
   [{:keys [classes interval setInterval]}]
-  (d/div nil
-         (RE FormControl {:className   (:buttonFormControl classes)
+  (d/div {:className (:item classes)}
+         (RE FormControl {:className (:button classes)
                           #_#_:variant "outlined"}
              (RE InputLabel {:id "interval-select-label"} "Interval")
              (RE Select {:labelId  "interval-select-label"
@@ -72,8 +77,8 @@
 
 (defn game-length
   [{:keys [classes length setLength]}]
-  (d/div nil
-         (RE FormControl {:className   (:buttonFormControl classes)
+  (d/div {:className (:item classes)}
+         (RE FormControl {:className   (:button classes)
                           #_#_:variant "outlined"}
              (RE InputLabel {:id "length-select-label"} "Length")
              (RE Select {:labelId  "length-select-label"
@@ -113,8 +118,8 @@
         (fn []))
       #js [])
 
-    (d/div nil
-           (RE FormControl {:className   (:buttonFormControl classes)
+    (d/div {:className (:item classes)}
+           (RE FormControl {:className (:button classes)
                             #_#_:variant "outlined"}
                (RE InputLabel {:id "device-select-label"} "Playback Device")
                (RE Select {:labelId  "device-select-label"
@@ -161,8 +166,8 @@
     ;; TODO use a split button https://material-ui.com/components/button-group/#split-button
     ;; then it can be very obvious that you are taking the action of "queueing" a playlist
     ;; I can have some default "power hour" playlists. Also, can do away with playlist state.
-    (d/div nil
-           (RE FormControl {:className   (:buttonFormControl classes)
+    (d/div {:className (:item classes)}
+           (RE FormControl {:className (:button classes)
                             #_#_:variant "outlined"}
                (RE InputLabel {:id "playlist-select-label"} "Queue Playlist (optional)")
                (RE Select {:labelId  "playlist-select-label"
@@ -196,8 +201,7 @@
 
 (defn now-playing
   [{:keys [classes currentTrack]}]
-  (cljs.pprint/pprint currentTrack)
-  (d/div nil
+  (d/div {:className (classname classes [:item])}
          (d/img {:src    (-> currentTrack :album :images second :url)
                  :height 200
                  :width  200})
@@ -209,8 +213,9 @@
 
 (defn play-pause
   [{:keys [classes spotify-token device playing setPlaying]}]
-  (d/div nil
-         (RE Fab {:onClick (fn [_]
+  (d/div {:className (:item classes)}
+         (RE Fab {:className (:fab classes)
+                  :onClick (fn [_]
                              (if playing
                                (spotify/pause! spotify-token
                                                (fn [_response] (setPlaying false))
