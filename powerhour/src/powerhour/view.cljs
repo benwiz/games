@@ -46,6 +46,26 @@
                         (map #(get classes %))
                         classnames))))
 
+(defn shot-interval
+  [{:keys [classes interval setInterval]}]
+  (RE FormControl {:className   (:buttonFormControl classes)
+                   #_#_:variant "outlined"}
+      (RE InputLabel {:id "interval-select-label"} "Interval")
+      (RE Select {:labelId  "interval-select-label"
+                  :value    (str interval)
+                  :onChange (fn [e]
+                              (setInterval (.. e -target -value)))}
+          (into []
+                (map (fn [seconds]
+                       (RE MenuItem {:key   (str seconds)
+                                     :value (str seconds)}
+                           (d/span nil
+                                   (as-> (/ seconds 60) minutes
+                                     (if (< minutes 2)
+                                       (str seconds " seconds")
+                                       (str minutes " minutes")))))))
+                [15 30 60 90 120 180]))))
+
 (defn devices
   [{:keys [classes spotify-token device setDevice]}]
   (let [[devices setDevices] (react/useState [])]
@@ -156,7 +176,8 @@
   (let [;; Log into spotify so that full songs can be played through iFrame and get access token for api use.
         classes            (->clj (styles))
         spotify-token      (spotify/token "ff53948d58f1491baa6169d34bc4179a")
-        [device setDevice] (react/useState "")]
+        [device setDevice] (react/useState "")
+        [interval setInterval] (react/useState 60)]
     (d/div {:className (:app classes)}
            #_(RE Iframe {:src               "https://open.spotify.com/embed/playlist/02FALZS2dSPI33T644ENNb"
                          :width             "300"
@@ -164,6 +185,9 @@
                          :frameborder       "0"
                          :allowtransparency "true"
                          :allow             "encrypted-media"})
+           (CE shot-interval {:classes classes
+                              :interval interval
+                              :setInterval setInterval})
            (CE devices {:classes       classes
                         :spotify-token spotify-token
                         :device        device
