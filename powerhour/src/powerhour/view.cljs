@@ -21,7 +21,6 @@
 
 ;; NOTE neither spotify play butter nor spotify web playback api work on mobile
 
-;; TODO select a playlist -> load songs into queue, with an info icon button explaining what is happening
 ;; TODO shot interval seletor
 ;; TODO game length selector
 ;; TODO play button
@@ -36,7 +35,7 @@
                   #js {:app               #js {:fontFamily    "'Roboto', sans-serif"
                                                :dispaly       "flex"
                                                :flexDirection "column"}
-                       :buttonFormControl #js {:width 180}}))))
+                       :buttonFormControl #js {:width 200}}))))
 
 (defn classname
   [classes classnames]
@@ -115,23 +114,32 @@
                                                                      (comp
                                                                        (map :id))
                                                                      ps))))))))]
-          (get-and-update-playlists)
-          ;; (js/setInterval get-and-update-playlists 10000)
-          )
+          (get-and-update-playlists))
         (fn []))
       #js [])
 
+    ;; TODO use a split button https://material-ui.com/components/button-group/#split-button
+    ;; then it can be very obvious that you are taking the action of "queueing" a playlist
+    ;; I can have some default "power hour" playlists
     (d/div nil
-           ;; TODO better signal that this is optional
            (RE FormControl {:className   (:buttonFormControl classes)
                             #_#_:variant "outlined"}
-               (RE InputLabel {:id "playlist-select-label"} "Playlist")
+               (RE InputLabel {:id "playlist-select-label"} "Queue Playlist (optional)")
                (RE Select {:labelId  "playlist-select-label"
                            :value    playlist
                            :onChange (fn [e]
                                        (let [playlist-id (.. e -target -value)]
-                                         (prn "TODO call start/resume on spotify api")
-                                         (spotify/play! spotify-token identity [(str "spotify:playlist:" playlist-id)] device)
+                                         ;; NOTE it would be nice to empty the queue but
+                                         ;;      that is not a feature of Spotify's apis
+                                         (spotify/playlist spotify-token playlist-id
+                                                           (fn [response]
+                                                             (as-> (into []
+                                                                         (comp
+                                                                           (map (comp :uri :track)))
+                                                                         (-> response :body :items))
+                                                                 uris
+                                                               (doseq [uri uris]
+                                                                 (spotify/queue! spotify-token uri identity device)))))
                                          (setPlaylist playlist-id)))}
                    (into []
                          (comp
@@ -143,7 +151,7 @@
            (RE IconButton {:className "select-help-button"
                            :size      "small"
                            :onClick   (fn []
-                                        (js/alert "This app is just a remote for Spotify. Selecting a playlist will start playing that playlist. This is optional."))}
+                                        (js/alert "This app is just a remote for Spotify. Selecting a playlist will replace your queue with the first 60 songs of the playlist. This is optional."))}
                (RE HelpOutlineIcon {:fontSize "inherit"})))))
 
 (defn app

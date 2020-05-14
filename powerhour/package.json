@@ -9,6 +9,7 @@
   "dependencies": {
     "@material-ui/core": "^4.9.0",
     "@material-ui/icons": "^4.9.0",
+    "@material-ui/lab": "^4.0.0-alpha.53",
     "@material-ui/styles": "^4.9.0",
     "create-react-class": "^15.6.2",
     "react": "^16.12.0",

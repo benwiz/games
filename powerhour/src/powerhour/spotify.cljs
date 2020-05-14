@@ -82,6 +82,10 @@
                                       (some? query-params) (assoc :query-params query-params))))]
         (handler response))))
 
+(defn playlist
+  [token playlist-id handler]
+  (api-get (str "https://api.spotify.com/v1/playlists/" playlist-id "/tracks") token handler))
+
 (defn playlists
   [token handler]
   (api-get "https://api.spotify.com/v1/me/playlists" token handler))
@@ -100,9 +104,9 @@
   (api-get "https://api.spotify.com/v1/me/player" token handler))
 
 (defn queue!
-  [token track-id handler & [device-id]]
+  [token track-uri handler & [device-id]]
   (api-post "https://api.spotify.com/v1/me/player/queue" token handler
-            (cond-> {"uri" (str "spotify:track:" track-id)}
+            (cond-> {"uri" track-uri}
               (some? device-id) (assoc "device_id" device-id))))
 
 (defn skip!
