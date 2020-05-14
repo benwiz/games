@@ -25,8 +25,7 @@
 ;; NOTE neither spotify play butter nor spotify web playback api work on mobile
 
 ;; TODO album cover and track name
-;; TODO play/pause button
-;; TOOD timer component
+;; TOOD timer component... play-pause needs to link into this
 ;; TODO trigger next on minute mark
 ;; TODO trigger ding on monite mark
 ;; TODO very very simple audio reactive quil background, with checkbox to turn it on, default off
@@ -119,7 +118,9 @@
                             #_#_:variant "outlined"}
                (RE InputLabel {:id "device-select-label"} "Playback Device")
                (RE Select {:labelId  "device-select-label"
-                           :value    device
+                           :value    (if (some #(= device (:id %)) devices)
+                                       device
+                                       "")
                            :onChange (fn [e]
                                        (let [device-id (.. e -target -value)]
                                          (spotify/transfer! spotify-token device-id identity)
@@ -135,7 +136,7 @@
            (RE IconButton {:className "select-help-button"
                            :size      "small"
                            :onClick   (fn []
-                                        (js/alert "This app is just a remote for Spotify. Open the Spotify app on this device or another device then select it from the list."))}
+                                        (js/alert "This app is just a remote for Spotify. Open the Spotify app on this device or another device then select it from the list. If your device is not on the list, double check that the app is open, if it still isn't there then that speaker (e.g. Sonos) cannot be controlled from Spotify's Web API."))}
                (RE HelpOutlineIcon {:fontSize "inherit"})))))
 
 (defn playlists
@@ -193,11 +194,23 @@
                                         (js/alert "This app is just a remote for Spotify. Selecting a playlist will replace your queue with the first 60 songs of the playlist. This is optional."))}
                (RE HelpOutlineIcon {:fontSize "inherit"})))))
 
+(defn now-playing
+  [{:keys [classes currentTrack]}]
+  (cljs.pprint/pprint currentTrack)
+  (d/div nil
+         (d/img {:src    (-> currentTrack :album :images second :url)
+                 :height 200
+                 :width  200})
+         (d/div nil (-> currentTrack :name))
+         (d/div nil (->> (into []
+                               (map :name)
+                               (-> currentTrack :artists))
+                         (str/join ", ")))))
+
 (defn play-pause
   [{:keys [classes spotify-token device playing setPlaying]}]
   (d/div nil
          (RE Fab {:onClick (fn [_]
-                             (prn "playing" playing)
                              (if playing
                                (spotify/pause! spotify-token
                                                (fn [_response] (setPlaying false))
@@ -214,17 +227,23 @@
   (let [;; Log into spotify so that full songs can be played through iFrame and get access token for api use.
         classes                (->clj (styles))
         spotify-token          (spotify/token "ff53948d58f1491baa6169d34bc4179a")
-        [interval setInterval] (react/useState 60)
+        [interval setShotInterval] (react/useState 60)
         [length setLength]     (react/useState 60)
         [device setDevice]     (react/useState "")
-        [playing setPlaying]   (react/useState false)]
+        [playing setPlaying]   (react/useState false)
+        [currentTrack setCurrentTrack] (react/useState nil)]
 
-    ;; On load, playing state (device state is set inside component)
+    ;; Update playing and currentTrack
     (react/useEffect
       (fn []
-        (spotify/player spotify-token
-                        (fn [response]
-                          (setPlaying (-> response :body :is_playing))))
+        (letfn [(currently-playing
+                  []
+                  (spotify/player spotify-token
+                                  (fn [response]
+                                    (setCurrentTrack (-> response :body :item))
+                                    (setPlaying (-> response :body :is_playing)))))]
+          (currently-playing)
+          (js/setInterval currently-playing 1000))
         (fn []))
       #js [])
 
@@ -237,7 +256,7 @@
                          :allow               "encrypted-media"})
            (CE shot-interval {:classes     classes
                               :interval    interval
-                              :setInterval setInterval})
+                              :setInterval setShotInterval})
            (CE game-length {:classes   classes
                             :length    length
                             :setLength setLength})
@@ -249,6 +268,8 @@
              (CE playlists {:classes       classes
                             :spotify-token spotify-token
                             :device        device}))
+           (CE now-playing {:classes      classes
+                            :currentTrack currentTrack})
            (when (not-empty device)
              (CE play-pause {:classes       classes
                              :spotify-token spotify-token
