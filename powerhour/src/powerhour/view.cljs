@@ -1,14 +1,14 @@
 (ns powerhour.view
   (:require ["@material-ui/core/Button" :default Button]
-            ["@material-ui/core/FormControl" :default FormControl]
             ["@material-ui/core/Fab" :default Fab]
+            ["@material-ui/core/FormControl" :default FormControl]
             ["@material-ui/core/IconButton" :default IconButton]
             ["@material-ui/core/InputLabel" :default InputLabel]
             ["@material-ui/core/MenuItem" :default MenuItem]
             ["@material-ui/core/Select" :default Select]
             ["@material-ui/icons/HelpOutline" :default HelpOutlineIcon]
-            ["@material-ui/icons/PlayArrow" :default PlayArrowIcon]
             ["@material-ui/icons/Pause" :default PauseIcon]
+            ["@material-ui/icons/PlayArrow" :default PlayArrowIcon]
             ["react" :as react]
             ;; ["react-iframe" :default Iframe]
             ;; ["@material-ui/core/Card" :default Card]
@@ -20,30 +20,35 @@
             [clojure.string :as str]
             [crinkle.component :refer [CE RE]]
             [crinkle.dom :as d]
+            [goog.string :as gstr]
+            [goog.string.format]
             [powerhour.spotify :as spotify]))
 
 ;; NOTE neither spotify play butter nor spotify web playback api work on mobile
 
-;; TODO album cover and track name
 ;; TOOD timer component... play-pause needs to link into this
 ;; TODO trigger next on minute mark
 ;; TODO trigger ding on monite mark
 ;; TODO very very simple audio reactive quil background, with checkbox to turn it on, default off
 ;; TODO login button if not logged in
 ;; TODO refresh access token when appropriate
+;; TODO make buttons average color of album color, or maybe the dominant (mode) color
 
 (def styles
   (makeStyles (fn [theme]
                 (let [theme (->clj theme)]
-                  #js {:app    #js {:fontFamily    "'Roboto', sans-serif"
-                                    :display       "flex"
-                                    :flexDirection "column"
-                                    :margin        "0 auto"
-                                    :width         300}
-                       :item   #js {:margin ((:spacing theme) 3.0)}
-                       :button #js {:textAlign "left"
-                                    :width     200}
-                       :fab    #js {:margin "0 auto"}}))))
+                  #js {:app         #js {:fontFamily    "'Roboto', sans-serif"
+                                         :display       "flex"
+                                         :flexDirection "column"
+                                         :margin        "0 auto"
+                                         :width         300}
+                       :item        #js {:margin    ((:spacing theme) 3.0)
+                                         :textAlign "center"}
+                       :button      #js {:textAlign "left"
+                                         :width     200}
+                       :fab         #js {:margin "0 auto"}
+                       :now-playing #js {}
+                       :artist #js {:color "gray"}}))))
 
 (defn classname
   [classes classnames]
@@ -53,6 +58,22 @@
     (str/join " " (into []
                         (map #(get classes %))
                         classnames))))
+
+(defn useInterval
+  [callback delay]
+  (let [savedCallback (react/useRef)]
+    (react/useEffect
+      (fn []
+        (set! (.. savedCallback -current) callback)
+        (fn []))
+      #js [callback])
+    (react/useEffect
+      (fn []
+        (when (some? delay)
+          (let [id (js/setInterval #(.. savedCallback current) delay)]
+            (fn []
+              (js/clearInterval id)))))
+      #js [delay])))
 
 (defn shot-interval
   [{:keys [classes interval setInterval]}]
@@ -87,9 +108,10 @@
                                      (setLength (js/parseInt (.. e -target -value))))}
                  (into []
                        (map (fn [minutes]
-                              (RE MenuItem {:key   (str minutes)
-                                            :value (str minutes)}
-                                  (d/span nil (str minutes " minutes")))))
+                              (let [seconds (* 60 minutes)]
+                                (RE MenuItem {:key   (str minutes)
+                                              :value (str seconds)}
+                                    (d/span nil (str minutes " minutes"))))))
                        [20 30 60 90 100])))))
 
 (defn devices
@@ -138,11 +160,12 @@
                                                 :value id}
                                       (d/span nil name)))))
                          devices)))
-           (RE IconButton {:className "select-help-button"
-                           :size      "small"
-                           :onClick   (fn []
-                                        (js/alert "This app is just a remote for Spotify. Open the Spotify app on this device or another device then select it from the list. If your device is not on the list, double check that the app is open, if it still isn't there then that speaker (e.g. Sonos) cannot be controlled from Spotify's Web API."))}
-               (RE HelpOutlineIcon {:fontSize "inherit"})))))
+           (d/div nil ;; TODO make pretty
+                  (RE IconButton {:className "select-help-button"
+                                      :size      "small"
+                                      :onClick   (fn []
+                                                   (js/alert "This app is just a remote for Spotify. Open the Spotify app on this device or another device then select it from the list. If your device is not on the list, double check that the app is open, if it still isn't there then that speaker (e.g. Sonos) cannot be controlled from Spotify's Web API."))}
+                          (RE HelpOutlineIcon {:fontSize "inherit"}))))))
 
 (defn playlists
   [{:keys [classes spotify-token device]}]
@@ -193,23 +216,42 @@
                                                 :value id}
                                       (d/span nil name)))))
                          playlists)))
-           (RE IconButton {:className "select-help-button"
-                           :size      "small"
-                           :onClick   (fn []
-                                        (js/alert "Selecting a playlist will append (not replace) the songs from this playlist to your queue. This is optional."))}
-               (RE HelpOutlineIcon {:fontSize "inherit"})))))
+           (d/div nil ;; TODO make pretty
+                  (RE IconButton {:className "select-help-button"
+                                  :size      "small"
+                                  :onClick   (fn []
+                                               (js/alert "Selecting a playlist will append (not replace) the songs from this playlist to your queue. This is optional."))}
+                      (RE HelpOutlineIcon {:fontSize "inherit"}))))))
+
+(defn clock
+  [{:keys [classes length playing]}]
+  (let [[timer setTimer] (react/useState length)
+        minutes (int (/ timer 60))
+        seconds (mod timer 60)]
+
+    (useInterval
+      (fn []
+        (when playing
+          (setTimer dec)))
+      1000)
+
+    (d/div {:className (:item classes)}
+           (d/span {:className (:clock-span classes)}
+                   (str minutes ":" (gstr/format "%02d" seconds))))))
 
 (defn now-playing
   [{:keys [classes currentTrack]}]
-  (d/div {:className (classname classes [:item])}
+  (d/div {:className (classname classes [:item :now-playing])}
          (d/img {:src    (-> currentTrack :album :images second :url)
                  :height 200
                  :width  200})
-         (d/div nil (-> currentTrack :name))
-         (d/div nil (->> (into []
-                               (map :name)
-                               (-> currentTrack :artists))
-                         (str/join ", ")))))
+         (d/div {:className (:track classes)}
+                (-> currentTrack :name))
+         (d/div {:className (:artist classes)}
+                (->> (into []
+                           (map :name)
+                           (-> currentTrack :artists))
+                     (str/join ", ")))))
 
 (defn play-pause
   [{:keys [classes spotify-token device playing setPlaying]}]
@@ -227,15 +269,30 @@
                (RE PauseIcon)
                (RE PlayArrowIcon)))))
 
+(defn start-button
+  [{:keys [classes spotify-token device setStarted playing setPlaying]}]
+  (RE Button {:className (:item classes)
+              :disabled  (nil? device)
+              :variant   "contained"
+              :color     "primary"
+              :onClick   (fn [_]
+                           (setStarted true)
+                           (when-not playing
+                             (spotify/play! spotify-token
+                                            (fn [_response] (setPlaying true))
+                                            device)))}
+      "Start!"))
+
 (defn app
   []
   (let [;; Log into spotify so that full songs can be played through iFrame and get access token for api use.
-        classes                (->clj (styles))
-        spotify-token          (spotify/token "ff53948d58f1491baa6169d34bc4179a")
-        [interval setShotInterval] (react/useState 60)
-        [length setLength]     (react/useState 60)
-        [device setDevice]     (react/useState "")
-        [playing setPlaying]   (react/useState false)
+        classes                        (->clj (styles))
+        spotify-token                  (spotify/token "ff53948d58f1491baa6169d34bc4179a")
+        [interval setShotInterval]     (react/useState 60)
+        [length setLength]             (react/useState 3600)
+        [device setDevice]             (react/useState "")
+        [started setStarted]           (react/useState false)
+        [playing setPlaying]           (react/useState false)
         [currentTrack setCurrentTrack] (react/useState nil)]
 
     ;; Update playing and currentTrack
@@ -245,8 +302,12 @@
                   []
                   (spotify/player spotify-token
                                   (fn [response]
-                                    (setCurrentTrack (-> response :body :item))
-                                    (setPlaying (-> response :body :is_playing)))))]
+                                    (let [track (-> response :body :item)
+                                          playing (-> response :body :is_playing)]
+                                      (when (some? track)
+                                        (setCurrentTrack track))
+                                      (when (some? playing)
+                                        (setPlaying playing))))))]
           (currently-playing)
           (js/setInterval currently-playing 1000))
         (fn []))
@@ -273,11 +334,21 @@
              (CE playlists {:classes       classes
                             :spotify-token spotify-token
                             :device        device}))
+           (when started
+             (CE clock {:classes classes
+                        :length length
+                        :playing playing}))
            (CE now-playing {:classes      classes
                             :currentTrack currentTrack})
-           (when (not-empty device)
+           (if started
              (CE play-pause {:classes       classes
                              :spotify-token spotify-token
                              :device        device
                              :playing       playing
-                             :setPlaying    setPlaying})))))
+                             :setPlaying    setPlaying})
+             (CE start-button {:classes       classes
+                               :spotify-token spotify-token
+                               :device        device
+                               :playing       playing
+                               :setPlaying    setPlaying
+                               :setStarted    setStarted})))))
