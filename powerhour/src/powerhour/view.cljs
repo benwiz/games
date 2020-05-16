@@ -26,8 +26,8 @@
 
 ;; NOTE neither spotify play butter nor spotify web playback api work on mobile
 
-;; TODO login button if not logged in
 ;; TODO refresh access token when appropriate
+;; TODO better login screen (button styling and power hour title)
 
 ;; TODO trigger ding on minute mark
 ;; TODO make buttons average color of album color, or maybe the dominant (mode) color
