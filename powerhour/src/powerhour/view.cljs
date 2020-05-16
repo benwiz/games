@@ -26,7 +26,6 @@
 
 ;; NOTE neither spotify play butter nor spotify web playback api work on mobile
 
-;; TODO trigger next on minute mark
 ;; TODO login button if not logged in
 ;; TODO refresh access token when appropriate
 
@@ -296,76 +295,89 @@
                                             device)))}
       "Start!"))
 
+(defn redirect-button
+  [{:keys [classes]}]
+  (RE Button {:className (:spotify-button classes)
+              :color "primary"
+              :variant "contained"
+              :onClick (fn []
+                         (spotify/redirect "ff53948d58f1491baa6169d34bc4179a"))}
+      "Login to Spotify"))
+
 (defn app
   []
-  (let [;; Log into spotify so that full songs can be played through iFrame and get access token for api use.
-        classes                        (->clj (styles))
-        spotify-token                  (spotify/token "ff53948d58f1491baa6169d34bc4179a")
-        [interval setShotInterval]     (react/useState 60)
-        [length setLength]             (react/useState 3600)
-        [device setDevice]             (react/useState "")
-        [started setStarted]           (react/useState false)
-        [playing setPlaying]           (react/useState false)
-        [currentTrack setCurrentTrack] (react/useState nil)]
+  ;; Log into spotify so that full songs can be played through iFrame and get access token for api use.
+  (let [classes       (->clj (styles))
+        spotify-token (spotify/token)]
+    (if-not spotify-token
+      ;; Redirect
+      (CE redirect-button {:classes classes})
+      ;; Main app
+      (let [[interval setShotInterval]     (react/useState 60)
+            [length setLength]             (react/useState 3600)
+            [device setDevice]             (react/useState "")
+            [started setStarted]           (react/useState false)
+            [playing setPlaying]           (react/useState false)
+            [currentTrack setCurrentTrack] (react/useState nil)]
 
-    ;; Update playing and currentTrack
-    (react/useEffect
-      (fn []
-        (letfn [(currently-playing
-                  []
-                  (spotify/player spotify-token
-                                  (fn [response]
-                                    (let [track (-> response :body :item)
-                                          playing (-> response :body :is_playing)]
-                                      (when (some? track)
-                                        (setCurrentTrack track))
-                                      (when (some? playing)
-                                        (setPlaying playing))))))]
-          (currently-playing)
-          (js/setInterval currently-playing 5000))
-        (fn []))
-      #js [])
+        ;; Update playing and currentTrack
+        (react/useEffect
+          (fn []
+            (letfn [(currently-playing
+                      []
+                      (spotify/player spotify-token
+                                      (fn [response]
+                                        (let [track   (-> response :body :item)
+                                              playing (-> response :body :is_playing)]
+                                          (when (some? track)
+                                            (setCurrentTrack track))
+                                          (when (some? playing)
+                                            (setPlaying playing))))))]
+              (currently-playing)
+              (js/setInterval currently-playing 5000))
+            (fn []))
+          #js [])
 
-    (d/div {:className (:app classes)}
-           #_(RE Iframe {:src                 (int minutesminutes        "Length://open.spotify.com/embed/playlist/02FALZS2dSPI33T644ENNb")
-                         :minutesminuteswidth "300"
-                         :height              "80"
-                         :frameborder         "0"
-                         :allowtransparency   "true"
-                         :allow               "encrypted-media"})
-           (CE shot-interval {:classes     classes
-                              :interval    interval
-                              :setInterval setShotInterval})
-           (CE game-length {:classes   classes
-                            :length    length
-                            :setLength setLength
-                            :started   started})
-           (CE devices {:classes       classes
-                        :spotify-token spotify-token
-                        :device        device
-                        :setDevice     setDevice})
-           (when (not-empty device)
-             (CE playlists {:classes       classes
+        (d/div {:className (:app classes)}
+               #_(RE Iframe {:src                 (int minutesminutes        "Length://open.spotify.com/embed/playlist/02FALZS2dSPI33T644ENNb")
+                             :minutesminuteswidth "300"
+                             :height              "80"
+                             :frameborder         "0"
+                             :allowtransparency   "true"
+                             :allow               "encrypted-media"})
+               (CE shot-interval {:classes     classes
+                                  :interval    interval
+                                  :setInterval setShotInterval})
+               (CE game-length {:classes   classes
+                                :length    length
+                                :setLength setLength
+                                :started   started})
+               (CE devices {:classes       classes
                             :spotify-token spotify-token
-                            :device        device}))
-           (when started
-             (CE clock {:classes       classes
-                        :spotify-token spotify-token
-                        :device        device
-                        :length        length
-                        :playing       playing
-                        :interval      interval}))
-           (CE now-playing {:classes      classes
-                            :currentTrack currentTrack})
-           (if started
-             (CE play-pause {:classes       classes
-                             :spotify-token spotify-token
-                             :device        device
-                             :playing       playing
-                             :setPlaying    setPlaying})
-             (CE start-button {:classes       classes
-                               :spotify-token spotify-token
-                               :device        device
-                               :playing       playing
-                               :setPlaying    setPlaying
-                               :setStarted    setStarted})))))
+                            :device        device
+                            :setDevice     setDevice})
+               (when (not-empty device)
+                 (CE playlists {:classes       classes
+                                :spotify-token spotify-token
+                                :device        device}))
+               (when started
+                 (CE clock {:classes       classes
+                            :spotify-token spotify-token
+                            :device        device
+                            :length        length
+                            :playing       playing
+                            :interval      interval}))
+               (CE now-playing {:classes      classes
+                                :currentTrack currentTrack})
+               (if started
+                 (CE play-pause {:classes       classes
+                                 :spotify-token spotify-token
+                                 :device        device
+                                 :playing       playing
+                                 :setPlaying    setPlaying})
+                 (CE start-button {:classes       classes
+                                   :spotify-token spotify-token
+                                   :device        device
+                                   :playing       playing
+                                   :setPlaying    setPlaying
+                                   :setStarted    setStarted})))))))

@@ -9,6 +9,7 @@
             [powerhour.localstorage :as localstorage]))
 
 ;; TODO I think there is a way for me to tell spotify to only give me desired parts of response tree
+
 (defn redirect
   [client-id]
   (let [scopes            (js/encodeURIComponent (str/join " " ["user-read-playback-state"
@@ -25,7 +26,7 @@
 
 (defn token
   "Get access token. I am currently never refreshing this token, I should."
-  [client-id]
+  []
   (let [stored-access-token (-> (localstorage/get-item "spotify-access-token")
                                 edn/read-string)
         url-access-token    (-> (subs js/window.location.hash 1)
@@ -44,18 +45,20 @@
               (localstorage/set-item! "spotify-access-token" {:token      url-access-token
                                                               :expiration (+ now ttl)})
               url-access-token)
-            (redirect client-id))
+            ;; not logged in
+            false)
           token))
 
-      ;; Access token from url (but only after checking for local storage) -> store in localstorage
+      ;; Access token from url (but only after checking for local storage) -> store in localstorage, then redirect to remove it from url
       (some? url-access-token)
       (do
         (localstorage/set-item! "spotify-access-token" {:token      url-access-token
                                                         :expiration (+ now ttl)})
-        url-access-token)
+        ;; url-access-token
+        (set! js/window.location ""))
 
       ;; Otherwise, we have no token -> redirect
-      :else (redirect client-id))))
+      :else false)))
 
 (defn api-get
   [url token handler & [query-params]]
