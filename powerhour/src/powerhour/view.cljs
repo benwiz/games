@@ -94,16 +94,17 @@
                                             (if (< minutes 2)
                                               (str seconds " seconds")
                                               (str minutes " minutes")))))))
-                       [15 30 60 90 120 180])))))
+                       [5 15 30 60 90 120 180])))))
 
 (defn game-length
-  [{:keys [classes length setLength]}]
+  [{:keys [classes length setLength started]}]
   (d/div {:className (:item classes)}
          (RE FormControl {:className   (:button classes)
                           #_#_:variant "outlined"}
              (RE InputLabel {:id "length-select-label"} "Length")
              (RE Select {:labelId  "length-select-label"
                          :value    (str length)
+                         :disabled started
                          :onChange (fn [e]
                                      (setLength (js/parseInt (.. e -target -value))))}
                  (into []
@@ -224,7 +225,7 @@
                       (RE HelpOutlineIcon {:fontSize "inherit"}))))))
 
 (defn clock
-  [{:keys [classes spotify-token device length playing]}]
+  [{:keys [classes spotify-token device length playing interval]}]
   (let [[timer setTimer] (react/useState length)
         minutes (int (/ timer 60))
         seconds (mod timer 60)]
@@ -237,12 +238,15 @@
 
     (react/useEffect
       (fn []
-        (when (zero? (/ timer 60))
+        (prn seconds)
+        (when (and (< timer length) ;; don't skip at start of game
+                   (zero? (mod timer interval)))
+          ;; TODO make a ding sound
           (spotify/skip! spotify-token
                           (fn [_response])
                           device))
         (fn []))
-      #js [timer])
+      #js [timer shot-interval])
 
     (d/div {:className (:item classes)}
            (d/span {:className (:clock-span classes)}
@@ -318,7 +322,7 @@
                                       (when (some? playing)
                                         (setPlaying playing))))))]
           (currently-playing)
-          (js/setInterval currently-playing 1000))
+          (js/setInterval currently-playing 5000))
         (fn []))
       #js [])
 
@@ -334,7 +338,8 @@
                               :setInterval setShotInterval})
            (CE game-length {:classes   classes
                             :length    length
-                            :setLength setLength})
+                            :setLength setLength
+                            :started   started})
            (CE devices {:classes       classes
                         :spotify-token spotify-token
                         :device        device
@@ -348,7 +353,8 @@
                         :spotify-token spotify-token
                         :device        device
                         :length        length
-                        :playing       playing}))
+                        :playing       playing
+                        :interval      interval}))
            (CE now-playing {:classes      classes
                             :currentTrack currentTrack})
            (if started
