@@ -7,6 +7,7 @@
             ["@material-ui/core/MenuItem" :default MenuItem]
             ["@material-ui/core/Select" :default Select]
             ["@material-ui/icons/HelpOutline" :default HelpOutlineIcon]
+            ["@material-ui/core/SvgIcon" :default SvgIcon]
             ["@material-ui/icons/Pause" :default PauseIcon]
             ["@material-ui/icons/PlayArrow" :default PlayArrowIcon]
             ["react" :as react]
@@ -36,18 +37,23 @@
 (def styles
   (makeStyles (fn [theme]
                 (let [theme (->clj theme)]
-                  #js {:app         #js {:fontFamily    "'Roboto', sans-serif"
-                                         :display       "flex"
-                                         :flexDirection "column"
-                                         :margin        "0 auto"
-                                         :width         300}
-                       :item        #js {:margin    ((:spacing theme) 3.0)
-                                         :textAlign "center"}
-                       :button      #js {:textAlign "left"
-                                         :width     200}
-                       :fab         #js {:margin "0 auto"}
-                       :now-playing #js {}
-                       :artist #js {:color "gray"}}))))
+                  #js {:app            #js {:fontFamily    "'Roboto', sans-serif"
+                                            :display       "flex"
+                                            :flexDirection "column"
+                                            :margin        "0 auto"
+                                            :width         300}
+                       :item           #js {:margin    ((:spacing theme) 3.0)
+                                            :textAlign "center"}
+                       :button         #js {:textAlign "left"
+                                            :width     200}
+                       :fab            #js {:margin "0 auto"}
+                       :now-playing    #js {}
+                       :artist         #js {:color "gray"}
+                       :spotify-button #js {:backgroundColor "#1DB954"
+                                            :color           "white"
+                                            :fontWeight      900
+                                            :border          "none"
+                                            :borderRadius    "100px"}}))))
 
 (defn classname
   [classes classnames]
@@ -297,12 +303,12 @@
 
 (defn redirect-button
   [{:keys [classes]}]
-  (RE Button {:className (:spotify-button classes)
-              :color "primary"
-              :variant "contained"
-              :onClick (fn []
-                         (spotify/redirect "ff53948d58f1491baa6169d34bc4179a"))}
-      "Login to Spotify"))
+  (RE Button {:className        (:spotify-button classes)
+              :variant          "contained"
+              :disableElevation true
+              :startIcon        (RE SvgIcon {:style #js {:background "url('https://api.iconify.design/mdi-spotify.svg?color=%23FFFFFF') no-repeat center center / contain"}})
+              :onClick          #(spotify/redirect "ff53948d58f1491baa6169d34bc4179a")}
+      "Log into Spotify"))
 
 (defn app
   []
