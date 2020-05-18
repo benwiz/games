@@ -23,7 +23,7 @@ const OPTIONS = [{location: "Beach", roles: ["Beach Waitress", "Kite Surfer", "L
                  {location: "Airplane", roles: ["First Class Passenger", "Air Marshal", "Mechanic", "Flight Attendant", "Co-Pilot", "Captain", "Economy Class Passenger"]},
                  {location: "Passenger Train", roles: ["Mechanic", "Border Patrol", "Train Attendant", "Restaurant Chef", "Train Driver", "Stoker", "Passenger"]},
                  {location: "Submarine", roles: ["Cook", "Commander", "Sonar Technician", "Eloctronics Technician", "Radioman", "Navigator", "Sailor"]},
-                 {location: "Pirate Ship", roles: ["Cook", "Slave", "Cannoneer", "Tied Up Prisoner", "Cabin Boy", "Brave Captain", "Sailor"]},
+                 {location: "Pirate Ship", roles: ["Cook", "Deckhand", "Cannoneer", "Prisoner", "Cabin Boy", "Captain", "Sailor"]},
                  {location: "Cathedral", roles: ["Priest", "Beggar", "Sinner", "Tourist", "Sponsor", "Chorister", "Parishioner"]},
                  // {location: "Crusader Army", roles: ["Monk", "Imprision Saracen (Roman-era Arab/Muslim)", "Servant", "Bishop", "Squire", "Archer", "Knight"]},
                  {location: "Cemetery", roles: ["Priest", "Grave Robber", "Poet", "Mourner", "Gatekeeper", "Dead Person", "Relative", "Flower Seller", "Grave Digger", "Goth Girl/Boy"]},
@@ -102,12 +102,13 @@ const locationLabel = document.querySelector('#location-label');
 const roleLabel = document.querySelector('#role-label');
 
 const selectLocationAndRole = () => {
-    const pack = shuffle(OPTIONS.slice(), SEED)[0];
+    const seed = SEED * PLAYER_COUNT;
+    const pack = shuffle(OPTIONS.slice(), seed)[0];
     const location = pack.location;
     const index = PLAYER_ID_MAP[PLAYER];
-    let roles = shuffle(pack.roles.slice(), SEED).slice(0, PLAYER_COUNT - 1); // randomly keep PLAYER_COUNT - 1 roles (max 7)
+    let roles = shuffle(pack.roles.slice(), seed).slice(0, PLAYER_COUNT - 1); // randomly keep PLAYER_COUNT - 1 roles (max 7)
     roles.push('Spy'); // append spy
-    roles = shuffle(roles, SEED); // shuffle again to mix in spy
+    roles = shuffle(roles, seed); // shuffle again to mix in spy
     const role = roles[index];
     if (role === 'Spy') {
         locationLabel.innerHTML = '???';
