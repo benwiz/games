@@ -27,8 +27,14 @@
 
 ;; NOTE neither spotify play butter nor spotify web playback api work on mobile
 
+;; TOP
 ;; TODO refresh access token when appropriate
 
+;; MIDDLE
+;; TODO split button https://material-ui.com/components/button-group/#split-button
+;; change button to a green check after 200 back from spotify
+
+;; NOT IMPORTANT
 ;; TODO trigger ding on minute mark
 ;; TODO make buttons average color of album color, or maybe the dominant (mode) color
 ;; TODO very very simple audio reactive quil background, with checkbox to turn it on, default off
