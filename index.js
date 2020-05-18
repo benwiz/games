@@ -1,11 +1,11 @@
 const options = Boba.getDefaultOptions();
 console.log(options);
 
-var color1 = { r: 250, g: 150, b: 0, a: 0.2 };
+var color1 = { r: 248, g: 186, b: 10, a: 0.2 };
 options.vertexColors = [color1];
 options.edgeColors = [color1];
 
-var color2 = { r: 250, g: 150, b: 0, a: 0.05 };
+var color2 = { ...color1, a: 0.05 };
 options.shapeColors = [color2];
 options.drawShapes = false;
 
