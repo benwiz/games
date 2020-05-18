@@ -42,6 +42,7 @@
                                             :flexDirection "column"
                                             :margin        "0 auto"
                                             :width         300}
+                       :title          #js {:textAlign "center"}
                        :item           #js {:margin    ((:spacing theme) 3.0)
                                             :textAlign "center"}
                        :button         #js {:textAlign "left"
@@ -310,14 +311,21 @@
               :onClick          #(spotify/redirect "ff53948d58f1491baa6169d34bc4179a")}
       "Log into Spotify"))
 
+(defn login-page
+  [{:keys [classes]}]
+  (d/div {:className (:app classes)}
+         (d/h2 {:className (:title classes)}
+               "Power Hour")
+         (CE redirect-button {:classes classes})))
+
 (defn app
   []
   ;; Log into spotify so that full songs can be played through iFrame and get access token for api use.
   (let [classes       (->clj (styles))
         spotify-token (spotify/token)]
     (if-not spotify-token
-      ;; Redirect
-      (CE redirect-button {:classes classes})
+      ;; Log in to Spotify page
+      (CE login-page {:classes classes})
       ;; Main app
       (let [[interval setShotInterval]     (react/useState 60)
             [length setLength]             (react/useState 3600)
