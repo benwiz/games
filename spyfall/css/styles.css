@@ -47,19 +47,19 @@ body {
 }
 
 .e {
-    background-color: yellow;
+    background-color:  cyan;
 }
 
 .f {
- n   background-color: cyan;
-}
-
-.g {
     background-color: magenta;
 }
 
+.g {
+    background-color: yellow;
+}
+
 .h {
-    background-color: blanchedalmond;
+    background-color: black;
 }
 
 .scratch {

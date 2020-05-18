@@ -341,8 +341,16 @@ seedInput.addEventListener('change', updateSeed);
 
 // Number of players
 const updatePlayerCount = (e) => {
-    const playerCount = e.target.value;
-    PLAYER_COUNT = parseInt(playerCount);
+    const maxCount = 8;
+    const playerCount = parseInt(e.target.value);
+    PLAYER_COUNT = Math.min(maxCount, playerCount);
+
+    if (playerCount > maxCount) {
+        e.target.value = maxCount;
+    }
+    if (PLAYER_COUNT) {
+        colorPicker.querySelector('h4').classList.remove('hidden');
+    }
     render();
 };
 const playerCountInput = document.querySelector('#player-count');
