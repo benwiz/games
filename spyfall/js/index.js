@@ -144,6 +144,7 @@ const populateLocationsList = (options) => {
     };
 };
 
+const backButton = document.querySelector('#back-button');
 const numPlayers = document.querySelector('#num-players');
 const colorPicker = document.querySelector('#color-picker');
 const confirmColors = document.querySelector('#confirm-colors');
@@ -155,6 +156,7 @@ const playerColor = game.querySelector('#player-color');
 const render = () => {
     if (PLAYER_COUNT && PLAYER && !CONFIRMED_COLOR) {
         // Second Stage
+        backButton.classList.remove('hidden');
         numPlayers.classList.add('hidden');
         colorPicker.classList.add('hidden');
         confirmColors.classList.remove('hidden');
@@ -166,6 +168,7 @@ const render = () => {
         document.querySelector('#error').innerHTML = "";
     } else if (PLAYER_COUNT && !PLAYER && !CONFIRMED_COLOR) {
         // First Stage
+        backButton.classList.add('hidden');
         numPlayers.classList.remove('hidden');
         colorPicker.classList.remove('hidden');
         confirmColors.classList.add('hidden');
@@ -276,6 +279,7 @@ const render = () => {
         }
     } else if (PLAYER_COUNT && PLAYER && CONFIRMED_COLOR) {
         // Stage Three
+        backButton.classList.remove('hidden');
         numPlayers.classList.add('hidden');
         colorPicker.classList.add('hidden');
         confirmColors.classList.add('hidden');
