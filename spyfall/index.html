@@ -22,55 +22,57 @@
   </head>
 
   <body>
-    <h1>Spyfall</h1>
-    <p id="back-button" class="button hidden">< start over</p>
+    <div>
+      <h1>Spyfall</h1>
+      <p id="back-button" class="button hidden">< start over</p>
 
-    <div id="game-seed">
-      <h4>Game ID (any number)</h4>
-      <input type="number" id="seed" name="seed" min="0" pattern="\d*" autocomplete="off">
-    </div>
-
-    <div id="num-players">
-      <h4>Number of Players (max 8)</h4>
-      <input type="number" id="player-count" name="seed" min="1" max="8" pattern="\d*" autocomplete="off">
-    </div>
-
-    <div id="color-picker">
-      <h4>First, pick your color</h4>
-      <div class="color-grid">
-        <div class="color-item a hidden"></div>
-        <div class="color-item b hidden"></div>
-        <div class="color-item c hidden"></div>
-        <div class="color-item d hidden"></div>
-        <div class="color-item e hidden"></div>
-        <div class="color-item f hidden"></div>
-        <div class="color-item g hidden"></div>
-        <div class="color-item h hidden"></div>
+      <div id="game-seed">
+        <h4>Game ID (any number)</h4>
+        <input type="number" id="seed" name="seed" min="0" pattern="\d*" autocomplete="off">
       </div>
-    </div>
 
-    <div id="confirm-colors" class="hidden">
-      <h4>Second, show everyone your color. Confirm everyone has a different color.</h4>
-      <h5><u>Click here to continue</u></h5>
-      <div class="color-item-confirm"></div>
-    </div>
-
-    <div id="game" class="hidden">
-      <div id="player-color"></div>
-      <p><u>Location and Role</u> <span id="hide-show-button" class="button">(hide)</span></p>
-      <div id="location-and-role">
-        <p><span><b>Location:</b> </span><span id="location-label"></span></p>
-        <p><span><b>Role:</b> </span><span id="role-label"></span></p>
+      <div id="num-players">
+        <h4>Number of Players (max 8)</h4>
+        <input type="number" id="player-count" name="seed" min="1" max="8" pattern="\d*" autocomplete="off">
       </div>
-      <div id="locations-list"></div>
-    </div>
 
-    <div id="error"></div>
+      <div id="color-picker">
+        <h4>First, pick your color</h4>
+        <div class="color-grid">
+          <div class="color-item a hidden"></div>
+          <div class="color-item b hidden"></div>
+          <div class="color-item c hidden"></div>
+          <div class="color-item d hidden"></div>
+          <div class="color-item e hidden"></div>
+          <div class="color-item f hidden"></div>
+          <div class="color-item g hidden"></div>
+          <div class="color-item h hidden"></div>
+        </div>
+      </div>
 
-    <div id="links">
-      <div>
-        <a href="https://benwiz.io/"><i class="fas fa-home"></i></a>
-        <a href="https://github.com/benwiz/games/"><i class="fab fa-github"></i></a>
+      <div id="confirm-colors" class="hidden">
+        <h4>Second, show everyone your color. Confirm everyone has a different color.</h4>
+        <h5><u>Click here to continue</u></h5>
+        <div class="color-item-confirm"></div>
+      </div>
+
+      <div id="game" class="hidden">
+        <div id="player-color"></div>
+        <p><u>Location and Role</u> <span id="hide-show-button" class="button">(hide)</span></p>
+        <div id="location-and-role">
+          <p><span><b>Location:</b> </span><span id="location-label"></span></p>
+          <p><span><b>Role:</b> </span><span id="role-label"></span></p>
+        </div>
+        <div id="locations-list"></div>
+      </div>
+
+      <div id="error"></div>
+
+      <div id="links">
+        <div>
+          <a href="https://benwiz.io/"><i class="fas fa-home"></i></a>
+          <a href="https://github.com/benwiz/games/"><i class="fab fa-github"></i></a>
+        </div>
       </div>
     </div>
 
