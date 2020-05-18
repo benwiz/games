@@ -22,12 +22,12 @@
   </head>
 
   <body>
-    <div>
+    <div id="wrapper">
       <h1>Spyfall</h1>
       <p id="back-button" class="button hidden">< start over</p>
 
       <div id="game-seed">
-        <h4>Game ID (any number)</h4>
+        <h4>Room Number (any number)</h4>
         <input type="number" id="seed" name="seed" min="0" pattern="\d*" autocomplete="off">
       </div>
 
@@ -51,8 +51,8 @@
       </div>
 
       <div id="confirm-colors" class="hidden">
-        <h4>Second, show everyone your color. Confirm everyone has a different color.</h4>
-        <h5><u>Click here to continue</u></h5>
+        <h4>Confirm everyone has a different color.</h4>
+        <button class="continue-button">Continue ></button>
         <div class="color-item-confirm"></div>
       </div>
 

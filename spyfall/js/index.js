@@ -317,7 +317,7 @@ document.querySelectorAll('.color-item').forEach((elem) => {
 });
 
 // Confirm button
-document.querySelector('#confirm-colors > h5').addEventListener('click', (_e) => {
+document.querySelector('#confirm-colors > button').addEventListener('click', (_e) => {
     CONFIRMED_COLOR = true;
     render();
 });
