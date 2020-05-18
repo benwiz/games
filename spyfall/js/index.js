@@ -118,10 +118,8 @@ const selectLocationAndRole = () => {
 };
 
 const populateLocationsList = (options) => {
-    // TODO turn #locations-list into a flexbox col of flexbox rows with items in row being space apart
     const locationsList = document.querySelector('#locations-list');
     const locations = options.map(option => option.location).sort();
-    // const height = 20;
     for (let i = 0; i < locations.length; i += 2) {
         const locationsWrapper = document.createElement('div');
         locationsWrapper.style.display = 'flex';
@@ -134,16 +132,16 @@ const populateLocationsList = (options) => {
         location1.innerHTML = loc1;
         locationsWrapper.appendChild(location1);
 
-        const location2 = document.createElement('span');
-        // location2.style.backgroundColor = 'red';
-        location2.style.textAlign = 'right';
-        location2.classList.add('location-item');
-        location2.innerHTML = loc2;
-        locationsWrapper.appendChild(location2);
+        if (i + 1 < locations.length) {
+            const location2 = document.createElement('span');
+            location2.style.textAlign = 'right';
+            location2.classList.add('location-item');
+            location2.innerHTML = loc2;
+            locationsWrapper.appendChild(location2);
+        }
 
         locationsList.appendChild(locationsWrapper);
     };
-    // locationsList.style.height = height / 2 * locations.length + 'px'; // this is janky pt. 2, this is the reason for janky pt. 1
 };
 
 const numPlayers = document.querySelector('#num-players');
