@@ -28,7 +28,6 @@
 ;; NOTE neither spotify play butter nor spotify web playback api work on mobile
 
 ;; TODO refresh access token when appropriate
-;; TODO better login screen (button styling and power hour title)
 
 ;; TODO trigger ding on minute mark
 ;; TODO make buttons average color of album color, or maybe the dominant (mode) color
@@ -171,7 +170,7 @@
                   (RE IconButton {:className "select-help-button"
                                       :size      "small"
                                       :onClick   (fn []
-                                                   (js/alert "This app is just a remote for Spotify. Open the Spotify app on this device or another device then select it from the list. If your device is not on the list, double check that the app is open, if it still isn't there then that speaker (e.g. Sonos) cannot be controlled from Spotify's Web API."))}
+                                                   (js/alert "This app is just a remote for Spotify. Open the Spotify app on this device or another device then select it from the list."))}
                           (RE HelpOutlineIcon {:fontSize "inherit"}))))))
 
 (defn playlists
