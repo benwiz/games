@@ -98,14 +98,14 @@ u {
 
 #game-seed > input,
 #num-players > input {
-    width: 100px;
+    width: 80px;
     border: 1px solid black;
     background-color: white;
     color: black;
     padding: 14px 28px;
     font-size: 16px;
     cursor: pointer;
-    border-radius: 100px;
+    /* border-radius: 100px; */
 }
 
 #game {
