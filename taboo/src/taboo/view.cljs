@@ -20,6 +20,8 @@
    [goog.string.format]
    [taboo.words :as w]))
 
+;; TODO !!! score keeping
+;; TODO !!! reset timer button
 ;; TODO can I do a floating, arrow down to show to scroll on the review panel?
 ;; TODO rotate cards to it looks like a stack
 ;; TODO after rotating cards, visually prepare next card when swiping top card so it is vertical and easy to read
