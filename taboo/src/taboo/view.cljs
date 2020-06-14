@@ -5,12 +5,15 @@
    ["@material-ui/core/Card" :default Card]
    ["@material-ui/core/CardContent" :default CardContent]
    ["@material-ui/core/CardHeader" :default CardHeader]
+   ["@material-ui/core/IconButton" :default IconButton]
    ["@material-ui/core/styles/makeStyles" :default makeStyles]
+   ["@material-ui/icons/Add" :default AddIcon]
    ["@material-ui/icons/Check" :default CheckIcon]
    ["@material-ui/icons/Clear" :default ClearIcon]
    ["@material-ui/icons/FastForward" :default FastForwardIcon]
    ["@material-ui/icons/FastRewind" :default FastRewindIcon]
    ["@material-ui/icons/Redo" :default RedoIcon]
+   ["@material-ui/icons/Remove" :default RemoveIcon]
    ["react" :as react]
    [cljs-bean.core :refer [->clj]]
    [clojure.string :as str]
@@ -18,8 +21,8 @@
    [crinkle.dom :as d]
    [goog.string :as gstr]
    [goog.string.format]
-   [taboo.words :as w]))
-
+   [taboo.words :as w])
+)
 ;; TODO !!! score keeping
 ;; TODO !!! reset timer button
 ;; TODO can I do a floating, arrow down to show to scroll on the review panel?
@@ -43,8 +46,16 @@
                       next-button-height 60
                       next-button-margin ((:spacing theme) 1.0)]
                   #js {:app          #js {:fontFamily    "'Walter Turncoat', 'Roboto', sans-serif" ;; , cursive (phone was making cursive weird but may have been bad import)
-                                          :dispaly       "flex"
-                                          :flexDirection "column"}
+                                          ;; :dispaly       "flex"
+                                          ;; :flexDirection "column"
+                                          }
+                       ;; :game         #js {:flex-grow 10}
+                       :scores         #js {:position        "absolute"
+                                            :bottom          100
+                                            :textAlign       "center"
+                                            :width           "100%"}
+                       :score        #js {:margin ((:spacing theme) 1.0)}
+                       :score-span   #js {:margin ((:spacing theme) 0.5)}
                        :deck         #js {:marginTop ((:spacing theme) 4.0)
                                           :width     card-width
                                           :height    card-height}
@@ -267,8 +278,25 @@
                       :extra-classes (when (zero? timer) (:invisible classes))
                       :timer         timer}))))
 
+(defn score
+  [{:keys [classes]}]
+  (let [[score setScore] (react/useState 0)]
+    (d/span {:className (:score classes)}
+            (RE IconButton {:onClick #(setScore dec)}
+                (RE RemoveIcon nil))
+            (d/span {:className (:score-span classes)} score)
+            (RE IconButton {:onClick #(setScore inc)}
+                (RE AddIcon nil)))))
+
+(defn scores
+  [{:keys [classes]}]
+  (d/div {:className (:scores classes)}
+         (CE score {:classes classes})
+         (CE score {:classes classes})))
+
 (defn app
   []
   (let [classes (->clj (styles))]
     (d/div {:className (:app classes)}
-           (CE game {:classes classes}))))
+           (CE game {:classes classes})
+           (CE scores {:classes classes}))))
