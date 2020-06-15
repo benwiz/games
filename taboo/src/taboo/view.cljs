@@ -51,7 +51,7 @@
                                           }
                        ;; :game         #js {:flex-grow 10}
                        :scores         #js {:position        "absolute"
-                                            :bottom          100
+                                            :bottom          50
                                             :textAlign       "center"
                                             :width           "100%"}
                        :score        #js {:margin ((:spacing theme) 1.0)}
