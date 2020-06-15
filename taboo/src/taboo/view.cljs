@@ -54,7 +54,8 @@
                                             :bottom          50
                                             :textAlign       "center"
                                             :width           "100%"}
-                       :score        #js {:margin ((:spacing theme) 1.0)}
+                       :score        #js {:margin  ((:spacing theme) 1.0)
+                                          :padding ((:spacing theme) 1.0)}
                        :score-span   #js {:margin ((:spacing theme) 0.5)}
                        :deck         #js {:marginTop ((:spacing theme) 4.0)
                                           :width     card-width
@@ -97,6 +98,8 @@
                        :purple         #js {:backgroundColor "#8e2dfc"}
                        :green          #js {:backgroundColor "#27c4a8"}
                        :blue           #js {:backgroundColor "dodgerblue"}
+                       :pale-purple    #js {:backgroundColor "#e4cffc"}
+                       :pale-green     #js {:backgroundColor "#d2fcf5"}
                        :front          #js {:zIndex -1}
                        :clock          #js {:fontFamily "'Roboto Mono', monospace"
                                             :textAlign  "center"
@@ -279,9 +282,9 @@
                       :timer         timer}))))
 
 (defn score
-  [{:keys [classes]}]
+  [{:keys [classes color]}]
   (let [[score setScore] (react/useState 0)]
-    (d/span {:className (:score classes)}
+    (d/span {:className (classname classes [:score color])}
             (RE IconButton {:onClick #(setScore dec)}
                 (RE RemoveIcon nil))
             (d/span {:className (:score-span classes)} score)
@@ -291,8 +294,10 @@
 (defn scores
   [{:keys [classes]}]
   (d/div {:className (:scores classes)}
-         (CE score {:classes classes})
-         (CE score {:classes classes})))
+         (CE score {:classes classes
+                    :color   :pale-purple})
+         (CE score {:classes classes
+                    :color   :pale-green})))
 
 (defn app
   []
