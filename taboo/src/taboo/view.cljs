@@ -237,7 +237,7 @@
   (let [game-seconds              (as-> (-> (js/URLSearchParams. js/window.location.search) (.get "t") js/parseInt)
                                       custom-game-length
                                     (if (js/isNaN custom-game-length)
-                                      21
+                                      61
                                       custom-game-length))
         excess                    5
         [t setT]                  (react/useState 0)
