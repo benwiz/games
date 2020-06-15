@@ -56,7 +56,8 @@
                                             :width           "100%"}
                        :score        #js {:margin  ((:spacing theme) 1.0)
                                           :padding ((:spacing theme) 1.0)}
-                       :score-span   #js {:margin ((:spacing theme) 0.5)}
+                       :score-span   #js {:margin ((:spacing theme) 0.5)
+                                          :fontWeight "bolder"}
                        :deck         #js {:marginTop ((:spacing theme) 4.0)
                                           :width     card-width
                                           :height    card-height}
