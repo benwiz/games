@@ -23,8 +23,10 @@
    [goog.string.format]
    [taboo.words :as w])
 )
-;; TODO !!! score keeping
+
 ;; TODO !!! reset timer button
+;; FIXME hide score keeping during gameplay. it doesn't show in the beginning but that actually works out for the best.
+;; TODO score keeping should not use absolute position class
 ;; TODO can I do a floating, arrow down to show to scroll on the review panel?
 ;; TODO rotate cards to it looks like a stack
 ;; TODO after rotating cards, visually prepare next card when swiping top card so it is vertical and easy to read
@@ -211,12 +213,31 @@
            (d/span {:className (:clock-span classes)}
                    (str minutes ":" (gstr/format "%02d" seconds))))))
 
+(defn score
+  [{:keys [classes color]}]
+  (let [[score setScore] (react/useState 0)]
+    (d/span {:className (classname classes [:score color])}
+            (RE IconButton {:onClick #(setScore dec)}
+                (RE RemoveIcon nil))
+            (d/span {:className (:score-span classes)} score)
+            (RE IconButton {:onClick #(setScore inc)}
+                (RE AddIcon nil)))))
+
+(defn scores
+  [{:keys [classes reviewing?]}]
+  (when-not reviewing?
+    (d/div {:className (:scores classes)}
+           (CE score {:classes classes
+                      :color   :pale-purple})
+           (CE score {:classes classes
+                      :color   :pale-green}))))
+
 (defn game
   [{:keys [classes]}]
   (let [game-seconds              (as-> (-> (js/URLSearchParams. js/window.location.search) (.get "t") js/parseInt)
                                       custom-game-length
                                     (if (js/isNaN custom-game-length)
-                                      61
+                                      21
                                       custom-game-length))
         excess                    5
         [t setT]                  (react/useState 0)
@@ -280,29 +301,12 @@
                      :setT          setT})
            (CE clock {:classes       classes
                       :extra-classes (when (zero? timer) (:invisible classes))
-                      :timer         timer}))))
-
-(defn score
-  [{:keys [classes color]}]
-  (let [[score setScore] (react/useState 0)]
-    (d/span {:className (classname classes [:score color])}
-            (RE IconButton {:onClick #(setScore dec)}
-                (RE RemoveIcon nil))
-            (d/span {:className (:score-span classes)} score)
-            (RE IconButton {:onClick #(setScore inc)}
-                (RE AddIcon nil)))))
-
-(defn scores
-  [{:keys [classes]}]
-  (d/div {:className (:scores classes)}
-         (CE score {:classes classes
-                    :color   :pale-purple})
-         (CE score {:classes classes
-                    :color   :pale-green})))
+                      :timer         timer})
+           (CE scores {:classes    classes
+                       :reviewing? reviewing?}))))
 
 (defn app
   []
   (let [classes (->clj (styles))]
     (d/div {:className (:app classes)}
-           (CE game {:classes classes})
-           (CE scores {:classes classes}))))
+           (CE game {:classes classes}))))
