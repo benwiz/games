@@ -10,6 +10,6 @@
                       :devtools          {:before-load taboo.core/stop
                                           :after-load  taboo.core/start
                                           :repl-pprint true
-                                          :http-root   "docs"
+                                          :http-root   "./"
                                           :http-port   8700
                                           :preloads    [devtools.preload]}}}}

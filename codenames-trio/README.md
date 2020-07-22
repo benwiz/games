@@ -1,8 +1,16 @@
 # codenames-trio
 
-Three player cooperative maps for Codenames
+## What
 
-## How it works
+Three player cooperative key cards for Codenames.
+
+## What this is not
+
+This is not a full Codenames implementation. It is just the key card. You are expected to have the actual game and use the physical target cards.
+
+## How
+
+Vanilla JavaScript.
 
 Hard coded the base template. Shuffle the rows. Each row represents a card.
 

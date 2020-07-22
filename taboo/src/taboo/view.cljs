@@ -5,12 +5,15 @@
    ["@material-ui/core/Card" :default Card]
    ["@material-ui/core/CardContent" :default CardContent]
    ["@material-ui/core/CardHeader" :default CardHeader]
+   ["@material-ui/core/IconButton" :default IconButton]
    ["@material-ui/core/styles/makeStyles" :default makeStyles]
+   ["@material-ui/icons/Add" :default AddIcon]
    ["@material-ui/icons/Check" :default CheckIcon]
    ["@material-ui/icons/Clear" :default ClearIcon]
    ["@material-ui/icons/FastForward" :default FastForwardIcon]
    ["@material-ui/icons/FastRewind" :default FastRewindIcon]
    ["@material-ui/icons/Redo" :default RedoIcon]
+   ["@material-ui/icons/Remove" :default RemoveIcon]
    ["react" :as react]
    [cljs-bean.core :refer [->clj]]
    [clojure.string :as str]
@@ -18,8 +21,12 @@
    [crinkle.dom :as d]
    [goog.string :as gstr]
    [goog.string.format]
-   [taboo.words :as w]))
+   [taboo.words :as w])
+)
 
+;; TODO !!! reset timer button
+;; FIXME hide score keeping during gameplay. it doesn't show in the beginning but that actually works out for the best.
+;; TODO score keeping should not use absolute position class
 ;; TODO can I do a floating, arrow down to show to scroll on the review panel?
 ;; TODO rotate cards to it looks like a stack
 ;; TODO after rotating cards, visually prepare next card when swiping top card so it is vertical and easy to read
@@ -41,8 +48,18 @@
                       next-button-height 60
                       next-button-margin ((:spacing theme) 1.0)]
                   #js {:app          #js {:fontFamily    "'Walter Turncoat', 'Roboto', sans-serif" ;; , cursive (phone was making cursive weird but may have been bad import)
-                                          :dispaly       "flex"
-                                          :flexDirection "column"}
+                                          ;; :dispaly       "flex"
+                                          ;; :flexDirection "column"
+                                          }
+                       ;; :game         #js {:flex-grow 10}
+                       :scores         #js {:position        "absolute"
+                                            :bottom          4
+                                            :textAlign       "center"
+                                            :width           "100%"}
+                       :score        #js {:margin  ((:spacing theme) 1.0)
+                                          :padding ((:spacing theme) 1.0)}
+                       :score-span   #js {:margin ((:spacing theme) 0.5)
+                                          :fontWeight "bolder"}
                        :deck         #js {:marginTop ((:spacing theme) 4.0)
                                           :width     card-width
                                           :height    card-height}
@@ -84,6 +101,8 @@
                        :purple         #js {:backgroundColor "#8e2dfc"}
                        :green          #js {:backgroundColor "#27c4a8"}
                        :blue           #js {:backgroundColor "dodgerblue"}
+                       :pale-purple    #js {:backgroundColor "#e4cffc"}
+                       :pale-green     #js {:backgroundColor "#d2fcf5"}
                        :front          #js {:zIndex -1}
                        :clock          #js {:fontFamily "'Roboto Mono', monospace"
                                             :textAlign  "center"
@@ -194,6 +213,25 @@
            (d/span {:className (:clock-span classes)}
                    (str minutes ":" (gstr/format "%02d" seconds))))))
 
+(defn score
+  [{:keys [classes color]}]
+  (let [[score setScore] (react/useState 0)]
+    (d/span {:className (classname classes [:score color])}
+            (RE IconButton {:onClick #(setScore dec)}
+                (RE RemoveIcon nil))
+            (d/span {:className (:score-span classes)} score)
+            (RE IconButton {:onClick #(setScore inc)}
+                (RE AddIcon nil)))))
+
+(defn scores
+  [{:keys [classes reviewing?]}]
+  (when-not reviewing?
+    (d/div {:className (:scores classes)}
+           (CE score {:classes classes
+                      :color   :pale-purple})
+           (CE score {:classes classes
+                      :color   :pale-green}))))
+
 (defn game
   [{:keys [classes]}]
   (let [game-seconds              (as-> (-> (js/URLSearchParams. js/window.location.search) (.get "t") js/parseInt)
@@ -263,7 +301,9 @@
                      :setT          setT})
            (CE clock {:classes       classes
                       :extra-classes (when (zero? timer) (:invisible classes))
-                      :timer         timer}))))
+                      :timer         timer})
+           (CE scores {:classes    classes
+                       :reviewing? reviewing?}))))
 
 (defn app
   []
