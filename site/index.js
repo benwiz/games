@@ -1,22 +1,43 @@
-const options = Boba.getDefaultOptions();
-console.log(options);
+const bobaOptions = Boba.getDefaultOptions();
 
-var color1 = { r: 248, g: 186, b: 10, a: 0.2 };
-options.vertexColors = [color1];
-options.edgeColors = [color1];
+// Vertex configs
+bobaOptions.numVertices = 40;
+bobaOptions.drawVertices = true;
+bobaOptions.vertexMinSize = 8;
+bobaOptions.vertexMaxSize = 16;
+bobaOptions.vertexMinSpeed = 0.2;
+bobaOptions.vertexMaxSpeed = 1.5;
+bobaOptions.vertexColors = [
+  {
+    r: 255,
+    g: 157,
+    b: 30,
+    a: 0.18,
+  },
+];
 
-var color2 = { ...color1, a: 0.05 };
-options.shapeColors = [color2];
-options.drawShapes = false;
+// Edge configs
+bobaOptions.numNeighbors = 2;
+bobaOptions.drawEdges = true;
+bobaOptions.edgeColors = [
+  {
+    r: 255,
+    g: 157,
+    b: 30,
+    a: 0.18,
+  },
+];
 
-options.vertexMaxSpeed = 1.0;
-options.vertexMinSpeed = 0.2;
+// Shape configs
+bobaOptions.drawShapes = false;
+bobaOptions.shapeColors = [
+  {
+    r: 255,
+    g: 157,
+    b: 30,
+    a: 0.06,
+  },
+];
 
-Boba.start(options);
-
-
-// Lol, for Marg
-if (window.location.host == 'games.benwiz.io') {
-    const powerhour = document.querySelector('#power-hour');
-    powerhour.style.display = 'none';
-}
+// Start the animation
+Boba.start(bobaOptions);

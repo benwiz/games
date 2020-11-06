@@ -4,57 +4,31 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Games | benwiz</title>
+    <meta name="description" content="List of games: Spyfall, Taboo, Codenames Trio, Power Hour">
+    <title>Games | Ben Wiz</title>
 
+    <link href="https://fonts.googleapis.com/css2?family=Dosis:wght@300&display=swap" rel="stylesheet">
+    <link rel="shortcut icon" href="images/hat.png" type="image/x-icon">
+    <link rel="stylesheet" type="text/css" href="index.css">
     <script src="https://unpkg.com/@benwiz/boba.js@latest/dist/bundle.js"></script>
-    <link href="https://cdn.jsdelivr.net/npm/tailwindcss/dist/tailwind.min.css" rel="stylesheet">
-
-    <!-- Global site tag (gtag.js) - Google Analytics -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-131129805-3"></script>
-    <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-      gtag('config', 'UA-131129805-3');
-    </script>
-
   </head>
   <body>
+    <div id="container">
+      <h1>Games</h1>
 
-    <!-- NOTE would be better to use anchor tags but i couldn't get the buttons to be same width without button button tags -->
+      <a href="/spyfall/">
+        <button> Spyfall </button>
+      </a>
+      <a href="/taboo/">
+        <button> Taboo </button>
+      </a>
+      <a href="/powerhour/">
+        <button> Power Hour </button>
+      </a>
+      <a href="/codenames-trio/">
+        <button> Codenames Trio </button>
+      </a>
 
-    <div class="m-auto mt-4 flex flex-col items-center w-64 max-w-xs">
-      <div class="text-center px-4 py-2 m-2">
-        <span class="text-2xl">
-          Games
-        </span>
-      </div>
-      <div class="text-center px-4 py-2 m-2 w-full">
-        <button class="w-full shadow bg-blue-500 hover:bg-blue-400 text-white font-bold py-2 px-4 border-b-4 border-blue-700 hover:border-blue-500 rounded"
-                onclick="location.href='/spyfall/'">
-          Spyfall
-        </button>
-      </div>
-      <div class="text-center px-4 py-2 m-2 w-full">
-        <button class="w-full shadow bg-blue-500 hover:bg-blue-400 text-white font-bold py-2 px-4 border-b-4 border-blue-700 hover:border-blue-500 rounded"
-                onclick="location.href='/taboo/'">
-          Taboo
-        </button>
-      </div>
-      <div class="text-center px-4 py-2 m-2 w-full">
-        <button class="w-full shadow bg-blue-500 hover:bg-blue-400 text-white font-bold py-2 px-4 border-b-4 border-blue-700 hover:border-blue-500 rounded"
-                onclick="location.href='/codenames-trio/'">
-          Codenames Trio
-        </a>
-      </div>
-      <div id="power-hour" class="text-center px-4 py-2 m-2 w-full">
-        <button class="w-full shadow bg-blue-500 hover:bg-blue-400 text-white font-bold py-2 px-4 border-b-4 border-blue-700 hover:border-blue-500 rounded"
-                onclick="location.href='/powerhour/'">
-          Power Hour
-        </a>
-      </div>
-    </div>
-
-  <script src="./index.js"></script>
+      <script type="text/javascript" src="index.js"></script>
   </body>
 </html>
