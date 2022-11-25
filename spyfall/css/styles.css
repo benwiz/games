@@ -128,9 +128,7 @@ u {
 }
 
 .location-item {
-    /* margin: 15px 0px 15px 5px; */
     cursor: pointer;
-    width: 50%;
 }
 
 #error {

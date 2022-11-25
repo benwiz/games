@@ -121,27 +121,29 @@ const selectLocationAndRole = () => {
 const populateLocationsList = (options) => {
     const locationsList = document.querySelector('#locations-list');
     const locations = options.map(option => option.location).sort();
-    for (let i = 0; i < locations.length; i += 2) {
-        const locationsWrapper = document.createElement('div');
-        locationsWrapper.style.display = 'flex';
-        locationsWrapper.style.justifyContent = 'space-between';
+    const half = Math.ceil(locations.length / 2);
+    const locations1 = locations.slice(0, half);
+    const locations2 = locations.slice(half);
+    const locationsTable = document.createElement('table');
+    const tableBody = document.createElement('tbody');
+    locationsTable.appendChild(tableBody);
+    locationsList.appendChild(locationsTable);
+    const ls = [locations1, locations2];
+    for (let i = 0; i < locations1.length; i += 1) {
+        const row = document.createElement('tr');
+        tableBody.appendChild(row);
 
-        const loc1 = locations[i];
-        const loc2 = locations[i+1];
-        const location1 = document.createElement('span');
-        location1.classList.add('location-item');
-        location1.innerHTML = loc1;
-        locationsWrapper.appendChild(location1);
-
-        if (i + 1 < locations.length) {
-            const location2 = document.createElement('span');
-            location2.style.textAlign = 'right';
-            location2.classList.add('location-item');
-            location2.innerHTML = loc2;
-            locationsWrapper.appendChild(location2);
+        for (var l of ls) {
+            const loc = l[i];
+            if (loc) {
+                const cell = document.createElement('td');
+                cell.innerHTML = loc;
+                cell.classList.add('location-item');
+                row.appendChild(cell);
+            }
         }
 
-        locationsList.appendChild(locationsWrapper);
+
     };
 };
 
