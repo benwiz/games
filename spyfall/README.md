@@ -27,6 +27,7 @@ Push to master
 
 ## To Do
 
+- Spyfall: "next" button, just make it a + for now
 - Feedback form for reporting bugs, bad locations/roles, and suggesting new locations/roles
   - probably just make it a mailto link with a template
 - "Easy mode" where there is a predefined subset of locations

@@ -98,6 +98,7 @@ const populateLocationsList = (options) => {
 const backButton = document.querySelector('#back-button');
 const rulesButton = document.querySelector('#rules-button');
 const numPlayers = document.querySelector('#num-players');
+const nextButton = document.querySelector('#next-button');
 const colorPicker = document.querySelector('#color-picker');
 const confirmColors = document.querySelector('#confirm-colors');
 const confirmColorItem = confirmColors.querySelector('.color-item-confirm');
@@ -108,9 +109,11 @@ const playerColor = game.querySelector('#player-color');
 const render = () => {
     if (PLAYER_COUNT && PLAYER && !CONFIRMED_COLOR) {
         // Second Stage
+        console.log('Stage 2');
         backButton.classList.remove('hidden');
         rulesButton.classList.remove('hidden');
         numPlayers.classList.add('hidden');
+        nextButton.classList.add('hidden');
         colorPicker.classList.add('hidden');
         confirmColors.classList.remove('hidden');
         confirmColorItem.className = 'color-item-confirm'; // this is breakable but gets the job done
@@ -121,9 +124,11 @@ const render = () => {
         document.querySelector('#error').innerHTML = "";
     } else if (PLAYER_COUNT && !PLAYER && !CONFIRMED_COLOR) {
         // First Stage
+        console.log('Stage 1');
         backButton.classList.add('hidden');
         rulesButton.classList.remove('hidden');
         numPlayers.classList.remove('hidden');
+        nextButton.classList.add('hidden');
         colorPicker.classList.remove('hidden');
         confirmColors.classList.add('hidden');
         game.classList.add('hidden');
@@ -233,9 +238,11 @@ const render = () => {
         }
     } else if (PLAYER_COUNT && PLAYER && CONFIRMED_COLOR) {
         // Stage Three
+        console.log('Stage 3');
         backButton.classList.remove('hidden');
         rulesButton.classList.add('hidden');
         numPlayers.classList.add('hidden');
+        nextButton.classList.remove('hidden');
         colorPicker.classList.add('hidden');
         confirmColors.classList.add('hidden');
         game.classList.remove('hidden');
