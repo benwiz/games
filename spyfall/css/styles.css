@@ -9,6 +9,20 @@ body {
     margin: 0 auto;
 }
 
+#buttons {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+#buttons > a {
+    text-decoration: none;
+}
+
+#buttons > a:hover {
+    text-decoration: underline;
+}
+
 .button {
     color: gray;
 }

@@ -27,8 +27,8 @@ Push to master
 
 ## To Do
 
-- List of all locations+roles at new route
 - Feedback form for reporting bugs, bad locations/roles, and suggesting new locations/roles
+  - probably just make it a mailto link with a template
 - "Easy mode" where there is a predefined subset of locations
 - "Hard mode" where locations are grouped into sets of 12 really similar locations (e.g. "stores" includes boutique, sports store, restaurant, fast food, etc.)
 - Next game button (maybe)
