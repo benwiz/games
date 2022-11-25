@@ -9,9 +9,9 @@ bobaOptions.vertexMinSpeed = 0.0001  * window.innerHeight;
 bobaOptions.vertexMaxSpeed = 0.001 * window.innerHeight;
 bobaOptions.vertexColors = [
   {
-    r: 255,
-    g: 157,
-    b: 30,
+    r: 30,
+    g: 144,
+    b: 255,
     a: 0.06,
   },
 ];
@@ -21,9 +21,9 @@ bobaOptions.numNeighbors = 2;
 bobaOptions.drawEdges = true;
 bobaOptions.edgeColors = [
   {
-    r: 255,
-    g: 157,
-    b: 30,
+    r: 30,
+    g: 144,
+    b: 255,
     a: 0.06,
   },
 ];
@@ -32,9 +32,9 @@ bobaOptions.edgeColors = [
 bobaOptions.drawShapes = false;
 bobaOptions.shapeColors = [
   {
-    r: 255,
-    g: 157,
-    b: 30,
+    r: 30,
+    g: 144,
+    b: 255,
     a: 0.005,
   },
 ];
